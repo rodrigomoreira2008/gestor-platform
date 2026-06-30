@@ -1,8 +1,11 @@
+using Gestor.Api;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddGestorGeneratedServices();
 
 var app = builder.Build();
 
