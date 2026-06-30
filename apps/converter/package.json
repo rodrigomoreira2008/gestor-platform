@@ -1,0 +1,22 @@
+{
+  "name": "@gestor/converter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "gestor-converter": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test dist/**/*.test.js",
+    "convert:dfm": "node dist/index.js"
+  },
+  "dependencies": {
+    "@gestor/dsl": "workspace:*",
+    "@gestor/parser": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "latest"
+  }
+}
