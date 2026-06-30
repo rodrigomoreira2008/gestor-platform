@@ -1,0 +1,21 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/workspace
+      - /workspace/node_modules
+    command: pnpm --filter @gestor/frontend dev
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    ports:
+      - "5000:8080"
+    volumes:
+      - .:/workspace
+    command: dotnet run --project apps/backend/Gestor.Api.csproj --urls http://0.0.0.0:8080
