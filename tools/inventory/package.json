@@ -1,0 +1,17 @@
+{
+  "name": "@gestor/inventory",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "gestor-inventory": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "echo \"No inventory tests yet\""
+  },
+  "devDependencies": {
+    "typescript": "latest"
+  }
+}
