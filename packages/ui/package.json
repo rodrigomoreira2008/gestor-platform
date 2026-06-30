@@ -1,0 +1,26 @@
+{
+  "name": "@gestor/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "echo \"No UI tests yet\""
+  },
+  "dependencies": {
+    "@gestor/dsl": "workspace:*",
+    "@mui/material": "latest",
+    "react": "latest"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "typescript": "latest"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "@mui/material": ">=5"
+  }
+}
