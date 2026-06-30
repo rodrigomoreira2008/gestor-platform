@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { basename, dirname, extname, resolve } from 'node:path';
+import { basename, dirname, extname, join, resolve } from 'node:path';
 import { parseGestorForm } from '@gestor/dsl';
-import { generateReactForm } from '@gestor/generator';
+import { generateDotNetCrud, generateReactForm } from '@gestor/generator';
 import { createMigrationModuleReport, dfmToGestorForm, parseDfm, parsePas } from '@gestor/parser';
 
 interface CliOptions {
   input?: string;
   output?: string;
   reactOutput?: string;
+  apiOutputDir?: string;
   pasInput?: string;
   dfmInput?: string;
   pasReportOutput?: string;
@@ -62,6 +63,10 @@ async function convertDfm(inputPath: string, options: CliOptions): Promise<void>
     console.log(`React gerado: ${reactOutputPath}`);
   }
 
+  if (options.apiOutputDir) {
+    await writeDotNetCrud(form, resolve(options.apiOutputDir));
+  }
+
   if (dfmResult.warnings.length > 0) {
     console.warn('Avisos:');
     for (const warning of dfmResult.warnings) console.warn(`- ${warning}`);
@@ -104,6 +109,34 @@ async function convertModule(options: CliOptions): Promise<void> {
   await writeFile(outputPath, JSON.stringify(report, null, options.pretty ? 2 : 0), 'utf8');
 
   console.log(`Relatório de módulo gerado: ${outputPath}`);
+
+  if (form && options.reactOutput) {
+    const reactOutputPath = resolve(options.reactOutput);
+    await mkdir(dirname(reactOutputPath), { recursive: true });
+    await writeFile(reactOutputPath, generateReactForm(form), 'utf8');
+    console.log(`React gerado: ${reactOutputPath}`);
+  }
+
+  if (form && options.apiOutputDir) {
+    await writeDotNetCrud(form, resolve(options.apiOutputDir));
+  }
+}
+
+async function writeDotNetCrud(form: ReturnType<typeof parseGestorForm>, outputDir: string): Promise<void> {
+  const files = generateDotNetCrud(form);
+  const baseName = files.entity.match(/public class (\w+)/)?.[1] ?? 'GeneratedEntity';
+
+  const targets = [
+    { path: join(outputDir, 'Entities', `${baseName}.cs`), content: files.entity },
+    { path: join(outputDir, 'DTO', `${baseName}Dto.cs`), content: files.dto },
+    { path: join(outputDir, 'Controllers', `${baseName}Controller.cs`), content: files.controller }
+  ];
+
+  for (const target of targets) {
+    await mkdir(dirname(target.path), { recursive: true });
+    await writeFile(target.path, target.content, 'utf8');
+    console.log(`API gerada: ${target.path}`);
+  }
 }
 
 function parseArgs(args: string[]): CliOptions {
@@ -142,6 +175,11 @@ function parseArgs(args: string[]): CliOptions {
       continue;
     }
 
+    if (arg === '--api-output-dir') {
+      options.apiOutputDir = args[++index];
+      continue;
+    }
+
     if (arg === '--pas-report-output') {
       options.pasReportOutput = args[++index];
       continue;
@@ -174,7 +212,7 @@ function defaultPasReportOutputPath(input: string): string {
 }
 
 function printUsage(): void {
-  console.log(`Uso:\n  gestor-converter --input CadastroPedidos.dfm --output CadastroPedidos.gestor.json --react-output CadastroPedidosPage.tsx\n  gestor-converter --input CadastroPedidos.pas --pas-report-output CadastroPedidos.pas-report.json\n  gestor-converter --dfm-input CadastroPedidos.dfm --pas-input CadastroPedidos.pas --module-report-output CadastroPedidos.migration-report.json\n\nOpções:\n  -i, --input             Caminho do arquivo .dfm ou .pas\n  --dfm-input             Caminho do arquivo .dfm para relatório consolidado\n  --pas-input             Caminho do arquivo .pas para relatório consolidado\n  --module-name           Nome do módulo no relatório consolidado\n  -o, --output            Caminho do arquivo gerado\n  --react-output          Caminho do componente React gerado para .dfm\n  --pas-report-output     Caminho do relatório técnico gerado para .pas\n  --module-report-output  Caminho do relatório consolidado de módulo\n  --compact               Gera JSON sem indentação`);
+  console.log(`Uso:\n  gestor-converter --input CadastroPedidos.dfm --output CadastroPedidos.gestor.json --react-output CadastroPedidosPage.tsx --api-output-dir ./backend\n  gestor-converter --input CadastroPedidos.pas --pas-report-output CadastroPedidos.pas-report.json\n  gestor-converter --dfm-input CadastroPedidos.dfm --pas-input CadastroPedidos.pas --module-report-output CadastroPedidos.migration-report.json\n\nOpções:\n  -i, --input             Caminho do arquivo .dfm ou .pas\n  --dfm-input             Caminho do arquivo .dfm para relatório consolidado\n  --pas-input             Caminho do arquivo .pas para relatório consolidado\n  --module-name           Nome do módulo no relatório consolidado\n  -o, --output            Caminho do arquivo gerado\n  --react-output          Caminho do componente React gerado para .dfm\n  --api-output-dir        Diretório base para arquivos .NET gerados\n  --pas-report-output     Caminho do relatório técnico gerado para .pas\n  --module-report-output  Caminho do relatório consolidado de módulo\n  --compact               Gera JSON sem indentação`);
 }
 
 main().catch((error: unknown) => {
