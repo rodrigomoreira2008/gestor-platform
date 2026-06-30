@@ -1,0 +1,65 @@
+{
+  "version": "0.1",
+  "entity": "frmcadastropedidos",
+  "title": "Cadastro de Pedidos",
+  "source": {
+    "dfm": "CadastroPedidos.sample.dfm"
+  },
+  "fields": [
+    {
+      "name": "pedido",
+      "label": "edtPedido",
+      "type": "integer",
+      "required": false,
+      "readOnly": true,
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "PEDIDO"
+    },
+    {
+      "name": "cliente",
+      "label": "edtCliente",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "CLIENTE"
+    },
+    {
+      "name": "data_locacao",
+      "label": "edtDataLocacao",
+      "type": "date",
+      "required": false,
+      "readOnly": false,
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "DATA_LOCACAO"
+    },
+    {
+      "name": "valor_total",
+      "label": "edtValorTotal",
+      "type": "money",
+      "required": false,
+      "readOnly": false,
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "VALOR_TOTAL"
+    },
+    {
+      "name": "observacao",
+      "label": "memoObservacao",
+      "type": "memo",
+      "required": false,
+      "readOnly": false,
+      "sourceComponent": "TDBMemo",
+      "sourceBinding": "OBSERVACAO"
+    },
+    {
+      "name": "griditens",
+      "label": "gridItens",
+      "type": "grid",
+      "required": false,
+      "readOnly": false,
+      "sourceComponent": "TDBGrid"
+    }
+  ],
+  "actions": [],
+  "notes": []
+}
