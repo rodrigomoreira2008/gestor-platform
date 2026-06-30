@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, basename, resolve } from 'node:path';
-import { dfmToGestorForm, parseDfm } from '@gestor/parser';
+import { basename, dirname, resolve } from 'node:path';
 import { parseGestorForm } from '@gestor/dsl';
+import { generateReactForm } from '@gestor/generator';
+import { dfmToGestorForm, parseDfm } from '@gestor/parser';
 
 interface CliOptions {
   input?: string;
   output?: string;
+  reactOutput?: string;
   pretty: boolean;
 }
 
@@ -21,7 +23,7 @@ async function main(): Promise<void> {
   }
 
   const inputPath = resolve(options.input);
-  const outputPath = resolve(options.output ?? defaultOutputPath(options.input));
+  const outputPath = resolve(options.output ?? defaultDslOutputPath(options.input));
 
   const content = await readFile(inputPath, 'utf8');
   const dfmResult = parseDfm(content);
@@ -31,6 +33,15 @@ async function main(): Promise<void> {
   await writeFile(outputPath, JSON.stringify(form, null, options.pretty ? 2 : 0), 'utf8');
 
   console.log(`DSL gerada: ${outputPath}`);
+
+  if (options.reactOutput) {
+    const reactOutputPath = resolve(options.reactOutput);
+    const reactCode = generateReactForm(form);
+    await mkdir(dirname(reactOutputPath), { recursive: true });
+    await writeFile(reactOutputPath, reactCode, 'utf8');
+    console.log(`React gerado: ${reactOutputPath}`);
+  }
+
   if (dfmResult.warnings.length > 0) {
     console.warn('Avisos:');
     for (const warning of dfmResult.warnings) console.warn(`- ${warning}`);
@@ -53,6 +64,11 @@ function parseArgs(args: string[]): CliOptions {
       continue;
     }
 
+    if (arg === '--react-output') {
+      options.reactOutput = args[++index];
+      continue;
+    }
+
     if (arg === '--compact') {
       options.pretty = false;
       continue;
@@ -66,12 +82,12 @@ function parseArgs(args: string[]): CliOptions {
   return options;
 }
 
-function defaultOutputPath(input: string): string {
+function defaultDslOutputPath(input: string): string {
   return input.replace(/\.dfm$/i, '.gestor.json');
 }
 
 function printUsage(): void {
-  console.log(`Uso:\n  gestor-converter --input CadastroPedidos.dfm --output CadastroPedidos.gestor.json\n\nOpções:\n  -i, --input     Caminho do arquivo .dfm\n  -o, --output    Caminho do arquivo DSL gerado\n  --compact       Gera JSON sem indentação`);
+  console.log(`Uso:\n  gestor-converter --input CadastroPedidos.dfm --output CadastroPedidos.gestor.json --react-output CadastroPedidosPage.tsx\n\nOpções:\n  -i, --input       Caminho do arquivo .dfm\n  -o, --output      Caminho do arquivo DSL gerado\n  --react-output    Caminho do componente React gerado\n  --compact         Gera JSON sem indentação`);
 }
 
 main().catch((error: unknown) => {
