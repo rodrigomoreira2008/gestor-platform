@@ -129,7 +129,10 @@ async function writeDotNetCrud(form: ReturnType<typeof parseGestorForm>, outputD
   const targets = [
     { path: join(outputDir, 'Entities', `${baseName}.cs`), content: files.entity },
     { path: join(outputDir, 'DTO', `${baseName}Dto.cs`), content: files.dto },
-    { path: join(outputDir, 'Controllers', `${baseName}Controller.cs`), content: files.controller }
+    { path: join(outputDir, 'Controllers', `${baseName}Controller.cs`), content: files.controller },
+    { path: join(outputDir, 'Services', `${baseName}Service.cs`), content: files.service },
+    { path: join(outputDir, 'Repositories', `${baseName}Repository.cs`), content: files.repository },
+    { path: join(outputDir, 'Validators', `${baseName}Validator.cs`), content: files.validator }
   ];
 
   for (const target of targets) {
