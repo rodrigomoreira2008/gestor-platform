@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@gestor/dsl": "workspace:*",
+    "@gestor/generator": "workspace:*",
     "@gestor/parser": "workspace:*"
   },
   "devDependencies": {
