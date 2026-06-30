@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { basename, dirname, resolve } from 'node:path';
+import { basename, dirname, extname, resolve } from 'node:path';
 import { parseGestorForm } from '@gestor/dsl';
 import { generateReactForm } from '@gestor/generator';
-import { dfmToGestorForm, parseDfm } from '@gestor/parser';
+import { dfmToGestorForm, parseDfm, parsePas } from '@gestor/parser';
 
 interface CliOptions {
   input?: string;
   output?: string;
   reactOutput?: string;
+  pasReportOutput?: string;
   pretty: boolean;
 }
 
@@ -23,8 +24,18 @@ async function main(): Promise<void> {
   }
 
   const inputPath = resolve(options.input);
-  const outputPath = resolve(options.output ?? defaultDslOutputPath(options.input));
+  const extension = extname(inputPath).toLowerCase();
 
+  if (extension === '.pas') {
+    await convertPas(inputPath, options);
+    return;
+  }
+
+  await convertDfm(inputPath, options);
+}
+
+async function convertDfm(inputPath: string, options: CliOptions): Promise<void> {
+  const outputPath = resolve(options.output ?? defaultDslOutputPath(inputPath));
   const content = await readFile(inputPath, 'utf8');
   const dfmResult = parseDfm(content);
   const form = parseGestorForm(dfmToGestorForm(dfmResult, basename(inputPath)));
@@ -48,6 +59,17 @@ async function main(): Promise<void> {
   }
 }
 
+async function convertPas(inputPath: string, options: CliOptions): Promise<void> {
+  const outputPath = resolve(options.pasReportOutput ?? options.output ?? defaultPasReportOutputPath(inputPath));
+  const content = await readFile(inputPath, 'utf8');
+  const report = parsePas(content);
+
+  await mkdir(dirname(outputPath), { recursive: true });
+  await writeFile(outputPath, JSON.stringify(report, null, options.pretty ? 2 : 0), 'utf8');
+
+  console.log(`Relatório PAS gerado: ${outputPath}`);
+}
+
 function parseArgs(args: string[]): CliOptions {
   const options: CliOptions = { pretty: true };
 
@@ -69,6 +91,11 @@ function parseArgs(args: string[]): CliOptions {
       continue;
     }
 
+    if (arg === '--pas-report-output') {
+      options.pasReportOutput = args[++index];
+      continue;
+    }
+
     if (arg === '--compact') {
       options.pretty = false;
       continue;
@@ -86,8 +113,12 @@ function defaultDslOutputPath(input: string): string {
   return input.replace(/\.dfm$/i, '.gestor.json');
 }
 
+function defaultPasReportOutputPath(input: string): string {
+  return input.replace(/\.pas$/i, '.pas-report.json');
+}
+
 function printUsage(): void {
-  console.log(`Uso:\n  gestor-converter --input CadastroPedidos.dfm --output CadastroPedidos.gestor.json --react-output CadastroPedidosPage.tsx\n\nOpções:\n  -i, --input       Caminho do arquivo .dfm\n  -o, --output      Caminho do arquivo DSL gerado\n  --react-output    Caminho do componente React gerado\n  --compact         Gera JSON sem indentação`);
+  console.log(`Uso:\n  gestor-converter --input CadastroPedidos.dfm --output CadastroPedidos.gestor.json --react-output CadastroPedidosPage.tsx\n  gestor-converter --input CadastroPedidos.pas --pas-report-output CadastroPedidos.pas-report.json\n\nOpções:\n  -i, --input             Caminho do arquivo .dfm ou .pas\n  -o, --output            Caminho do arquivo gerado\n  --react-output          Caminho do componente React gerado para .dfm\n  --pas-report-output     Caminho do relatório técnico gerado para .pas\n  --compact               Gera JSON sem indentação`);
 }
 
 main().catch((error: unknown) => {
