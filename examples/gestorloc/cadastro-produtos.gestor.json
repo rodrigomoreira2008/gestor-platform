@@ -1,0 +1,312 @@
+{
+  "version": "0.1",
+  "entity": "produto",
+  "title": "Cadastro de Produtos",
+  "source": {
+    "dfm": "CadastroProdutos.dfm",
+    "pas": "CadastroProdutos.pas"
+  },
+  "table": "PRODUTOS",
+  "fields": [
+    {
+      "name": "numero",
+      "label": "Código",
+      "type": "integer",
+      "required": false,
+      "readOnly": false,
+      "section": "Dados Gerais",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "NUMERO"
+    },
+    {
+      "name": "descricao",
+      "label": "Descrição",
+      "type": "text",
+      "required": true,
+      "readOnly": false,
+      "section": "Dados Gerais",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "DESCRICAO"
+    },
+    {
+      "name": "marca",
+      "label": "Marca",
+      "type": "text",
+      "required": true,
+      "readOnly": false,
+      "section": "Dados Gerais",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "MARCA"
+    },
+    {
+      "name": "grupo",
+      "label": "Grupo",
+      "type": "integer",
+      "required": true,
+      "readOnly": false,
+      "section": "Dados Gerais",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "GRUPO"
+    },
+    {
+      "name": "nomegrupo",
+      "label": "Nome do Grupo",
+      "type": "text",
+      "required": false,
+      "readOnly": true,
+      "section": "Dados Gerais",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "NomeGrupo"
+    },
+    {
+      "name": "patrimonio",
+      "label": "Nº Patrimônio",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Dados Gerais",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "PATRIMONIO"
+    },
+    {
+      "name": "numeroserie",
+      "label": "Nº de Série",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Dados Gerais",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "NUMEROSERIE"
+    },
+    {
+      "name": "acessorio",
+      "label": "Este Produto é Acessório?",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Dados Gerais",
+      "sourceComponent": "TDBComboBox",
+      "sourceBinding": "ACESSORIO"
+    },
+    {
+      "name": "mostracontrato",
+      "label": "Mostra no Contrato?",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Dados Gerais",
+      "sourceComponent": "TDBComboBox",
+      "sourceBinding": "MOSTRACONTRATO"
+    },
+    {
+      "name": "status",
+      "label": "Status",
+      "type": "text",
+      "required": false,
+      "readOnly": true,
+      "section": "Dados Gerais",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "STATUS"
+    },
+    {
+      "name": "valorcompra",
+      "label": "Valor de Compra",
+      "type": "money",
+      "required": false,
+      "readOnly": false,
+      "section": "Valores",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "VALORCOMPRA"
+    },
+    {
+      "name": "valorestimado",
+      "label": "Valor Estimado",
+      "type": "money",
+      "required": true,
+      "readOnly": false,
+      "section": "Valores",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "VALORESTIMADO"
+    },
+    {
+      "name": "valorlimpeza",
+      "label": "Valor de Limpeza",
+      "type": "money",
+      "required": false,
+      "readOnly": false,
+      "section": "Valores",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "VALORLIMPEZA"
+    },
+    {
+      "name": "quantidadereal",
+      "label": "Quantidade Real",
+      "type": "decimal",
+      "required": false,
+      "readOnly": false,
+      "section": "Unidade e Quantidades",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "QUANTIDADEREAL"
+    },
+    {
+      "name": "unidade",
+      "label": "Unidade de Medida",
+      "type": "text",
+      "required": true,
+      "readOnly": false,
+      "section": "Unidade e Quantidades",
+      "sourceComponent": "TDBComboBox",
+      "sourceBinding": "UNIDADE"
+    },
+    {
+      "name": "quantidadeestoque",
+      "label": "Quantidade em Estoque",
+      "type": "decimal",
+      "required": false,
+      "readOnly": false,
+      "section": "Unidade e Quantidades",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "QUANTIDADEESTOQUE"
+    },
+    {
+      "name": "valorminimo",
+      "label": "Valor Mínimo",
+      "type": "money",
+      "required": false,
+      "readOnly": false,
+      "section": "Valores Para Locação",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "VALORMINIMO"
+    },
+    {
+      "name": "valormensal",
+      "label": "Valor Mensal",
+      "type": "money",
+      "required": false,
+      "readOnly": false,
+      "section": "Valores Para Locação",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "VALORMENSAL"
+    },
+    {
+      "name": "valordiario",
+      "label": "Valor Diário",
+      "type": "money",
+      "required": false,
+      "readOnly": false,
+      "section": "Valores Para Locação",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "VALORDIARIO"
+    },
+    {
+      "name": "tipo",
+      "label": "Tipo de Locação",
+      "type": "text",
+      "required": true,
+      "readOnly": false,
+      "section": "Valores Para Locação",
+      "sourceComponent": "TDBComboBox",
+      "sourceBinding": "TIPO"
+    },
+    {
+      "name": "tabeladescontomensal",
+      "label": "Tabela de Desconto",
+      "type": "integer",
+      "required": false,
+      "readOnly": false,
+      "section": "Valores Para Locação",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "TABELADESCONTOMENSAL"
+    },
+    {
+      "name": "nometabeladescontomensal",
+      "label": "Nome da Tabela de Desconto",
+      "type": "text",
+      "required": false,
+      "readOnly": true,
+      "section": "Valores Para Locação",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "NomeTabelaDescontoMensal"
+    },
+    {
+      "name": "descricaodetalhada",
+      "label": "Descrição Detalhada",
+      "type": "memo",
+      "required": false,
+      "readOnly": false,
+      "section": "Dados Adicionais",
+      "sourceComponent": "TDBMemo",
+      "sourceBinding": "DESCRICAODETALHADA"
+    },
+    {
+      "name": "locacao",
+      "label": "Locação do Produto",
+      "type": "integer",
+      "required": true,
+      "readOnly": false,
+      "section": "Dados Adicionais",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "LOCACAO"
+    },
+    {
+      "name": "nomelocacao",
+      "label": "Nome da Locação",
+      "type": "text",
+      "required": false,
+      "readOnly": true,
+      "section": "Dados Adicionais",
+      "sourceComponent": "TDBEdit",
+      "sourceBinding": "NOMELOCACAO"
+    }
+  ],
+  "actions": [
+    {
+      "name": "novo",
+      "label": "Novo",
+      "kind": "create",
+      "sourceEvent": "btnNovoClick"
+    },
+    {
+      "name": "alterar",
+      "label": "Alterar",
+      "kind": "update",
+      "sourceEvent": "btnAlterarClick"
+    },
+    {
+      "name": "excluir",
+      "label": "Excluir",
+      "kind": "delete",
+      "sourceEvent": "btnExcluirClick"
+    },
+    {
+      "name": "localizar",
+      "label": "Localizar",
+      "kind": "custom",
+      "sourceEvent": "btnLocalizarClick"
+    },
+    {
+      "name": "gravar",
+      "label": "Gravar",
+      "kind": "update",
+      "sourceEvent": "btnGravarClick"
+    },
+    {
+      "name": "cancelar",
+      "label": "Cancelar",
+      "kind": "custom",
+      "sourceEvent": "btnCancelarClick"
+    },
+    {
+      "name": "sair",
+      "label": "Sair",
+      "kind": "custom",
+      "sourceEvent": "btnSairClick"
+    }
+  ],
+  "notes": [
+    "DSL piloto criada a partir do formulário real CadastroProdutos.dfm do GestorLoc.",
+    "Campos foram agrupados a partir dos GroupBox do DFM.",
+    "Validações obrigatórias foram inferidas a partir da função VerificaCamposObrigatorios no PAS.",
+    "Este artefato é uma primeira versão para orientar evolução do parser e do gerador."
+  ]
+}
