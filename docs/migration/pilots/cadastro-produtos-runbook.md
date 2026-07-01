@@ -26,6 +26,12 @@ curl http://localhost:5000/api/produtos
 
 O piloto usa Entity Framework Core com SQLite.
 
+A string de conexão local fica em:
+
+```text
+apps/backend/appsettings.Development.json
+```
+
 Ao iniciar a API, o arquivo abaixo é criado automaticamente se ainda não existir:
 
 ```text
@@ -33,6 +39,14 @@ gestor.db
 ```
 
 Os produtos cadastrados permanecem após reiniciar o backend. Para reiniciar a base local, pare a API e remova o arquivo `gestor.db`.
+
+O arquivo SQLite local não deve ser versionado. O `.gitignore` já ignora:
+
+```text
+*.db
+*.db-shm
+*.db-wal
+```
 
 ## Frontend
 
