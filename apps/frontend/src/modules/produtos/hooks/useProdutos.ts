@@ -1,45 +1,25 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createProduto, getProdutos, removeProduto, updateProduto } from '../api/produtoApi';
-import type { ProdutoInput } from '../types/produto';
+import { useCrudResource } from '../../../shared/crud/useCrudResource';
+import { produtoApi } from '../api/produtoApi';
+import type { Produto, ProdutoInput } from '../types/produto';
 
 export const produtosQueryKey = ['produtos'];
 
+export function useProdutoResource() {
+  return useCrudResource<Produto, ProdutoInput>('produtos', produtoApi);
+}
+
 export function useProdutos() {
-  return useQuery({
-    queryKey: produtosQueryKey,
-    queryFn: getProdutos
-  });
+  return useProdutoResource().list;
 }
 
 export function useCreateProduto() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: createProduto,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: produtosQueryKey });
-    }
-  });
+  return useProdutoResource().create;
 }
 
 export function useUpdateProduto() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, input }: { id: number; input: ProdutoInput }) => updateProduto(id, input),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: produtosQueryKey });
-    }
-  });
+  return useProdutoResource().update;
 }
 
 export function useRemoveProduto() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: removeProduto,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: produtosQueryKey });
-    }
-  });
+  return useProdutoResource().remove;
 }
