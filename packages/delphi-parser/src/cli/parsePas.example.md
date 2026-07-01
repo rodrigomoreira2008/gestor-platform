@@ -58,3 +58,7 @@ end;
   ]
 }
 ```
+
+## Observação
+
+O parser já reconhece concatenação de strings SQL em múltiplas linhas quando a expressão usa literais Pascal unidos por `+`.
