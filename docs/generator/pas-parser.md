@@ -8,11 +8,14 @@ Ele complementa o parser DFM, que entende a estrutura visual, trazendo informaç
 
 ## Implementação inicial
 
-A primeira versão suporta:
+A versão atual suporta:
 
 - identificação de métodos `procedure`;
+- identificação de métodos `function` com tipo de retorno;
 - captura do corpo `begin ... end`;
 - extração simples de SQL em `SQL.Text` e `CommandText`;
+- extração de SQL por chamadas `SQL.Add(...)`;
+- normalização inicial de strings SQL concatenadas com `+`;
 - extração de mensagens em `ShowMessage`, `MessageDlg` e `Exception.Create`;
 - heurística inicial para campos obrigatórios com `FieldByName(...).IsNull` e `.Text = ''`.
 
@@ -37,11 +40,17 @@ A saída é um JSON contendo:
 {
   "methods": [
     {
+      "kind": "procedure",
       "name": "BtnGravarClick",
       "body": "begin\n  ...\nend"
     }
   ],
-  "sqlSnippets": [],
+  "sqlSnippets": [
+    {
+      "methodName": "BtnGravarClick",
+      "text": "select * from produtos"
+    }
+  ],
   "validationHints": [
     {
       "methodName": "BtnGravarClick",
@@ -59,15 +68,13 @@ Esta versão ainda não interpreta completamente a linguagem Pascal. Ela usa heu
 
 Limitações atuais:
 
-- não suporta `function` ainda;
 - não resolve herança ou includes;
-- não interpreta SQL montado por concatenação complexa;
+- não interpreta SQL montado por concatenação complexa com variáveis;
 - não diferencia todos os tipos de validação;
 - não faz análise semântica completa de variáveis.
 
 ## Próximas melhorias
 
-- suportar `function`;
 - detectar eventos vinculados aos componentes do DFM;
 - extrair `TDataSource`, `TFDQuery`, `TClientDataSet` e conexões de dataset;
 - mapear validações para campos da DSL;
