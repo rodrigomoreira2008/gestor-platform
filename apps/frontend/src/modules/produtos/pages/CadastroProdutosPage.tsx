@@ -1,6 +1,7 @@
 import type { GestorAction, GestorField, GestorForm } from '@gestor/dsl';
 import { Alert, Box, CircularProgress, Snackbar, Typography } from '@mui/material';
 import { CrudPage, type FormValues } from '@gestor/ui';
+import axios from 'axios';
 import { useState } from 'react';
 import form from '../../../../../../examples/gestorloc/cadastro-produtos.gestor.json';
 import { useCreateProduto, useProdutos } from '../hooks/useProdutos';
@@ -10,6 +11,7 @@ export function CadastroProdutosPage() {
   const createProduto = useCreateProduto();
   const [values, setValues] = useState<FormValues>({});
   const [message, setMessage] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   function handleValueChange(field: GestorField, value: unknown) {
     setValues((current) => ({ ...current, [field.name]: value }));
@@ -18,12 +20,18 @@ export function CadastroProdutosPage() {
   async function handleAction(action: GestorAction) {
     if (action.name === 'novo') {
       setValues({});
+      setValidationError(null);
       return;
     }
 
     if (action.name === 'gravar') {
-      await createProduto.mutateAsync(values);
-      setMessage('Produto gravado com sucesso.');
+      try {
+        setValidationError(null);
+        await createProduto.mutateAsync(values);
+        setMessage('Produto gravado com sucesso.');
+      } catch (error) {
+        setValidationError(readApiError(error));
+      }
     }
   }
 
@@ -37,9 +45,9 @@ export function CadastroProdutosPage() {
         </Alert>
       )}
 
-      {createProduto.isError && (
+      {validationError && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          Não foi possível gravar o produto. Verifique os campos obrigatórios.
+          {validationError}
         </Alert>
       )}
 
@@ -54,4 +62,12 @@ export function CadastroProdutosPage() {
       <Snackbar open={message !== null} autoHideDuration={3000} message={message} onClose={() => setMessage(null)} />
     </Box>
   );
+}
+
+function readApiError(error: unknown): string {
+  if (axios.isAxiosError<{ error?: string }>(error)) {
+    return error.response?.data?.error ?? 'Não foi possível gravar o produto.';
+  }
+
+  return 'Não foi possível gravar o produto.';
 }
