@@ -13,7 +13,14 @@ begin
     Exit;
   end;
 
-  Query.SQL.Text := 'select * from produtos';
+  Query.SQL.Text := 'select * ' +
+    'from produtos';
+  Query.SQL.Add('where ativo = 1');
+end;
+
+function TCadastroProdutos.PodeGravar: Boolean;
+begin
+  Result := True;
 end;
 ```
 
@@ -23,13 +30,23 @@ end;
 {
   "methods": [
     {
+      "kind": "procedure",
       "name": "BtnGravarClick"
+    },
+    {
+      "kind": "function",
+      "name": "PodeGravar",
+      "returnType": "Boolean"
     }
   ],
   "sqlSnippets": [
     {
       "methodName": "BtnGravarClick",
       "text": "select * from produtos"
+    },
+    {
+      "methodName": "BtnGravarClick",
+      "text": "where ativo = 1"
     }
   ],
   "validationHints": [
