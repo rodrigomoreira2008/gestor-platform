@@ -1,4 +1,5 @@
 using System.Reflection;
+using Gestor.Api.Common;
 
 namespace Gestor.Api;
 
@@ -7,6 +8,8 @@ public static class DependencyInjection
     public static IServiceCollection AddGestorGeneratedServices(this IServiceCollection services)
     {
         var assembly = Assembly.GetExecutingAssembly();
+
+        services.AddScoped(typeof(CrudRepository<>));
 
         RegisterBySuffix(services, assembly, "Repository");
         RegisterBySuffix(services, assembly, "Service");
