@@ -1,4 +1,6 @@
+using Gestor.Api.Common;
 using Gestor.Api.DTO;
+using Gestor.Api.Entities;
 using Gestor.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,60 +8,9 @@ namespace Gestor.Api.Controllers;
 
 [ApiController]
 [Route("api/produtos")]
-public class ProdutoController : ControllerBase
+public class ProdutoController : CrudControllerBase<Produto, ProdutoDto, ProdutoService>
 {
-    private readonly ProdutoService _service;
-
-    public ProdutoController(ProdutoService service)
+    public ProdutoController(ProdutoService service) : base(service)
     {
-        _service = service;
-    }
-
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProdutoDto>>> GetAll(CancellationToken cancellationToken)
-    {
-        return Ok(await _service.GetAllAsync(cancellationToken));
-    }
-
-    [HttpGet("{id:int}")]
-    public async Task<ActionResult<ProdutoDto>> GetById(int id, CancellationToken cancellationToken)
-    {
-        var item = await _service.GetByIdAsync(id, cancellationToken);
-        return item is null ? NotFound() : Ok(item);
-    }
-
-    [HttpPost]
-    public async Task<ActionResult<ProdutoDto>> Create(ProdutoDto input, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var created = await _service.CreateAsync(input, cancellationToken);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
-        }
-        catch (InvalidOperationException error)
-        {
-            return BadRequest(new { error = error.Message });
-        }
-    }
-
-    [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, ProdutoDto input, CancellationToken cancellationToken)
-    {
-        try
-        {
-            await _service.UpdateAsync(id, input, cancellationToken);
-            return NoContent();
-        }
-        catch (InvalidOperationException error)
-        {
-            return BadRequest(new { error = error.Message });
-        }
-    }
-
-    [HttpDelete("{id:int}")]
-    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
-    {
-        await _service.DeleteAsync(id, cancellationToken);
-        return NoContent();
     }
 }
