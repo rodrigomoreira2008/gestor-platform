@@ -4,10 +4,10 @@
 
 Gerar artefatos ASP.NET Core a partir do modelo intermediário `ResolvedForm`.
 
-Nesta primeira versão, o gerador cria os arquivos mínimos de entidade e DTO para validar o fluxo:
+A versão atual gera um CRUD backend mínimo sobre a arquitetura genérica já usada nos pilotos manuais:
 
 ```text
-ResolvedForm -> Entity C# + DTO C#
+ResolvedForm -> Entity + DTO + Validator + Service + Controller
 ```
 
 ## Entrada
@@ -18,13 +18,16 @@ O gerador recebe um `ResolvedForm`, produzido pelo comando:
 pnpm --filter @gestor/delphi-parser resolve:form <arquivo.dfm> <arquivo.pas> <entidade> [tabela]
 ```
 
-## Saída inicial
+## Saída atual
 
 Arquivos gerados:
 
 ```text
 apps/backend/Entities/<Entidade>.cs
 apps/backend/DTO/<Entidade>Dto.cs
+apps/backend/Validators/<Entidade>Validator.cs
+apps/backend/Services/<Entidade>Service.cs
+apps/backend/Controllers/<Entidade>Controller.cs
 ```
 
 ## CLI
@@ -35,16 +38,10 @@ O arquivo de CLI foi adicionado em:
 packages/delphi-parser/src/cli/generateBackend.ts
 ```
 
-Uso planejado:
+Uso:
 
 ```bash
-pnpm --filter @gestor/delphi-parser generate:backend <arquivo.dfm> <arquivo.pas> <entidade> [tabela] [saida]
-```
-
-Observação: o registro do script no `package.json` pode ser aplicado manualmente se o conector bloquear a alteração:
-
-```json
-"generate:backend": "tsx src/cli/generateBackend.ts"
+pnpm --filter @gestor/delphi-parser gen:backend <arquivo.dfm> <arquivo.pas> <entidade> [tabela] [saida]
 ```
 
 ## Mapeamento inicial de tipos
@@ -56,11 +53,19 @@ A primeira heurística usa o nome do campo:
 - `data` -> `DateTime?`
 - demais campos -> `string?`
 
+## Validações
+
+Campos marcados como obrigatórios no `ResolvedForm` geram checks no validator:
+
+```csharp
+if (string.IsNullOrWhiteSpace(input.Campo?.ToString())) errors.Add("Mensagem inferida");
+```
+
+As mensagens são aproveitadas dos hints de validação extraídos do PAS quando disponíveis.
+
 ## Próximas etapas
 
-- Gerar validator;
-- Gerar service;
-- Gerar controller;
-- Gerar configuração EF Core;
+- Gerar configuração EF Core no `GestorDbContext`;
 - Gerar migration ou instruções de migration;
+- Melhorar inferência de tipos por metadados de dataset;
 - Incluir relatório de lacunas para revisão manual.
