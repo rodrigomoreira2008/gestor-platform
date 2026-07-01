@@ -6,11 +6,13 @@ O pacote `@gestor/delphi-parser` inicia a leitura automática dos formulários D
 
 ## Implementação inicial
 
-A primeira versão suporta:
+A versão atual suporta:
 
 - leitura de blocos `object ... end`;
 - montagem de árvore de componentes;
 - captura de propriedades simples;
+- captura inicial de propriedades multilinha;
+- leitura de listas `(...)`, coleções `<...>` e blobs `{...}` como texto preservado;
 - identificação de campos de entrada;
 - identificação de botões;
 - inferência de seção por `TGroupBox`, `TTabSheet` ou `TPanel`;
@@ -46,6 +48,24 @@ A primeira versão suporta:
 - `TTabSheet`
 - `TPanel`
 
+## Propriedades multilinha
+
+O parser já reconhece propriedades iniciadas por:
+
+```text
+(
+<
+{
+```
+
+Isso cobre casos comuns como:
+
+- `Items.Strings = (...)`
+- `Columns = <...>`
+- blobs binários/textuais representados entre `{...}`
+
+Nesta fase, coleções e blobs ainda são preservados como texto. A interpretação semântica virá em uma etapa posterior.
+
 ## Associação de labels
 
 Quando um campo não possui `Caption`, o parser tenta encontrar um `TLabel` próximo no mesmo componente pai.
@@ -78,8 +98,7 @@ A saída é um JSON com:
 
 ## Próximas melhorias
 
-- suportar propriedades multilinha;
-- tratar coleções Delphi;
+- tratar coleções Delphi semanticamente;
 - reconhecer `TPageControl`/abas com mais precisão;
 - exportar DSL `.gestor.json` diretamente;
 - integrar com analisador PAS;
