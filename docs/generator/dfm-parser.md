@@ -13,7 +13,9 @@ A primeira versão suporta:
 - captura de propriedades simples;
 - identificação de campos de entrada;
 - identificação de botões;
-- inferência de seção por `TGroupBox`, `TTabSheet` ou `TPanel`.
+- inferência de seção por `TGroupBox`, `TTabSheet` ou `TPanel`;
+- leitura de posição/tamanho (`Left`, `Top`, `Width`, `Height`);
+- associação inicial de labels por proximidade visual com `TLabel`.
 
 ## Componentes reconhecidos inicialmente
 
@@ -34,11 +36,27 @@ A primeira versão suporta:
 - `TSpeedButton`
 - `TButton`
 
+### Labels
+
+- `TLabel`
+
 ### Seções
 
 - `TGroupBox`
 - `TTabSheet`
 - `TPanel`
+
+## Associação de labels
+
+Quando um campo não possui `Caption`, o parser tenta encontrar um `TLabel` próximo no mesmo componente pai.
+
+A heurística atual considera labels:
+
+- acima do campo;
+- próximos verticalmente;
+- alinhados à esquerda do campo.
+
+Essa regra ainda é simples, mas já ajuda a converter muitos formulários Delphi típicos, onde o `TLabel` fica logo acima ou próximo do `TDBEdit`.
 
 ## CLI
 
@@ -53,13 +71,16 @@ A saída é um JSON com:
 - dados do formulário;
 - avisos;
 - campos encontrados;
-- ações encontradas.
+- ações encontradas;
+- seção inferida;
+- bounds dos componentes;
+- label inferido quando possível.
 
 ## Próximas melhorias
 
-- associar labels próximos aos campos;
 - suportar propriedades multilinha;
 - tratar coleções Delphi;
 - reconhecer `TPageControl`/abas com mais precisão;
 - exportar DSL `.gestor.json` diretamente;
-- integrar com analisador PAS.
+- integrar com analisador PAS;
+- adicionar testes automatizados com amostras reais de DFM.
