@@ -17,14 +17,25 @@ export interface PascalValidationHint {
   message: string;
 }
 
+export interface PascalDatasetHint {
+  name: string;
+  className: string;
+  tableName?: string;
+  dataSource?: string;
+}
+
 export interface PascalParseResult {
   methods: PascalMethod[];
   sqlSnippets: PascalSqlSnippet[];
   validationHints: PascalValidationHint[];
+  datasetHints: PascalDatasetHint[];
   warnings: string[];
 }
 
 const methodPattern = /^\s*(procedure|function)\s+(?:\w+\.)?(\w+)\s*(?:\((.*?)\))?\s*(?::\s*([\w.<>]+))?\s*;/i;
+const componentDeclarationPattern = /^\s*(\w+)\s*:\s*(T(?:FDQuery|Query|ClientDataSet|DataSource|Table|ADOQuery|ADOTable|IBQuery|IBDataSet))\s*;/i;
+const tableNamePattern = /(\w+)\.(?:TableName|CommandText)\s*:=\s*'([^']*(?:''[^']*)*)'/gi;
+const dataSourcePattern = /(\w+)\.DataSet\s*:=\s*(\w+)/gi;
 const sqlAssignmentPattern = /(?:SQL\.Text|CommandText)\s*:=\s*((?:'[^']*(?:''[^']*)*'\s*(?:\+\s*)?\s*)+)/gi;
 const sqlAddPattern = /SQL\.Add\s*\(\s*'([^']*(?:''[^']*)*)'\s*\)/gi;
 const messagePattern = /(?:ShowMessage|MessageDlg|raise\s+Exception\.Create)\s*\(\s*'([^']*(?:''[^']*)*)'/gi;
@@ -35,11 +46,13 @@ export function parsePascalUnit(input: string): PascalParseResult {
   const methods = collectMethods(input, warnings);
   const sqlSnippets = methods.flatMap((method) => collectSql(method));
   const validationHints = methods.flatMap((method) => collectValidationHints(method));
+  const datasetHints = collectDatasetHints(input);
 
   return {
     methods,
     sqlSnippets,
     validationHints,
+    datasetHints,
     warnings
   };
 }
@@ -76,6 +89,30 @@ function collectMethods(input: string, warnings: string[]): PascalMethod[] {
   }
 
   return methods;
+}
+
+function collectDatasetHints(input: string): PascalDatasetHint[] {
+  const datasets = new Map<string, PascalDatasetHint>();
+
+  for (const line of input.split(/\r?\n/)) {
+    const declaration = line.match(componentDeclarationPattern);
+    if (!declaration) continue;
+    datasets.set(declaration[1], { name: declaration[1], className: declaration[2] });
+  }
+
+  for (const match of input.matchAll(tableNamePattern)) {
+    const current = datasets.get(match[1]) ?? { name: match[1], className: 'unknown' };
+    current.tableName = unescapePascalString(match[2]);
+    datasets.set(match[1], current);
+  }
+
+  for (const match of input.matchAll(dataSourcePattern)) {
+    const current = datasets.get(match[1]) ?? { name: match[1], className: 'TDataSource' };
+    current.dataSource = match[2];
+    datasets.set(match[1], current);
+  }
+
+  return [...datasets.values()];
 }
 
 function findNextBegin(lines: string[], startIndex: number): number {
