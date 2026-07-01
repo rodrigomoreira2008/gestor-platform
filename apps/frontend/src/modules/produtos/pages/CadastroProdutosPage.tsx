@@ -4,6 +4,7 @@ import { CrudPage, type FormValues } from '@gestor/ui';
 import axios from 'axios';
 import { useState } from 'react';
 import form from '../../../../../../examples/gestorloc/cadastro-produtos.gestor.json';
+import { ProdutoList } from '../components/ProdutoList';
 import { useCreateProduto, useProdutos } from '../hooks/useProdutos';
 
 export function CadastroProdutosPage() {
@@ -28,6 +29,7 @@ export function CadastroProdutosPage() {
       try {
         setValidationError(null);
         await createProduto.mutateAsync(values);
+        setValues({});
         setMessage('Produto gravado com sucesso.');
       } catch (error) {
         setValidationError(readApiError(error));
@@ -52,9 +54,12 @@ export function CadastroProdutosPage() {
       )}
 
       {produtos.data && (
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Produtos carregados da API: {produtos.data.length}
-        </Typography>
+        <>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Produtos carregados da API: {produtos.data.length}
+          </Typography>
+          <ProdutoList produtos={produtos.data} />
+        </>
       )}
 
       <CrudPage form={form as GestorForm} values={values} onValueChange={handleValueChange} onAction={handleAction} />
