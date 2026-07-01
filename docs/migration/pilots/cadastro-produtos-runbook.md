@@ -22,6 +22,18 @@ Validar listagem de produtos:
 curl http://localhost:5000/api/produtos
 ```
 
+## Banco local
+
+O piloto usa Entity Framework Core com SQLite.
+
+Ao iniciar a API, o arquivo abaixo é criado automaticamente se ainda não existir:
+
+```text
+gestor.db
+```
+
+Os produtos cadastrados permanecem após reiniciar o backend. Para reiniciar a base local, pare a API e remova o arquivo `gestor.db`.
+
 ## Frontend
 
 ```bash
@@ -55,6 +67,8 @@ Produtos
 4. Clicar em `Gravar`.
 5. Confirmar mensagem de sucesso.
 6. Confirmar que a contagem de produtos carregados aumenta.
+7. Confirmar que o produto aparece na lista `Produtos cadastrados`.
+8. Reiniciar o backend e confirmar que o produto continua listado.
 
 ## Validação de erro
 
@@ -67,6 +81,4 @@ Para validar a regra de obrigatoriedade:
 
 ## Observações
 
-Neste piloto, o repository ainda é em memória. Portanto, os dados são perdidos ao reiniciar a API.
-
-A próxima evolução será substituir o repository em memória por persistência real via banco de dados.
+Este piloto já usa persistência local com SQLite. A próxima evolução será criar migrations formais do Entity Framework e evoluir o CRUD para edição/exclusão pela interface.
