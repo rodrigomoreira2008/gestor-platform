@@ -17,7 +17,8 @@ A versão atual suporta:
 - extração de SQL por chamadas `SQL.Add(...)`;
 - normalização inicial de strings SQL concatenadas com `+`, inclusive em múltiplas linhas;
 - extração de mensagens em `ShowMessage`, `MessageDlg` e `Exception.Create`;
-- heurística inicial para campos obrigatórios com `FieldByName(...).IsNull` e `.Text = ''`.
+- heurística inicial para campos obrigatórios com `FieldByName(...).IsNull` e `.Text = ''`;
+- extração inicial de componentes de dados como `TFDQuery`, `TQuery`, `TClientDataSet`, `TDataSource`, `TTable`, `TADOQuery`, `TADOTable`, `TIBQuery` e `TIBDataSet`.
 
 ## CLI
 
@@ -32,6 +33,7 @@ A saída é um JSON contendo:
 - `methods`;
 - `sqlSnippets`;
 - `validationHints`;
+- `datasetHints`;
 - `warnings`.
 
 ## Exemplo de saída
@@ -58,6 +60,13 @@ A saída é um JSON contendo:
       "message": "Descrição é obrigatória."
     }
   ],
+  "datasetHints": [
+    {
+      "name": "QryProdutos",
+      "className": "TFDQuery",
+      "tableName": "PRODUTOS"
+    }
+  ],
   "warnings": []
 }
 ```
@@ -71,12 +80,12 @@ Limitações atuais:
 - não resolve herança ou includes;
 - não interpreta SQL montado por concatenação complexa com variáveis;
 - não diferencia todos os tipos de validação;
-- não faz análise semântica completa de variáveis.
+- não faz análise semântica completa de variáveis;
+- não resolve todos os relacionamentos entre datasets criados dinamicamente.
 
 ## Próximas melhorias
 
 - detectar eventos vinculados aos componentes do DFM;
-- extrair `TDataSource`, `TFDQuery`, `TClientDataSet` e conexões de dataset;
 - mapear validações para campos da DSL;
 - gerar relatório de lacunas;
 - enriquecer automaticamente o `.gestor.json` gerado pelo parser DFM.
