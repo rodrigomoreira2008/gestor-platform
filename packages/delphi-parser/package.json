@@ -7,8 +7,11 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "parse:dfm": "tsx src/cli/parseDfm.ts"
+    "parse:dfm": "tsx src/cli/parseDfm.ts",
+    "dfm:gestor": "tsx src/cli/dfmToGestor.ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@gestor/dsl": "workspace:*"
+  },
   "devDependencies": {}
 }
