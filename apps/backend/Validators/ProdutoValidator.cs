@@ -1,8 +1,9 @@
+using Gestor.Api.Common;
 using Gestor.Api.DTO;
 
 namespace Gestor.Api.Validators;
 
-public class ProdutoValidator
+public class ProdutoValidator : IValidator<ProdutoDto>
 {
     public IReadOnlyList<string> Validate(ProdutoDto input)
     {
