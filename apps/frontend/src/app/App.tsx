@@ -1,14 +1,16 @@
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import GroupsIcon from '@mui/icons-material/Groups';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import MenuIcon from '@mui/icons-material/Menu';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import { AppBar, Box, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
 import { useState } from 'react';
+import { CadastroClientesPage } from '../modules/clientes/pages/CadastroClientesPage';
 import { CadastroProdutosPage } from '../modules/produtos/pages/CadastroProdutosPage';
 
 const drawerWidth = 280;
 
-type AppPage = 'dashboard' | 'produtos' | 'migracao';
+type AppPage = 'dashboard' | 'clientes' | 'produtos' | 'migracao';
 
 export function App() {
   const [page, setPage] = useState<AppPage>('dashboard');
@@ -43,6 +45,12 @@ export function App() {
             </ListItemIcon>
             <ListItemText primary="Dashboard" />
           </ListItemButton>
+          <ListItemButton selected={page === 'clientes'} onClick={() => setPage('clientes')}>
+            <ListItemIcon>
+              <GroupsIcon />
+            </ListItemIcon>
+            <ListItemText primary="Clientes" />
+          </ListItemButton>
           <ListItemButton selected={page === 'produtos'} onClick={() => setPage('produtos')}>
             <ListItemIcon>
               <InventoryIcon />
@@ -61,6 +69,7 @@ export function App() {
       <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, md: 3 } }}>
         <Toolbar />
         {page === 'dashboard' && <DashboardPage />}
+        {page === 'clientes' && <CadastroClientesPage />}
         {page === 'produtos' && <CadastroProdutosPage />}
         {page === 'migracao' && <MigrationPage />}
       </Box>
