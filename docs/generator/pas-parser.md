@@ -15,7 +15,7 @@ A versão atual suporta:
 - captura do corpo `begin ... end`;
 - extração simples de SQL em `SQL.Text` e `CommandText`;
 - extração de SQL por chamadas `SQL.Add(...)`;
-- normalização inicial de strings SQL concatenadas com `+`;
+- normalização inicial de strings SQL concatenadas com `+`, inclusive em múltiplas linhas;
 - extração de mensagens em `ShowMessage`, `MessageDlg` e `Exception.Create`;
 - heurística inicial para campos obrigatórios com `FieldByName(...).IsNull` e `.Text = ''`.
 
