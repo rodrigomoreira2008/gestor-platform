@@ -7,7 +7,7 @@ Gerar artefatos ASP.NET Core a partir do modelo intermediário `ResolvedForm`.
 A versão atual gera um CRUD backend mínimo sobre a arquitetura genérica já usada nos pilotos manuais:
 
 ```text
-ResolvedForm -> Entity + DTO + Validator + Service + Controller
+ResolvedForm -> Entity + DTO + Validator + Service + Controller + DbContext snippet
 ```
 
 ## Entrada
@@ -28,6 +28,7 @@ apps/backend/DTO/<Entidade>Dto.cs
 apps/backend/Validators/<Entidade>Validator.cs
 apps/backend/Services/<Entidade>Service.cs
 apps/backend/Controllers/<Entidade>Controller.cs
+apps/backend/Generated/<Entidade>DbContextRegistration.cs.txt
 ```
 
 ## CLI
@@ -63,9 +64,19 @@ if (string.IsNullOrWhiteSpace(input.Campo?.ToString())) errors.Add("Mensagem inf
 
 As mensagens são aproveitadas dos hints de validação extraídos do PAS quando disponíveis.
 
+## Registro no DbContext
+
+O gerador emite um arquivo `.txt` com o trecho sugerido para registrar a entidade no `GestorDbContext`:
+
+```csharp
+public DbSet<Entidade> Entidades => Set<Entidade>();
+```
+
+Nesta etapa, o gerador ainda não edita automaticamente o `GestorDbContext` para evitar sobrescrever código manual.
+
 ## Próximas etapas
 
-- Gerar configuração EF Core no `GestorDbContext`;
+- Gerar configuração EF Core completa;
 - Gerar migration ou instruções de migration;
 - Melhorar inferência de tipos por metadados de dataset;
 - Incluir relatório de lacunas para revisão manual.
