@@ -10,13 +10,16 @@ export function collectFieldBindings(root: DelphiFormNode): DelphiFieldBinding[]
   walk(root, [], (node, parents) => {
     if (!fieldClasses.has(node.className)) return;
 
+    const sectionPath = findSectionPath(parents);
+
     result.push({
       componentName: node.name,
       componentClass: node.className,
       dataSource: node.properties.DataSource,
       dataField: node.properties.DataField,
       label: node.properties.Caption ?? findNearbyLabel(node, parents.at(-1)),
-      section: findNearestSection(parents),
+      section: sectionPath.at(-1),
+      sectionPath,
       bounds: readBounds(node)
     });
   });
@@ -28,12 +31,15 @@ export function collectActionBindings(root: DelphiFormNode): DelphiActionBinding
   walk(root, [], (node, parents) => {
     if (!buttonClasses.has(node.className)) return;
 
+    const sectionPath = findSectionPath(parents);
+
     result.push({
       componentName: node.name,
       componentClass: node.className,
       caption: node.properties.Caption,
       event: node.properties.OnClick,
-      section: findNearestSection(parents),
+      section: sectionPath.at(-1),
+      sectionPath,
       bounds: readBounds(node)
     });
   });
@@ -45,9 +51,10 @@ function walk(node: DelphiFormNode, parents: DelphiFormNode[], visit: (node: Del
   for (const child of node.children) walk(child, [...parents, node], visit);
 }
 
-function findNearestSection(parents: DelphiFormNode[]): string | undefined {
-  const section = [...parents].reverse().find((parent) => sectionClasses.has(parent.className) && parent.properties.Caption);
-  return section?.properties.Caption;
+function findSectionPath(parents: DelphiFormNode[]): string[] {
+  return parents
+    .filter((parent) => sectionClasses.has(parent.className) && parent.properties.Caption)
+    .map((parent) => parent.properties.Caption);
 }
 
 function findNearbyLabel(field: DelphiFormNode, parent?: DelphiFormNode): string | undefined {
