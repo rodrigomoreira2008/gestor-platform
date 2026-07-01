@@ -18,7 +18,8 @@ A versão atual suporta:
 - normalização inicial de strings SQL concatenadas com `+`, inclusive em múltiplas linhas;
 - extração de mensagens em `ShowMessage`, `MessageDlg` e `Exception.Create`;
 - heurística inicial para campos obrigatórios com `FieldByName(...).IsNull` e `.Text = ''`;
-- extração inicial de componentes de dados como `TFDQuery`, `TQuery`, `TClientDataSet`, `TDataSource`, `TTable`, `TADOQuery`, `TADOTable`, `TIBQuery` e `TIBDataSet`.
+- extração inicial de componentes de dados como `TFDQuery`, `TQuery`, `TClientDataSet`, `TDataSource`, `TTable`, `TADOQuery`, `TADOTable`, `TIBQuery` e `TIBDataSet`;
+- extração inicial de eventos por atribuição (`Componente.OnClick := Handler`) e por convenção de nome (`BotaoClick`, `CampoExit`, etc.).
 
 ## CLI
 
@@ -34,6 +35,7 @@ A saída é um JSON contendo:
 - `sqlSnippets`;
 - `validationHints`;
 - `datasetHints`;
+- `eventHints`;
 - `warnings`.
 
 ## Exemplo de saída
@@ -67,9 +69,35 @@ A saída é um JSON contendo:
       "tableName": "PRODUTOS"
     }
   ],
+  "eventHints": [
+    {
+      "componentName": "BtnGravar",
+      "eventName": "OnClick",
+      "handlerName": "BtnGravarClick"
+    }
+  ],
   "warnings": []
 }
 ```
+
+## Eventos
+
+O parser detecta eventos de duas formas:
+
+1. Atribuições explícitas no código:
+
+```pascal
+BtnGravar.OnClick := BtnGravarClick;
+```
+
+2. Convenções comuns do Delphi:
+
+```pascal
+procedure TForm.BtnGravarClick(Sender: TObject);
+procedure TForm.CampoDescricaoExit(Sender: TObject);
+```
+
+Essas pistas ajudam a conectar ações da DSL aos métodos encontrados no PAS.
 
 ## Limitações conhecidas
 
@@ -85,7 +113,6 @@ Limitações atuais:
 
 ## Próximas melhorias
 
-- detectar eventos vinculados aos componentes do DFM;
 - mapear validações para campos da DSL;
 - gerar relatório de lacunas;
 - enriquecer automaticamente o `.gestor.json` gerado pelo parser DFM.
