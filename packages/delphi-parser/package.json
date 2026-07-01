@@ -10,7 +10,8 @@
     "parse:dfm": "tsx src/cli/parseDfm.ts",
     "dfm:gestor": "tsx src/cli/dfmToGestor.ts",
     "parse:pas": "tsx src/cli/parsePas.ts",
-    "dfm-pas:gestor": "tsx src/cli/dfmPasToGestor.ts"
+    "dfm-pas:gestor": "tsx src/cli/dfmPasToGestor.ts",
+    "resolve:form": "tsx src/cli/resolveDelphiForm.ts"
   },
   "dependencies": {
     "@gestor/dsl": "workspace:*"
