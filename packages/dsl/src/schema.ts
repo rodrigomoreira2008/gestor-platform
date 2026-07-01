@@ -19,6 +19,7 @@ export const gestorFieldSchema = z.object({
   type: gestorFieldTypeSchema,
   required: z.boolean().default(false),
   readOnly: z.boolean().default(false),
+  section: z.string().optional(),
   sourceComponent: z.string().optional(),
   sourceBinding: z.string().optional(),
   lookup: z
