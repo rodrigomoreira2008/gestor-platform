@@ -1,6 +1,8 @@
+using Gestor.Api.Common;
+
 namespace Gestor.Api.Entities;
 
-public class Produto
+public class Produto : IEntity
 {
     public int Id { get; set; }
     public int? Numero { get; set; }
