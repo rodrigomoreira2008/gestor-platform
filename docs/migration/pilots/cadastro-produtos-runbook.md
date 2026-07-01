@@ -70,6 +70,20 @@ Produtos
 7. Confirmar que o produto aparece na lista `Produtos cadastrados`.
 8. Reiniciar o backend e confirmar que o produto continua listado.
 
+## Edição
+
+1. Clicar em `Editar` na linha de um produto.
+2. Confirmar que os dados aparecem no formulário.
+3. Alterar algum campo.
+4. Clicar em `Gravar`.
+5. Confirmar que a lista foi atualizada.
+
+## Exclusão
+
+1. Clicar em `Excluir` na linha de um produto.
+2. Confirmar mensagem de sucesso.
+3. Confirmar que o item saiu da lista.
+
 ## Validação de erro
 
 Para validar a regra de obrigatoriedade:
@@ -81,4 +95,4 @@ Para validar a regra de obrigatoriedade:
 
 ## Observações
 
-Este piloto já usa persistência local com SQLite. A próxima evolução será criar migrations formais do Entity Framework e evoluir o CRUD para edição/exclusão pela interface.
+Este piloto já usa persistência local com SQLite e CRUD básico na interface. A próxima evolução será criar migrations formais do Entity Framework e adicionar confirmação antes da exclusão.
