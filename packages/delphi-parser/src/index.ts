@@ -2,6 +2,7 @@ export * from './backendGenerator';
 export * from './dfmIntrospection';
 export * from './dfmParser';
 export * from './dfmToGestorForm';
+export * from './frontendGenerator';
 export * from './gestorPasEnrichment';
 export * from './pasParser';
 export * from './resolvedForm';
