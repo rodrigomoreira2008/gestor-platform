@@ -35,6 +35,10 @@ export function generateBackendFiles(resolved: ResolvedForm, options: BackendGen
     {
       path: `${outputRoot}/Controllers/${entityName}Controller.cs`,
       content: generateController(entityName, resolved.form.entity, namespace)
+    },
+    {
+      path: `${outputRoot}/Generated/${entityName}DbContextRegistration.cs.txt`,
+      content: generateDbContextRegistration(entityName)
     }
   ];
 }
@@ -142,6 +146,15 @@ public class ${entityName}Controller : CrudControllerBase<${entityName}, ${entit
     {
     }
 }
+`;
+}
+
+function generateDbContextRegistration(entityName: string): string {
+  return `// Adicionar em GestorDbContext.cs
+public DbSet<${entityName}> ${entityName}s => Set<${entityName}>();
+
+// Conferir se existe using da entidade gerada:
+// using Gestor.Api.Entities;
 `;
 }
 
