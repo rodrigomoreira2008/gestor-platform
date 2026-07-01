@@ -25,7 +25,7 @@ export interface PascalParseResult {
 }
 
 const methodPattern = /^\s*(procedure|function)\s+(?:\w+\.)?(\w+)\s*(?:\((.*?)\))?\s*(?::\s*([\w.<>]+))?\s*;/i;
-const sqlAssignmentPattern = /(?:SQL\.Text|CommandText)\s*:=\s*((?:'[^']*(?:''[^']*)*'\s*(?:\+\s*)?)+)/gi;
+const sqlAssignmentPattern = /(?:SQL\.Text|CommandText)\s*:=\s*((?:'[^']*(?:''[^']*)*'\s*(?:\+\s*)?\s*)+)/gi;
 const sqlAddPattern = /SQL\.Add\s*\(\s*'([^']*(?:''[^']*)*)'\s*\)/gi;
 const messagePattern = /(?:ShowMessage|MessageDlg|raise\s+Exception\.Create)\s*\(\s*'([^']*(?:''[^']*)*)'/gi;
 const requiredFieldPattern = /(?:FieldByName\s*\(\s*'([^']+)'\s*\)|\b(\w+)\s*)\.(?:IsNull|Text\s*=\s*'')/i;
