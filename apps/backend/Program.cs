@@ -1,4 +1,6 @@
 using Gestor.Api;
+using Gestor.Api.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,12 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddDbContext<GestorDbContext>(options =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("Gestor") ?? "Data Source=gestor.db";
+    options.UseSqlite(connectionString);
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -24,6 +32,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<GestorDbContext>();
+    await db.Database.EnsureCreatedAsync();
 }
 
 app.UseHttpsRedirection();
