@@ -31,15 +31,29 @@ public class ProdutoController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ProdutoDto>> Create(ProdutoDto input, CancellationToken cancellationToken)
     {
-        var created = await _service.CreateAsync(input, cancellationToken);
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        try
+        {
+            var created = await _service.CreateAsync(input, cancellationToken);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        }
+        catch (InvalidOperationException error)
+        {
+            return BadRequest(new { error = error.Message });
+        }
     }
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, ProdutoDto input, CancellationToken cancellationToken)
     {
-        await _service.UpdateAsync(id, input, cancellationToken);
-        return NoContent();
+        try
+        {
+            await _service.UpdateAsync(id, input, cancellationToken);
+            return NoContent();
+        }
+        catch (InvalidOperationException error)
+        {
+            return BadRequest(new { error = error.Message });
+        }
     }
 
     [HttpDelete("{id:int}")]
