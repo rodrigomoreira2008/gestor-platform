@@ -1,5 +1,5 @@
 import type { GestorAction, GestorField, GestorForm } from '@gestor/dsl';
-import { Alert, Box, CircularProgress, Snackbar, Typography } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, Typography } from '@mui/material';
 import { CrudPage, type FormValues } from '@gestor/ui';
 import axios from 'axios';
 import { useState } from 'react';
@@ -15,8 +15,11 @@ export function CadastroProdutosPage() {
   const removeProduto = useRemoveProduto();
   const [values, setValues] = useState<FormValues>({});
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Produto | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const isSaving = createProduto.isPending || updateProduto.isPending;
+  const isDeleting = removeProduto.isPending;
 
   function handleValueChange(field: GestorField, value: unknown) {
     setValues((current) => ({ ...current, [field.name]: value }));
@@ -58,9 +61,16 @@ export function CadastroProdutosPage() {
     setValues(produtoToFormValues(produto));
   }
 
-  async function handleDelete(produto: Produto) {
-    await removeProduto.mutateAsync(produto.id);
-    if (selectedId === produto.id) clearForm();
+  function handleDelete(produto: Produto) {
+    setPendingDelete(produto);
+  }
+
+  async function confirmDelete() {
+    if (!pendingDelete) return;
+
+    await removeProduto.mutateAsync(pendingDelete.id);
+    if (selectedId === pendingDelete.id) clearForm();
+    setPendingDelete(null);
     setMessage('Produto excluído com sucesso.');
   }
 
@@ -72,7 +82,7 @@ export function CadastroProdutosPage() {
 
   return (
     <Box>
-      {produtos.isLoading && <CircularProgress size={24} />}
+      {(produtos.isLoading || isSaving || isDeleting) && <CircularProgress size={24} />}
 
       {produtos.isError && (
         <Alert severity="warning" sx={{ mb: 2 }}>
@@ -96,6 +106,21 @@ export function CadastroProdutosPage() {
       )}
 
       <CrudPage form={form as GestorForm} values={values} onValueChange={handleValueChange} onAction={handleAction} />
+
+      <Dialog open={pendingDelete !== null} onClose={() => setPendingDelete(null)}>
+        <DialogTitle>Confirmar exclusão</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Deseja excluir o produto {pendingDelete?.descricao ?? pendingDelete?.id}? Esta ação não pode ser desfeita.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPendingDelete(null)}>Cancelar</Button>
+          <Button color="error" variant="contained" onClick={confirmDelete} disabled={isDeleting}>
+            Excluir
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar open={message !== null} autoHideDuration={3000} message={message} onClose={() => setMessage(null)} />
     </Box>
