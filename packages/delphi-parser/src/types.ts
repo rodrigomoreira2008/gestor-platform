@@ -10,6 +10,13 @@ export interface DelphiFormParseResult {
   warnings: string[];
 }
 
+export interface DelphiBounds {
+  left?: number;
+  top?: number;
+  width?: number;
+  height?: number;
+}
+
 export interface DelphiFieldBinding {
   componentName: string;
   componentClass: string;
@@ -17,6 +24,7 @@ export interface DelphiFieldBinding {
   dataField?: string;
   label?: string;
   section?: string;
+  bounds?: DelphiBounds;
 }
 
 export interface DelphiActionBinding {
@@ -25,4 +33,5 @@ export interface DelphiActionBinding {
   caption?: string;
   event?: string;
   section?: string;
+  bounds?: DelphiBounds;
 }
