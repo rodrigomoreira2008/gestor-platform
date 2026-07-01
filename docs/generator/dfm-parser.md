@@ -16,6 +16,7 @@ A versão atual suporta:
 - identificação de campos de entrada;
 - identificação de botões;
 - inferência de seção por `TGroupBox`, `TTabSheet` ou `TPanel`;
+- caminho completo de seção em `sectionPath`;
 - leitura de posição/tamanho (`Left`, `Top`, `Width`, `Height`);
 - associação inicial de labels por proximidade visual com `TLabel`.
 
@@ -66,6 +67,24 @@ Isso cobre casos comuns como:
 
 Nesta fase, coleções e blobs ainda são preservados como texto. A interpretação semântica virá em uma etapa posterior.
 
+## Seções e abas
+
+Cada campo e ação agora retorna:
+
+- `section`: seção mais próxima;
+- `sectionPath`: caminho completo de seções pai.
+
+Exemplo conceitual:
+
+```json
+{
+  "section": "Dados Gerais",
+  "sectionPath": ["Cadastro", "Dados Gerais"]
+}
+```
+
+Isso ajuda o gerador React a preservar agrupamentos, abas e painéis aninhados do formulário Delphi.
+
 ## Associação de labels
 
 Quando um campo não possui `Caption`, o parser tenta encontrar um `TLabel` próximo no mesmo componente pai.
@@ -93,6 +112,7 @@ A saída é um JSON com:
 - campos encontrados;
 - ações encontradas;
 - seção inferida;
+- caminho completo de seção;
 - bounds dos componentes;
 - label inferido quando possível.
 
