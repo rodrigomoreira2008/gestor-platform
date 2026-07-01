@@ -1,6 +1,8 @@
 export interface PascalMethod {
   name: string;
+  kind: 'procedure' | 'function';
   parameters?: string;
+  returnType?: string;
   body: string;
 }
 
@@ -22,8 +24,9 @@ export interface PascalParseResult {
   warnings: string[];
 }
 
-const methodPattern = /^\s*procedure\s+(?:\w+\.)?(\w+)\s*(?:\((.*?)\))?\s*;/i;
-const sqlPattern = /(?:SQL\.Text|CommandText)\s*:=\s*'([^']*(?:''[^']*)*)'/gi;
+const methodPattern = /^\s*(procedure|function)\s+(?:\w+\.)?(\w+)\s*(?:\((.*?)\))?\s*(?::\s*([\w.<>]+))?\s*;/i;
+const sqlAssignmentPattern = /(?:SQL\.Text|CommandText)\s*:=\s*((?:'[^']*(?:''[^']*)*'\s*(?:\+\s*)?)+)/gi;
+const sqlAddPattern = /SQL\.Add\s*\(\s*'([^']*(?:''[^']*)*)'\s*\)/gi;
 const messagePattern = /(?:ShowMessage|MessageDlg|raise\s+Exception\.Create)\s*\(\s*'([^']*(?:''[^']*)*)'/gi;
 const requiredFieldPattern = /(?:FieldByName\s*\(\s*'([^']+)'\s*\)|\b(\w+)\s*)\.(?:IsNull|Text\s*=\s*'')/i;
 
@@ -51,19 +54,21 @@ function collectMethods(input: string, warnings: string[]): PascalMethod[] {
 
     const beginIndex = findNextBegin(lines, index + 1);
     if (beginIndex === -1) {
-      warnings.push(`Método ${match[1]} sem bloco begin/end encontrado.`);
+      warnings.push(`Método ${match[2]} sem bloco begin/end encontrado.`);
       continue;
     }
 
     const endIndex = findMatchingEnd(lines, beginIndex);
     if (endIndex === -1) {
-      warnings.push(`Método ${match[1]} sem end correspondente.`);
+      warnings.push(`Método ${match[2]} sem end correspondente.`);
       continue;
     }
 
     methods.push({
-      name: match[1],
-      parameters: match[2],
+      kind: match[1].toLowerCase() as 'procedure' | 'function',
+      name: match[2],
+      parameters: match[3],
+      returnType: match[4],
       body: lines.slice(beginIndex, endIndex + 1).join('\n')
     });
 
@@ -95,9 +100,15 @@ function findMatchingEnd(lines: string[], beginIndex: number): number {
 
 function collectSql(method: PascalMethod): PascalSqlSnippet[] {
   const snippets: PascalSqlSnippet[] = [];
-  for (const match of method.body.matchAll(sqlPattern)) {
+
+  for (const match of method.body.matchAll(sqlAssignmentPattern)) {
+    snippets.push({ methodName: method.name, text: normalizePascalStringExpression(match[1]) });
+  }
+
+  for (const match of method.body.matchAll(sqlAddPattern)) {
     snippets.push({ methodName: method.name, text: unescapePascalString(match[1]) });
   }
+
   return snippets;
 }
 
@@ -112,6 +123,14 @@ function collectValidationHints(method: PascalMethod): PascalValidationHint[] {
   }
 
   return hints;
+}
+
+function normalizePascalStringExpression(value: string): string {
+  return [...value.matchAll(/'([^']*(?:''[^']*)*)'/g)]
+    .map((match) => unescapePascalString(match[1]))
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function stripPascalComment(line: string): string {
