@@ -11,6 +11,7 @@ public class GestorDbContext : DbContext
 
     public DbSet<Produto> Produtos => Set<Produto>();
     public DbSet<Cliente> Clientes => Set<Cliente>();
+    public DbSet<Fornecedor> Fornecedores => Set<Fornecedor>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,6 +35,17 @@ public class GestorDbContext : DbContext
             entity.Property(cliente => cliente.Email).HasMaxLength(150);
             entity.Property(cliente => cliente.Uf).HasMaxLength(2);
             entity.Property(cliente => cliente.Situacao).HasMaxLength(30);
+        });
+
+        modelBuilder.Entity<Fornecedor>(entity =>
+        {
+            entity.ToTable("Fornecedores");
+            entity.HasKey(fornecedor => fornecedor.Id);
+            entity.Property(fornecedor => fornecedor.RazaoSocial).HasMaxLength(200);
+            entity.Property(fornecedor => fornecedor.Fantasia).HasMaxLength(200);
+            entity.Property(fornecedor => fornecedor.Documento).HasMaxLength(20);
+            entity.Property(fornecedor => fornecedor.Email).HasMaxLength(150);
+            entity.Property(fornecedor => fornecedor.Uf).HasMaxLength(2);
         });
     }
 }
