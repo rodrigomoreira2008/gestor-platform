@@ -1,14 +1,14 @@
-import type { GestorForm } from '@gestor/dsl';
-import { Box, Button, Card, CardContent, Stack, Typography } from '@mui/material';
+import type { GestorAction, GestorForm } from '@gestor/dsl';
+import { Box, Card, CardContent, Typography } from '@mui/material';
+import { CrudToolbar } from './CrudToolbar.js';
 import { FormRenderer } from './FormRenderer.js';
 
 export interface CrudPageProps {
   form: GestorForm;
-  onSave?: () => void;
-  onCancel?: () => void;
+  onAction?: (action: GestorAction) => void;
 }
 
-export function CrudPage({ form, onSave, onCancel }: CrudPageProps) {
+export function CrudPage({ form, onAction }: CrudPageProps) {
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Typography variant="h5" sx={{ mb: 2 }}>
@@ -17,12 +17,8 @@ export function CrudPage({ form, onSave, onCancel }: CrudPageProps) {
 
       <Card>
         <CardContent>
+          <CrudToolbar actions={form.actions} onAction={onAction} />
           <FormRenderer form={form} />
-
-          <Stack direction="row" justifyContent="flex-end" spacing={1} sx={{ mt: 3 }}>
-            <Button variant="outlined" onClick={onCancel}>Cancelar</Button>
-            <Button variant="contained" onClick={onSave}>Salvar</Button>
-          </Stack>
         </CardContent>
       </Card>
     </Box>
