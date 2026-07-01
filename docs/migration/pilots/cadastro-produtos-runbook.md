@@ -81,8 +81,9 @@ Produtos
 ## Exclusão
 
 1. Clicar em `Excluir` na linha de um produto.
-2. Confirmar mensagem de sucesso.
-3. Confirmar que o item saiu da lista.
+2. Confirmar a exclusão no diálogo.
+3. Confirmar mensagem de sucesso.
+4. Confirmar que o item saiu da lista.
 
 ## Validação de erro
 
@@ -95,4 +96,4 @@ Para validar a regra de obrigatoriedade:
 
 ## Observações
 
-Este piloto já usa persistência local com SQLite e CRUD básico na interface. A próxima evolução será criar migrations formais do Entity Framework e adicionar confirmação antes da exclusão.
+Este piloto já usa persistência local com SQLite, CRUD básico na interface e confirmação antes da exclusão. A próxima evolução será criar migrations formais do Entity Framework.
