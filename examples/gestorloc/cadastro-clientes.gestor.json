@@ -1,0 +1,170 @@
+{
+  "version": "0.1",
+  "entity": "cliente",
+  "title": "Cadastro de Clientes",
+  "source": {
+    "dfm": "CadastroClientes.dfm",
+    "pas": "CadastroClientes.pas"
+  },
+  "table": "CLIENTES",
+  "fields": [
+    {
+      "name": "nome",
+      "label": "Nome / Razão Social",
+      "type": "text",
+      "required": true,
+      "readOnly": false,
+      "section": "Dados Gerais",
+      "sourceBinding": "NOME"
+    },
+    {
+      "name": "fantasia",
+      "label": "Nome Fantasia",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Dados Gerais",
+      "sourceBinding": "FANTASIA"
+    },
+    {
+      "name": "documento",
+      "label": "CPF/CNPJ",
+      "type": "text",
+      "required": true,
+      "readOnly": false,
+      "section": "Dados Gerais",
+      "sourceBinding": "DOCUMENTO"
+    },
+    {
+      "name": "inscricaoEstadual",
+      "label": "Inscrição Estadual",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Dados Gerais",
+      "sourceBinding": "INSCRICAOESTADUAL"
+    },
+    {
+      "name": "telefone",
+      "label": "Telefone",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Contato",
+      "sourceBinding": "TELEFONE"
+    },
+    {
+      "name": "celular",
+      "label": "Celular",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Contato",
+      "sourceBinding": "CELULAR"
+    },
+    {
+      "name": "email",
+      "label": "E-mail",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Contato",
+      "sourceBinding": "EMAIL"
+    },
+    {
+      "name": "cep",
+      "label": "CEP",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Endereço",
+      "sourceBinding": "CEP"
+    },
+    {
+      "name": "endereco",
+      "label": "Endereço",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Endereço",
+      "sourceBinding": "ENDERECO"
+    },
+    {
+      "name": "numero",
+      "label": "Número",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Endereço",
+      "sourceBinding": "NUMERO"
+    },
+    {
+      "name": "complemento",
+      "label": "Complemento",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Endereço",
+      "sourceBinding": "COMPLEMENTO"
+    },
+    {
+      "name": "bairro",
+      "label": "Bairro",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Endereço",
+      "sourceBinding": "BAIRRO"
+    },
+    {
+      "name": "cidade",
+      "label": "Cidade",
+      "type": "text",
+      "required": true,
+      "readOnly": false,
+      "section": "Endereço",
+      "sourceBinding": "CIDADE"
+    },
+    {
+      "name": "uf",
+      "label": "UF",
+      "type": "text",
+      "required": true,
+      "readOnly": false,
+      "section": "Endereço",
+      "sourceBinding": "UF"
+    },
+    {
+      "name": "situacao",
+      "label": "Situação",
+      "type": "text",
+      "required": false,
+      "readOnly": false,
+      "section": "Controle",
+      "sourceBinding": "SITUACAO"
+    },
+    {
+      "name": "observacoes",
+      "label": "Observações",
+      "type": "memo",
+      "required": false,
+      "readOnly": false,
+      "section": "Controle",
+      "sourceBinding": "OBSERVACOES"
+    }
+  ],
+  "actions": [
+    { "name": "novo", "label": "Novo", "kind": "create" },
+    { "name": "alterar", "label": "Alterar", "kind": "update" },
+    { "name": "excluir", "label": "Excluir", "kind": "delete" },
+    { "name": "localizar", "label": "Localizar", "kind": "custom" },
+    { "name": "gravar", "label": "Gravar", "kind": "update" },
+    { "name": "cancelar", "label": "Cancelar", "kind": "custom" },
+    { "name": "sair", "label": "Sair", "kind": "custom" }
+  ],
+  "notes": [
+    "DSL inicial do segundo piloto funcional Clientes.",
+    "Campos foram definidos como primeira versão para validar a arquitetura genérica já usada em Produto.",
+    "A próxima etapa será substituir esta DSL inicial por metadados extraídos diretamente do DFM/PAS real."
+  ]
+}
