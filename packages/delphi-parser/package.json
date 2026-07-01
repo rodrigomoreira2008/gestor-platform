@@ -9,7 +9,8 @@
     "build": "tsc -p tsconfig.json",
     "parse:dfm": "tsx src/cli/parseDfm.ts",
     "dfm:gestor": "tsx src/cli/dfmToGestor.ts",
-    "parse:pas": "tsx src/cli/parsePas.ts"
+    "parse:pas": "tsx src/cli/parsePas.ts",
+    "dfm-pas:gestor": "tsx src/cli/dfmPasToGestor.ts"
   },
   "dependencies": {
     "@gestor/dsl": "workspace:*"
