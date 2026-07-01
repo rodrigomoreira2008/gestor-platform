@@ -1,51 +1,79 @@
+using Gestor.Api.Common;
 using Gestor.Api.DTO;
-using Gestor.Api.Repositories;
+using Gestor.Api.Entities;
 using Gestor.Api.Validators;
 
 namespace Gestor.Api.Services;
 
-public class ProdutoService
+public class ProdutoService : CrudService<Produto, ProdutoDto>
 {
-    private readonly ProdutoRepository _repository;
-    private readonly ProdutoValidator _validator;
-
-    public ProdutoService(ProdutoRepository repository, ProdutoValidator validator)
+    public ProdutoService(CrudRepository<Produto> repository, ProdutoValidator validator) : base(repository, validator)
     {
-        _repository = repository;
-        _validator = validator;
     }
 
-    public Task<IEnumerable<ProdutoDto>> GetAllAsync(CancellationToken cancellationToken)
+    protected override ProdutoDto ToDto(Produto produto)
     {
-        return _repository.GetAllAsync(cancellationToken);
+        return new ProdutoDto
+        {
+            Id = produto.Id,
+            Numero = produto.Numero,
+            Descricao = produto.Descricao,
+            Marca = produto.Marca,
+            Grupo = produto.Grupo,
+            Nomegrupo = produto.Nomegrupo,
+            Patrimonio = produto.Patrimonio,
+            Numeroserie = produto.Numeroserie,
+            Acessorio = produto.Acessorio,
+            Mostracontrato = produto.Mostracontrato,
+            Status = produto.Status,
+            Valorcompra = produto.Valorcompra,
+            Valorestimado = produto.Valorestimado,
+            Valorlimpeza = produto.Valorlimpeza,
+            Quantidadereal = produto.Quantidadereal,
+            Unidade = produto.Unidade,
+            Quantidadeestoque = produto.Quantidadeestoque,
+            Valorminimo = produto.Valorminimo,
+            Valormensal = produto.Valormensal,
+            Valordiario = produto.Valordiario,
+            Tipo = produto.Tipo,
+            Tabeladescontomensal = produto.Tabeladescontomensal,
+            Nometabeladescontomensal = produto.Nometabeladescontomensal,
+            Descricaodetalhada = produto.Descricaodetalhada,
+            Locacao = produto.Locacao,
+            Nomelocacao = produto.Nomelocacao
+        };
     }
 
-    public Task<ProdutoDto?> GetByIdAsync(int id, CancellationToken cancellationToken)
+    protected override Produto ToEntity(ProdutoDto input)
     {
-        return _repository.GetByIdAsync(id, cancellationToken);
-    }
-
-    public Task<ProdutoDto> CreateAsync(ProdutoDto input, CancellationToken cancellationToken)
-    {
-        EnsureValid(input);
-        return _repository.CreateAsync(input, cancellationToken);
-    }
-
-    public Task UpdateAsync(int id, ProdutoDto input, CancellationToken cancellationToken)
-    {
-        input.Id = id;
-        EnsureValid(input);
-        return _repository.UpdateAsync(input, cancellationToken);
-    }
-
-    public Task DeleteAsync(int id, CancellationToken cancellationToken)
-    {
-        return _repository.DeleteAsync(id, cancellationToken);
-    }
-
-    private void EnsureValid(ProdutoDto input)
-    {
-        var errors = _validator.Validate(input);
-        if (errors.Count > 0) throw new InvalidOperationException(string.Join(" ", errors));
+        return new Produto
+        {
+            Id = input.Id,
+            Numero = input.Numero,
+            Descricao = input.Descricao,
+            Marca = input.Marca,
+            Grupo = input.Grupo,
+            Nomegrupo = input.Nomegrupo,
+            Patrimonio = input.Patrimonio,
+            Numeroserie = input.Numeroserie,
+            Acessorio = input.Acessorio,
+            Mostracontrato = input.Mostracontrato,
+            Status = input.Status,
+            Valorcompra = input.Valorcompra,
+            Valorestimado = input.Valorestimado,
+            Valorlimpeza = input.Valorlimpeza,
+            Quantidadereal = input.Quantidadereal,
+            Unidade = input.Unidade,
+            Quantidadeestoque = input.Quantidadeestoque,
+            Valorminimo = input.Valorminimo,
+            Valormensal = input.Valormensal,
+            Valordiario = input.Valordiario,
+            Tipo = input.Tipo,
+            Tabeladescontomensal = input.Tabeladescontomensal,
+            Nometabeladescontomensal = input.Nometabeladescontomensal,
+            Descricaodetalhada = input.Descricaodetalhada,
+            Locacao = input.Locacao,
+            Nomelocacao = input.Nomelocacao
+        };
     }
 }
