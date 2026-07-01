@@ -24,6 +24,7 @@ export interface DelphiFieldBinding {
   dataField?: string;
   label?: string;
   section?: string;
+  sectionPath?: string[];
   bounds?: DelphiBounds;
 }
 
@@ -33,5 +34,6 @@ export interface DelphiActionBinding {
   caption?: string;
   event?: string;
   section?: string;
+  sectionPath?: string[];
   bounds?: DelphiBounds;
 }
