@@ -22,6 +22,14 @@ function TCadastroProdutos.PodeGravar: Boolean;
 begin
   Result := True;
 end;
+
+var
+  QryProdutos: TFDQuery;
+  DsProdutos: TDataSource;
+begin
+  QryProdutos.TableName := 'PRODUTOS';
+  DsProdutos.DataSet := QryProdutos;
+end;
 ```
 
 ## Saída esperada
@@ -54,6 +62,18 @@ end;
       "methodName": "BtnGravarClick",
       "field": "DESCRICAO",
       "message": "Descrição é obrigatória."
+    }
+  ],
+  "datasetHints": [
+    {
+      "name": "QryProdutos",
+      "className": "TFDQuery",
+      "tableName": "PRODUTOS"
+    },
+    {
+      "name": "DsProdutos",
+      "className": "TDataSource",
+      "dataSource": "QryProdutos"
     }
   ]
 }
