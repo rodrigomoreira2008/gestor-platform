@@ -27,6 +27,10 @@ export function generateFrontendFiles(resolved: ResolvedForm, options: FrontendG
     {
       path: `${outputRoot}/hooks/index.ts`,
       content: generateHooks(entityPascal, entity, plural)
+    },
+    {
+      path: `${outputRoot}/pages/${entityPascal}Page.tsx`,
+      content: generatePage(entityPascal, plural, resolved.fields)
     }
   ];
 }
@@ -80,6 +84,30 @@ export function useUpdate${entityPascal}() {
 
 export function useRemove${entityPascal}() {
   return use${entityPascal}Resource().remove;
+}
+`;
+}
+
+function generatePage(entityPascal: string, plural: string, fields: ResolvedField[]): string {
+  const displayField = fields.find((field) => field.label)?.name ?? fields[0]?.name ?? 'id';
+  return `import { Alert, Box, CircularProgress, Typography } from '@mui/material';
+import { use${entityPascal}s } from '../hooks';
+
+export function ${entityPascal}Page() {
+  const list = use${entityPascal}s();
+
+  return (
+    <Box>
+      <Typography variant="h5" sx={{ mb: 2 }}>${entityPascal}</Typography>
+      {list.isLoading && <CircularProgress size={24} />}
+      {list.isError && <Alert severity="warning">Não foi possível carregar ${plural}.</Alert>}
+      {list.data?.map((item) => (
+        <Box key={item.id} sx={{ py: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+          {item.${toCamelCase(displayField)} ?? item.id}
+        </Box>
+      ))}
+    </Box>
+  );
 }
 `;
 }
