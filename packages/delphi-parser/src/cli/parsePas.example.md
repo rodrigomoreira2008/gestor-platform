@@ -29,6 +29,7 @@ var
 begin
   QryProdutos.TableName := 'PRODUTOS';
   DsProdutos.DataSet := QryProdutos;
+  BtnGravar.OnClick := BtnGravarClick;
 end;
 ```
 
@@ -74,6 +75,13 @@ end;
       "name": "DsProdutos",
       "className": "TDataSource",
       "dataSource": "QryProdutos"
+    }
+  ],
+  "eventHints": [
+    {
+      "componentName": "BtnGravar",
+      "eventName": "OnClick",
+      "handlerName": "BtnGravarClick"
     }
   ]
 }
