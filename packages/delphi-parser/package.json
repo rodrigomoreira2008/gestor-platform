@@ -8,7 +8,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "parse:dfm": "tsx src/cli/parseDfm.ts",
-    "dfm:gestor": "tsx src/cli/dfmToGestor.ts"
+    "dfm:gestor": "tsx src/cli/dfmToGestor.ts",
+    "parse:pas": "tsx src/cli/parsePas.ts"
   },
   "dependencies": {
     "@gestor/dsl": "workspace:*"
