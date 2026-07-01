@@ -24,11 +24,18 @@ export interface PascalDatasetHint {
   dataSource?: string;
 }
 
+export interface PascalEventHint {
+  componentName: string;
+  eventName: string;
+  handlerName: string;
+}
+
 export interface PascalParseResult {
   methods: PascalMethod[];
   sqlSnippets: PascalSqlSnippet[];
   validationHints: PascalValidationHint[];
   datasetHints: PascalDatasetHint[];
+  eventHints: PascalEventHint[];
   warnings: string[];
 }
 
@@ -36,6 +43,7 @@ const methodPattern = /^\s*(procedure|function)\s+(?:\w+\.)?(\w+)\s*(?:\((.*?)\)
 const componentDeclarationPattern = /^\s*(\w+)\s*:\s*(T(?:FDQuery|Query|ClientDataSet|DataSource|Table|ADOQuery|ADOTable|IBQuery|IBDataSet))\s*;/i;
 const tableNamePattern = /(\w+)\.(?:TableName|CommandText)\s*:=\s*'([^']*(?:''[^']*)*)'/gi;
 const dataSourcePattern = /(\w+)\.DataSet\s*:=\s*(\w+)/gi;
+const eventAssignmentPattern = /(\w+)\.(On\w+)\s*:=\s*(\w+)/gi;
 const sqlAssignmentPattern = /(?:SQL\.Text|CommandText)\s*:=\s*((?:'[^']*(?:''[^']*)*'\s*(?:\+\s*)?\s*)+)/gi;
 const sqlAddPattern = /SQL\.Add\s*\(\s*'([^']*(?:''[^']*)*)'\s*\)/gi;
 const messagePattern = /(?:ShowMessage|MessageDlg|raise\s+Exception\.Create)\s*\(\s*'([^']*(?:''[^']*)*)'/gi;
@@ -47,12 +55,14 @@ export function parsePascalUnit(input: string): PascalParseResult {
   const sqlSnippets = methods.flatMap((method) => collectSql(method));
   const validationHints = methods.flatMap((method) => collectValidationHints(method));
   const datasetHints = collectDatasetHints(input);
+  const eventHints = collectEventHints(input, methods);
 
   return {
     methods,
     sqlSnippets,
     validationHints,
     datasetHints,
+    eventHints,
     warnings
   };
 }
@@ -113,6 +123,60 @@ function collectDatasetHints(input: string): PascalDatasetHint[] {
   }
 
   return [...datasets.values()];
+}
+
+function collectEventHints(input: string, methods: PascalMethod[]): PascalEventHint[] {
+  const methodNames = new Set(methods.map((method) => method.name.toLowerCase()));
+  const hints = new Map<string, PascalEventHint>();
+
+  for (const match of input.matchAll(eventAssignmentPattern)) {
+    const hint = {
+      componentName: match[1],
+      eventName: match[2],
+      handlerName: match[3]
+    };
+    hints.set(`${hint.componentName}.${hint.eventName}.${hint.handlerName}`, hint);
+  }
+
+  for (const method of methods) {
+    const inferred = inferEventFromHandler(method.name);
+    if (!inferred) continue;
+
+    const hint = {
+      componentName: inferred.componentName,
+      eventName: inferred.eventName,
+      handlerName: method.name
+    };
+
+    if (methodNames.has(hint.handlerName.toLowerCase())) {
+      hints.set(`${hint.componentName}.${hint.eventName}.${hint.handlerName}`, hint);
+    }
+  }
+
+  return [...hints.values()];
+}
+
+function inferEventFromHandler(handlerName: string): { componentName: string; eventName: string } | null {
+  const knownSuffixes: Array<[string, string]> = [
+    ['Click', 'OnClick'],
+    ['Exit', 'OnExit'],
+    ['Enter', 'OnEnter'],
+    ['Change', 'OnChange'],
+    ['KeyDown', 'OnKeyDown'],
+    ['KeyPress', 'OnKeyPress'],
+    ['KeyUp', 'OnKeyUp'],
+    ['Close', 'OnClose'],
+    ['Create', 'OnCreate'],
+    ['Show', 'OnShow']
+  ];
+
+  const suffix = knownSuffixes.find(([name]) => handlerName.endsWith(name));
+  if (!suffix) return null;
+
+  const componentName = handlerName.slice(0, -suffix[0].length);
+  if (!componentName) return null;
+
+  return { componentName, eventName: suffix[1] };
 }
 
 function findNextBegin(lines: string[], startIndex: number): number {
