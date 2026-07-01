@@ -17,7 +17,7 @@ const resolved = resolveDelphiForm(readFileSync(dfmPath, 'utf8'), readFileSync(p
   pasFile: pasPath.split(/[\\/]/).at(-1)
 });
 
-const files = generateFrontendFiles(resolved, { outputRoot });
+const files = generateFrontendFiles(resolved, outputRoot ? { outputRoot } : {});
 
 for (const file of files) {
   const target = join(process.cwd(), file.path);
