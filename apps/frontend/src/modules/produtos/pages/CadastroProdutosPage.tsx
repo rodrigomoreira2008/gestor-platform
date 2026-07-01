@@ -5,12 +5,16 @@ import axios from 'axios';
 import { useState } from 'react';
 import form from '../../../../../../examples/gestorloc/cadastro-produtos.gestor.json';
 import { ProdutoList } from '../components/ProdutoList';
-import { useCreateProduto, useProdutos } from '../hooks/useProdutos';
+import { useCreateProduto, useProdutos, useRemoveProduto, useUpdateProduto } from '../hooks/useProdutos';
+import type { Produto } from '../types/produto';
 
 export function CadastroProdutosPage() {
   const produtos = useProdutos();
   const createProduto = useCreateProduto();
+  const updateProduto = useUpdateProduto();
+  const removeProduto = useRemoveProduto();
   const [values, setValues] = useState<FormValues>({});
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -20,21 +24,50 @@ export function CadastroProdutosPage() {
 
   async function handleAction(action: GestorAction) {
     if (action.name === 'novo') {
-      setValues({});
-      setValidationError(null);
+      clearForm();
+      return;
+    }
+
+    if (action.name === 'cancelar') {
+      clearForm();
       return;
     }
 
     if (action.name === 'gravar') {
       try {
         setValidationError(null);
-        await createProduto.mutateAsync(values);
-        setValues({});
-        setMessage('Produto gravado com sucesso.');
+
+        if (selectedId) {
+          await updateProduto.mutateAsync({ id: selectedId, input: values });
+          setMessage('Produto atualizado com sucesso.');
+        } else {
+          await createProduto.mutateAsync(values);
+          setMessage('Produto gravado com sucesso.');
+        }
+
+        clearForm();
       } catch (error) {
         setValidationError(readApiError(error));
       }
     }
+  }
+
+  function handleSelect(produto: Produto) {
+    setSelectedId(produto.id);
+    setValidationError(null);
+    setValues(produtoToFormValues(produto));
+  }
+
+  async function handleDelete(produto: Produto) {
+    await removeProduto.mutateAsync(produto.id);
+    if (selectedId === produto.id) clearForm();
+    setMessage('Produto excluído com sucesso.');
+  }
+
+  function clearForm() {
+    setValues({});
+    setSelectedId(null);
+    setValidationError(null);
   }
 
   return (
@@ -58,7 +91,7 @@ export function CadastroProdutosPage() {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Produtos carregados da API: {produtos.data.length}
           </Typography>
-          <ProdutoList produtos={produtos.data} />
+          <ProdutoList produtos={produtos.data} selectedId={selectedId} onSelect={handleSelect} onDelete={handleDelete} />
         </>
       )}
 
@@ -67,6 +100,36 @@ export function CadastroProdutosPage() {
       <Snackbar open={message !== null} autoHideDuration={3000} message={message} onClose={() => setMessage(null)} />
     </Box>
   );
+}
+
+function produtoToFormValues(produto: Produto): FormValues {
+  return {
+    numero: produto.numero,
+    descricao: produto.descricao,
+    marca: produto.marca,
+    grupo: produto.grupo,
+    nomegrupo: produto.nomegrupo,
+    patrimonio: produto.patrimonio,
+    numeroserie: produto.numeroserie,
+    acessorio: produto.acessorio,
+    mostracontrato: produto.mostracontrato,
+    status: produto.status,
+    valorcompra: produto.valorcompra,
+    valorestimado: produto.valorestimado,
+    valorlimpeza: produto.valorlimpeza,
+    quantidadereal: produto.quantidadereal,
+    unidade: produto.unidade,
+    quantidadeestoque: produto.quantidadeestoque,
+    valorminimo: produto.valorminimo,
+    valormensal: produto.valormensal,
+    valordiario: produto.valordiario,
+    tipo: produto.tipo,
+    tabeladescontomensal: produto.tabeladescontomensal,
+    nometabeladescontomensal: produto.nometabeladescontomensal,
+    descricaodetalhada: produto.descricaodetalhada,
+    locacao: produto.locacao,
+    nomelocacao: produto.nomelocacao
+  };
 }
 
 function readApiError(error: unknown): string {
