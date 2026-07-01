@@ -18,7 +18,8 @@ A versão atual suporta:
 - inferência de seção por `TGroupBox`, `TTabSheet` ou `TPanel`;
 - caminho completo de seção em `sectionPath`;
 - leitura de posição/tamanho (`Left`, `Top`, `Width`, `Height`);
-- associação inicial de labels por proximidade visual com `TLabel`.
+- associação inicial de labels por proximidade visual com `TLabel`;
+- exportação inicial para DSL `.gestor.json`.
 
 ## Componentes reconhecidos inicialmente
 
@@ -69,7 +70,7 @@ Nesta fase, coleções e blobs ainda são preservados como texto. A interpretaç
 
 ## Seções e abas
 
-Cada campo e ação agora retorna:
+Cada campo e ação retorna:
 
 - `section`: seção mais próxima;
 - `sectionPath`: caminho completo de seções pai.
@@ -116,10 +117,31 @@ A saída é um JSON com:
 - bounds dos componentes;
 - label inferido quando possível.
 
+## Exportar DSL Gestor
+
+Gerar uma DSL inicial diretamente do DFM:
+
+```bash
+pnpm --filter @gestor/delphi-parser dfm:gestor caminho/para/CadastroProdutos.dfm produto PRODUTOS
+```
+
+A saída é um JSON no formato `GestorForm`, contendo:
+
+- `entity`;
+- `title`;
+- `source`;
+- `table`;
+- `fields`;
+- `actions`;
+- `notes`.
+
+Nesta primeira versão, os tipos ainda são inferidos principalmente pela classe visual Delphi. Validações obrigatórias e regras de negócio serão enriquecidas pelo analisador PAS.
+
 ## Próximas melhorias
 
 - tratar coleções Delphi semanticamente;
 - reconhecer `TPageControl`/abas com mais precisão;
-- exportar DSL `.gestor.json` diretamente;
-- integrar com analisador PAS;
+- enriquecer DSL com validações extraídas do PAS;
+- integrar com gerador backend;
+- integrar com gerador frontend;
 - adicionar testes automatizados com amostras reais de DFM.
