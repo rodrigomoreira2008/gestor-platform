@@ -2,81 +2,85 @@
 
 ## Objetivo
 
-Gerar artefatos ASP.NET Core a partir do modelo intermediário `ResolvedForm`.
+Gerar artefatos ASP.NET Core a partir do modelo intermediario ResolvedForm.
 
-A versão atual gera um CRUD backend mínimo sobre a arquitetura genérica já usada nos pilotos manuais:
+A versao atual gera um CRUD backend minimo sobre a arquitetura generica ja usada nos pilotos manuais:
 
 ```text
-ResolvedForm -> Entity + DTO + Validator + Service + Controller + DbContext snippet
+ResolvedForm -> Entity + DTO + Validator + Service + Controller + EF Configuration + DbContext snippet + Migration commands
 ```
 
 ## Entrada
 
-O gerador recebe um `ResolvedForm`, produzido pelo comando:
+O gerador recebe um ResolvedForm, produzido pelo comando:
 
 ```bash
-pnpm --filter @gestor/delphi-parser resolve:form <arquivo.dfm> <arquivo.pas> <entidade> [tabela]
+pnpm --filter @gestor/delphi-parser resolve:form arquivo.dfm arquivo.pas Entidade tabela
 ```
 
-## Saída atual
+## Saida atual
 
 Arquivos gerados:
 
 ```text
-apps/backend/Entities/<Entidade>.cs
-apps/backend/DTO/<Entidade>Dto.cs
-apps/backend/Validators/<Entidade>Validator.cs
-apps/backend/Services/<Entidade>Service.cs
-apps/backend/Controllers/<Entidade>Controller.cs
-apps/backend/Generated/<Entidade>DbContextRegistration.cs.txt
+apps/backend/Entities/Entidade.cs
+apps/backend/DTO/EntidadeDto.cs
+apps/backend/Validators/EntidadeValidator.cs
+apps/backend/Services/EntidadeService.cs
+apps/backend/Controllers/EntidadeController.cs
+apps/backend/Configurations/EntidadeConfiguration.cs
+apps/backend/Generated/EntidadeDbContextRegistration.cs.txt
+apps/backend/Generated/EntidadeMigrationCommands.md
 ```
 
 ## CLI
 
-O arquivo de CLI foi adicionado em:
-
-```text
-packages/delphi-parser/src/cli/generateBackend.ts
-```
-
 Uso:
 
 ```bash
-pnpm --filter @gestor/delphi-parser gen:backend <arquivo.dfm> <arquivo.pas> <entidade> [tabela] [saida]
+pnpm --filter @gestor/delphi-parser gen:backend arquivo.dfm arquivo.pas Entidade tabela saida
 ```
 
 ## Mapeamento inicial de tipos
 
-A primeira heurística usa o nome do campo:
+A primeira heuristica usa o nome do campo:
 
-- `valor`, `preco`, `total`, `quantidade`, `qtd` -> `decimal?`
-- `id`, sufixo `id`, `codigo` -> `int?`
-- `data` -> `DateTime?`
-- demais campos -> `string?`
+- valor, preco, total, quantidade, qtd -> decimal opcional
+- id, sufixo id, codigo -> int opcional
+- data -> DateTime opcional
+- demais campos -> string opcional
 
-## Validações
+## Validacoes
 
-Campos marcados como obrigatórios no `ResolvedForm` geram checks no validator:
+Campos marcados como obrigatorios no ResolvedForm geram checks no validator. As mensagens sao aproveitadas dos hints de validacao extraidos do PAS quando disponiveis.
 
-```csharp
-if (string.IsNullOrWhiteSpace(input.Campo?.ToString())) errors.Add("Mensagem inferida");
-```
+## EF Core Configuration
 
-As mensagens são aproveitadas dos hints de validação extraídos do PAS quando disponíveis.
+O gerador emite Configurations/EntidadeConfiguration.cs com:
+
+- mapeamento de tabela inferida do SQL quando disponivel;
+- chave primaria Id;
+- mapeamento de colunas para os campos resolvidos;
+- comentarios para relacionamentos inferidos automaticamente.
 
 ## Registro no DbContext
 
-O gerador emite um arquivo `.txt` com o trecho sugerido para registrar a entidade no `GestorDbContext`:
+O gerador emite um arquivo txt com o trecho sugerido para registrar a entidade no GestorDbContext:
 
 ```csharp
 public DbSet<Entidade> Entidades => Set<Entidade>();
+modelBuilder.ApplyConfiguration(new EntidadeConfiguration());
 ```
 
-Nesta etapa, o gerador ainda não edita automaticamente o `GestorDbContext` para evitar sobrescrever código manual.
+Nesta etapa, o gerador ainda nao edita automaticamente o GestorDbContext para evitar sobrescrever codigo manual.
 
-## Próximas etapas
+## Migrations
 
-- Gerar configuração EF Core completa;
-- Gerar migration ou instruções de migration;
-- Melhorar inferência de tipos por metadados de dataset;
-- Incluir relatório de lacunas para revisão manual.
+O gerador tambem emite Generated/EntidadeMigrationCommands.md com comandos sugeridos para criar migration e atualizar o banco.
+
+## Proximas etapas
+
+- Gerar relacionamentos Fluent API reais quando a confianca for alta;
+- Melhorar inferencia de tipos por metadados de dataset;
+- Gerar indices e constraints a partir de SQL e eventos Delphi;
+- Incluir validacoes de build para os artefatos gerados.
