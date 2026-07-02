@@ -7,6 +7,7 @@ export * from './dfmToGestorForm';
 export * from './frontendFilterComponentGenerator';
 export * from './frontendFilterGenerator';
 export * from './frontendGenerator';
+export * from './frontendLookupGenerator';
 export * from './gestorPasEnrichment';
 export * from './lookupInference';
 export * from './migrationReportGenerator';
