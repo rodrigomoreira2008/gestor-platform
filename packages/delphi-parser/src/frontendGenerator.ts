@@ -43,6 +43,14 @@ export function generateFrontendFiles(resolved: ResolvedForm, options: FrontendG
     {
       path: `${outputRoot}/pages/${entityPascal}Page.tsx`,
       content: generatePage(entityPascal, plural, resolved.fields)
+    },
+    {
+      path: `${outputRoot}/Generated/${entityPascal}Route.tsx.txt`,
+      content: generateRouteSnippet(entityPascal, plural)
+    },
+    {
+      path: `${outputRoot}/Generated/${entityPascal}MenuItem.ts.txt`,
+      content: generateMenuSnippet(entityPascal, plural)
     }
   ];
 }
@@ -177,6 +185,26 @@ export function ${entityPascal}Page() {
       ))}
     </Box>
   );
+}
+`;
+}
+
+function generateRouteSnippet(entityPascal: string, plural: string): string {
+  return `// Adicionar ao arquivo de rotas da aplicação
+import { ${entityPascal}Page } from '../modules/${plural}/pages/${entityPascal}Page';
+
+{
+  path: '/${plural}',
+  element: <${entityPascal}Page />
+}
+`;
+}
+
+function generateMenuSnippet(entityPascal: string, plural: string): string {
+  return `// Adicionar ao menu lateral ou cadastro principal
+{
+  label: '${entityPascal}',
+  path: '/${plural}'
 }
 `;
 }
