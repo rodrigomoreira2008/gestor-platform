@@ -6,6 +6,7 @@ export * from './frontendFilterComponentGenerator';
 export * from './frontendFilterGenerator';
 export * from './frontendGenerator';
 export * from './gestorPasEnrichment';
+export * from './migrationReportGenerator';
 export * from './pasParser';
 export * from './resolvedForm';
 export * from './resolveForm';
