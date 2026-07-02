@@ -43,6 +43,10 @@ export function generateBackendFiles(resolved: ResolvedForm, options: BackendGen
     {
       path: `${outputRoot}/Generated/${entityName}DbContextRegistration.cs.txt`,
       content: generateDbContextRegistration(entityName)
+    },
+    {
+      path: `${outputRoot}/Generated/${entityName}MigrationCommands.md`,
+      content: generateMigrationCommands(entityName)
     }
   ];
 }
@@ -188,6 +192,26 @@ public DbSet<${entityName}> ${entityName}s => Set<${entityName}>();
 // Conferir usings:
 // using Gestor.Api.Entities;
 // using Gestor.Api.Configurations;
+`;
+}
+
+function generateMigrationCommands(entityName: string): string {
+  return `# Migration EF Core para ${entityName}
+
+Depois de copiar os arquivos gerados para o projeto backend e registrar a entidade no DbContext, execute:
+
+\`\`\`bash
+dotnet ef migrations add Add${entityName} --project apps/backend --startup-project apps/backend
+
+dotnet ef database update --project apps/backend --startup-project apps/backend
+\`\`\`
+
+## Checklist antes de executar
+
+- Conferir \`DbSet<${entityName}>\` no DbContext.
+- Conferir \`modelBuilder.ApplyConfiguration(new ${entityName}Configuration())\`.
+- Revisar tipos inferidos automaticamente.
+- Revisar relacionamentos marcados como \`medium\` ou \`low\` no relatorio de migracao.
 `;
 }
 
