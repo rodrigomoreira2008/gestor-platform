@@ -37,6 +37,10 @@ export function generateBackendFiles(resolved: ResolvedForm, options: BackendGen
       content: generateController(entityName, resolved.form.entity, namespace)
     },
     {
+      path: `${outputRoot}/Configurations/${entityName}Configuration.cs`,
+      content: generateEntityConfiguration(entityName, resolved, namespace)
+    },
+    {
       path: `${outputRoot}/Generated/${entityName}DbContextRegistration.cs.txt`,
       content: generateDbContextRegistration(entityName)
     }
@@ -149,12 +153,41 @@ public class ${entityName}Controller : CrudControllerBase<${entityName}, ${entit
 `;
 }
 
+function generateEntityConfiguration(entityName: string, resolved: ResolvedForm, namespace: string): string {
+  const tableName = resolved.databaseQueries[0]?.tables[0]?.name ?? resolved.form.table ?? entityName;
+  const relationshipNotes = resolved.relationships
+    .map((relationship) => `        // Relacionamento inferido (${relationship.confidence}): ${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn}`)
+    .join('\n');
+
+  return `using ${namespace}.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace ${namespace}.Configurations;
+
+public class ${entityName}Configuration : IEntityTypeConfiguration<${entityName}>
+{
+    public void Configure(EntityTypeBuilder<${entityName}> builder)
+    {
+        builder.ToTable("${escapeCSharpString(tableName)}");
+        builder.HasKey(entity => entity.Id);
+${resolved.fields.map((field) => `        builder.Property(entity => entity.${toPascalCase(field.name)}).HasColumnName("${escapeCSharpString(field.dataField ?? field.name)}");`).join('\n')}
+${relationshipNotes || '        // Nenhum relacionamento inferido automaticamente.'}
+    }
+}
+`;
+}
+
 function generateDbContextRegistration(entityName: string): string {
   return `// Adicionar em GestorDbContext.cs
 public DbSet<${entityName}> ${entityName}s => Set<${entityName}>();
 
-// Conferir se existe using da entidade gerada:
+// Adicionar em OnModelCreating:
+// modelBuilder.ApplyConfiguration(new ${entityName}Configuration());
+
+// Conferir usings:
 // using Gestor.Api.Entities;
+// using Gestor.Api.Configurations;
 `;
 }
 
