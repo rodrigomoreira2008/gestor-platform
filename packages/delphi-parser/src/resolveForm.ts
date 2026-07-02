@@ -4,6 +4,7 @@ import { dfmToGestorForm } from './dfmToGestorForm';
 import { enrichGestorFormWithPascal } from './gestorPasEnrichment';
 import { parseDfm } from './dfmParser';
 import { parsePascalUnit } from './pasParser';
+import { inferRelationships } from './relationshipInference';
 import type { PascalValidationHint } from './pasParser';
 import type { ResolvedAction, ResolvedField, ResolvedForm } from './resolvedForm';
 
@@ -25,6 +26,7 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
   const dfmFields = collectFieldBindings(parsedDfm.root);
   const dfmActions = collectActionBindings(parsedDfm.root);
   const databaseQueries = inferDatabaseQueries(pascal.sqlSnippets);
+  const relationships = inferRelationships(databaseQueries);
 
   return {
     form: enriched,
@@ -42,6 +44,7 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
     datasets: pascal.datasetHints,
     queries: pascal.sqlSnippets,
     databaseQueries,
+    relationships,
     validations: pascal.validationHints,
     warnings: [...parsedDfm.warnings, ...pascal.warnings]
   };
