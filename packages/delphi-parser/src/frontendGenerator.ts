@@ -37,6 +37,10 @@ export function generateFrontendFiles(resolved: ResolvedForm, options: FrontendG
       content: generateForm(entityPascal, entity, resolved.fields)
     },
     {
+      path: `${outputRoot}/table/${entity}Columns.ts`,
+      content: generateColumns(entityPascal, entity, resolved.fields)
+    },
+    {
       path: `${outputRoot}/pages/${entityPascal}Page.tsx`,
       content: generatePage(entityPascal, plural, resolved.fields)
     }
@@ -134,6 +138,22 @@ ${inputs}
     </Stack>
   );
 }
+`;
+}
+
+function generateColumns(entityPascal: string, entity: string, fields: ResolvedField[]): string {
+  const columns = fields
+    .slice(0, 8)
+    .map((field) => `  { field: '${toCamelCase(field.name)}', headerName: '${escapeSingleQuote(field.label ?? field.name)}', flex: 1 }`)
+    .join(',\n');
+
+  return `import type { GridColDef } from '@mui/x-data-grid';
+import type { ${entityPascal} } from '../types/${entity}';
+
+export const ${entity}Columns: GridColDef<${entityPascal}>[] = [
+  { field: 'id', headerName: 'ID', width: 90 },
+${columns}
+];
 `;
 }
 
