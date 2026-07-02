@@ -42,7 +42,7 @@ export function generateFrontendFiles(resolved: ResolvedForm, options: FrontendG
     },
     {
       path: `${outputRoot}/pages/${entityPascal}Page.tsx`,
-      content: generatePage(entityPascal, plural, resolved.fields)
+      content: generatePage(entityPascal, entity, plural)
     },
     {
       path: `${outputRoot}/Generated/${entityPascal}Route.tsx.txt`,
@@ -165,25 +165,50 @@ ${columns}
 `;
 }
 
-function generatePage(entityPascal: string, plural: string, fields: ResolvedField[]): string {
-  const displayField = fields.find((field) => field.label)?.name ?? fields[0]?.name ?? 'id';
-  return `import { Alert, Box, CircularProgress, Typography } from '@mui/material';
-import { use${entityPascal}s } from '../hooks';
+function generatePage(entityPascal: string, entity: string, plural: string): string {
+  return `import { Add } from '@mui/icons-material';
+import { Alert, Box, Button, Dialog, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+import { useState } from 'react';
+import { ${entityPascal}Form } from '../components/${entityPascal}Form';
+import { useCreate${entityPascal}, use${entityPascal}s } from '../hooks';
+import { ${entity}Columns } from '../table/${entity}Columns';
 
 export function ${entityPascal}Page() {
+  const [isCreating, setIsCreating] = useState(false);
   const list = use${entityPascal}s();
+  const create = useCreate${entityPascal}();
 
   return (
-    <Box>
-      <Typography variant="h5" sx={{ mb: 2 }}>${entityPascal}</Typography>
-      {list.isLoading && <CircularProgress size={24} />}
+    <Stack spacing={2}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Typography variant="h5">${entityPascal}</Typography>
+        <Button startIcon={<Add />} variant="contained" onClick={() => setIsCreating(true)}>Novo</Button>
+      </Box>
+
       {list.isError && <Alert severity="warning">Não foi possível carregar ${plural}.</Alert>}
-      {list.data?.map((item) => (
-        <Box key={item.id} sx={{ py: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
-          {item.${toCamelCase(displayField)} ?? item.id}
-        </Box>
-      ))}
-    </Box>
+
+      <Box sx={{ height: 520 }}>
+        <DataGrid
+          rows={list.data ?? []}
+          columns={${entity}Columns}
+          loading={list.isLoading}
+          disableRowSelectionOnClick
+          pageSizeOptions={[10, 25, 50]}
+          initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+        />
+      </Box>
+
+      <Dialog open={isCreating} onClose={() => setIsCreating(false)} fullWidth maxWidth="md">
+        <DialogTitle>Novo ${entityPascal}</DialogTitle>
+        <DialogContent>
+          <${entityPascal}Form
+            isSubmitting={create.isPending}
+            onSubmit={(input) => create.mutate(input, { onSuccess: () => setIsCreating(false) })}
+          />
+        </DialogContent>
+      </Dialog>
+    </Stack>
   );
 }
 `;
