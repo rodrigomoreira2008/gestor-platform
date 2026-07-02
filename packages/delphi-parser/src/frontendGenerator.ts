@@ -1,3 +1,4 @@
+import { mapDelphiComponent } from './componentMapping';
 import { renderFrontendFilterDefinitions } from './frontendFilterGenerator';
 import type { ResolvedField, ResolvedForm } from './resolvedForm';
 
@@ -65,21 +66,10 @@ function use${entityPascal}Resource() {
   return useCrudResource<${entityPascal}, ${entityPascal}Input>('${plural}', ${entity}ResourceApi);
 }
 
-export function use${entityPascal}s() {
-  return use${entityPascal}Resource().list;
-}
-
-export function useCreate${entityPascal}() {
-  return use${entityPascal}Resource().create;
-}
-
-export function useUpdate${entityPascal}() {
-  return use${entityPascal}Resource().update;
-}
-
-export function useRemove${entityPascal}() {
-  return use${entityPascal}Resource().remove;
-}
+export function use${entityPascal}s() { return use${entityPascal}Resource().list; }
+export function useCreate${entityPascal}() { return use${entityPascal}Resource().create; }
+export function useUpdate${entityPascal}() { return use${entityPascal}Resource().update; }
+export function useRemove${entityPascal}() { return use${entityPascal}Resource().remove; }
 `;
 }
 
@@ -99,7 +89,7 @@ function generateForm(entityPascal: string, entity: string, fields: ResolvedFiel
   const initialState = fields.map((field) => `    ${toCamelCase(field.name)}: initialValue?.${toCamelCase(field.name)} ?? ${defaultValue(field)}`).join(',\n');
   const inputs = fields.map((field) => generateInput(field)).join('\n');
 
-  return `import { Button, Stack, TextField } from '@mui/material';
+  return `import { Button, Checkbox, FormControlLabel, MenuItem, Stack, TextField } from '@mui/material';
 import { useState } from 'react';
 import type { ${entityPascal}Input } from '../types/${entity}';
 
@@ -125,11 +115,7 @@ ${inputs}
 }
 
 function generateColumns(entityPascal: string, entity: string, fields: ResolvedField[]): string {
-  const columns = fields
-    .slice(0, 8)
-    .map((field) => `  { field: '${toCamelCase(field.name)}', headerName: '${escapeSingleQuote(field.label ?? field.name)}', flex: 1 }`)
-    .join(',\n');
-
+  const columns = fields.slice(0, 8).map((field) => `  { field: '${toCamelCase(field.name)}', headerName: '${escapeSingleQuote(field.label ?? field.name)}', flex: 1 }`).join(',\n');
   return `import type { GridColDef } from '@mui/x-data-grid';
 import type { ${entityPascal} } from '../types/${entity}';
 
@@ -172,44 +158,19 @@ export function ${entityPascal}Page() {
   const columns = useMemo<GridColDef<${entityPascal}>[]>(() => [
     ...${entity}Columns,
     {
-      field: 'actions',
-      headerName: 'Ações',
-      width: 120,
-      sortable: false,
-      filterable: false,
-      renderCell: ({ row }) => (
-        <Stack direction="row" spacing={1}>
-          <IconButton size="small" aria-label="Editar" onClick={() => setEditing(row)}><Edit fontSize="small" /></IconButton>
-          <IconButton size="small" aria-label="Excluir" color="error" onClick={() => setRemoving(row)}><Delete fontSize="small" /></IconButton>
-        </Stack>
-      )
+      field: 'actions', headerName: 'Ações', width: 120, sortable: false, filterable: false,
+      renderCell: ({ row }) => <Stack direction="row" spacing={1}><IconButton size="small" aria-label="Editar" onClick={() => setEditing(row)}><Edit fontSize="small" /></IconButton><IconButton size="small" aria-label="Excluir" color="error" onClick={() => setRemoving(row)}><Delete fontSize="small" /></IconButton></Stack>
     }
   ], []);
 
   return (
     <Stack spacing={2}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
-        <Typography variant="h5">${entityPascal}</Typography>
-        <Button startIcon={<Add />} variant="contained" onClick={() => setIsCreating(true)}>Novo</Button>
-      </Box>
-
-      <TextField
-        placeholder="Pesquisar..."
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-        InputProps={{ startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment> }}
-      />
-
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}><Typography variant="h5">${entityPascal}</Typography><Button startIcon={<Add />} variant="contained" onClick={() => setIsCreating(true)}>Novo</Button></Box>
+      <TextField placeholder="Pesquisar..." value={search} onChange={(event) => setSearch(event.target.value)} InputProps={{ startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment> }} />
       {list.isError && <Alert severity="warning">Não foi possível carregar ${plural}.</Alert>}
-
-      <Box sx={{ height: 520 }}>
-        <DataGrid rows={rows} columns={columns} loading={list.isLoading} disableRowSelectionOnClick pageSizeOptions={[10, 25, 50]} initialState={{ pagination: { paginationModel: { pageSize: 10 } } }} />
-      </Box>
-
+      <Box sx={{ height: 520 }}><DataGrid rows={rows} columns={columns} loading={list.isLoading} disableRowSelectionOnClick pageSizeOptions={[10, 25, 50]} initialState={{ pagination: { paginationModel: { pageSize: 10 } } }} /></Box>
       <Dialog open={isCreating} onClose={() => setIsCreating(false)} fullWidth maxWidth="md"><DialogTitle>Novo ${entityPascal}</DialogTitle><DialogContent><${entityPascal}Form isSubmitting={create.isPending} onSubmit={(input) => create.mutate(input, { onSuccess: () => setIsCreating(false) })} /></DialogContent></Dialog>
-
       <Dialog open={Boolean(editing)} onClose={() => setEditing(null)} fullWidth maxWidth="md"><DialogTitle>Editar ${entityPascal}</DialogTitle><DialogContent>{editing && (<${entityPascal}Form initialValue={editing} isSubmitting={update.isPending} onSubmit={(input) => update.mutate({ id: editing.id, input }, { onSuccess: () => setEditing(null) })} />)}</DialogContent></Dialog>
-
       <Dialog open={Boolean(removing)} onClose={() => setRemoving(null)} fullWidth maxWidth="xs"><DialogTitle>Excluir ${entityPascal}</DialogTitle><DialogContent><Typography>Confirma a exclusão deste registro?</Typography></DialogContent><DialogActions><Button onClick={() => setRemoving(null)}>Cancelar</Button><Button color="error" variant="contained" disabled={remove.isPending} onClick={() => removing && remove.mutate(removing.id, { onSuccess: () => setRemoving(null) })}>Excluir</Button></DialogActions></Dialog>
     </Stack>
   );
@@ -221,19 +182,13 @@ function generateRouteSnippet(entityPascal: string, plural: string): string {
   return `// Adicionar ao arquivo de rotas da aplicação
 import { ${entityPascal}Page } from '../modules/${plural}/pages/${entityPascal}Page';
 
-{
-  path: '/${plural}',
-  element: <${entityPascal}Page />
-}
+{ path: '/${plural}', element: <${entityPascal}Page /> }
 `;
 }
 
 function generateMenuSnippet(entityPascal: string, plural: string): string {
   return `// Adicionar ao menu lateral ou cadastro principal
-{
-  label: '${entityPascal}',
-  path: '/${plural}'
-}
+{ label: '${entityPascal}', path: '/${plural}' }
 `;
 }
 
@@ -241,11 +196,35 @@ function generateInput(field: ResolvedField): string {
   const name = toCamelCase(field.name);
   const label = escapeTsx(field.label ?? field.name);
   const type = mapTsType(field) === 'number' ? 'number' : 'text';
-  return `      <TextField
+  const mapping = mapDelphiComponent(field.source?.componentClass);
+
+  if (mapping.role === 'checkbox') {
+    return `      <FormControlLabel
         label="${label}"
-        type="${type}"
+        control={<Checkbox checked={Boolean(form.${name})} onChange={(event) => setForm((current) => ({ ...current, ${name}: event.target.checked as never }))} />}
+      />`;
+  }
+
+  if (mapping.role === 'select') {
+    return `      <TextField
+        select
+        label="${label}"
         value={form.${name} ?? ''}
         required={${field.required ? 'true' : 'false'}}
+        helperText="TODO: revisar opcoes inferidas de ${escapeTsx(field.source?.componentClass ?? 'Delphi')}"
+        onChange={(event) => setForm((current) => ({ ...current, ${name}: event.target.value }))}
+      >
+        <MenuItem value="">Selecione...</MenuItem>
+      </TextField>`;
+  }
+
+  return `      <TextField
+        label="${label}"
+        type="${mapping.role === 'date' ? 'date' : type}"
+        value={form.${name} ?? ''}
+        required={${field.required ? 'true' : 'false'}}
+        InputLabelProps={${mapping.role === 'date' ? '{ shrink: true }' : 'undefined'}}
+        helperText="Origem Delphi: ${escapeTsx(field.source?.componentClass ?? 'desconhecida')} -> ${mapping.frontendComponent}"
         onChange={(event) => setForm((current) => ({ ...current, ${name}: ${type === 'number' ? 'Number(event.target.value)' : 'event.target.value'} }))}
       />`;
 }
@@ -259,28 +238,23 @@ function zodExpression(field: ResolvedField): string {
 }
 
 function defaultValue(field: ResolvedField): string {
+  const mapping = mapDelphiComponent(field.source?.componentClass);
+  if (mapping.role === 'checkbox') return 'false as never';
   return mapTsType(field) === 'number' ? 'undefined' : "''";
 }
 
 function mapTsType(field: ResolvedField): string {
   const normalized = field.name.toLowerCase();
+  const mapping = mapDelphiComponent(field.source?.componentClass);
+  if (mapping.role === 'checkbox') return 'boolean';
   if (normalized.includes('valor') || normalized.includes('preco') || normalized.includes('total')) return 'number';
   if (normalized.includes('quantidade') || normalized.includes('qtd')) return 'number';
   if (normalized === 'id' || normalized.endsWith('id') || normalized.includes('codigo')) return 'number';
-  if (normalized.includes('data')) return 'string';
   return 'string';
 }
 
 function toPascalCase(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9]+/g, ' ')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('');
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]+/g, ' ').trim().split(/\s+/).filter(Boolean).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('');
 }
 
 function toCamelCase(value: string): string {
