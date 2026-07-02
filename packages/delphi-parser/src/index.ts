@@ -1,4 +1,5 @@
 export * from './backendGenerator';
+export * from './databaseInference';
 export * from './dfmIntrospection';
 export * from './dfmParser';
 export * from './dfmToGestorForm';
