@@ -17,8 +17,8 @@ export function renderFrontendLookupDefinitions(lookups: InferredLookup[], expor
 }
 
 export function renderFrontendLookupHooks(entity: string, lookups: InferredLookup[]): string {
+  const hooks = lookups.map((lookup, index) => renderLookupHook(entity, lookup, index)).join('\n\n');
   const hookNames = lookups.map((lookup) => `use${toPascalCase(lookup.fieldName)}Lookup`).join(', ');
-  const hooks = lookups.map((lookup) => renderLookupHook(lookup)).join('\n\n');
 
   return `import { useQuery } from '@tanstack/react-query';
 import { ${entity}Lookups } from '../lookups/${entity}Lookups';
@@ -33,11 +33,7 @@ async function fetchLookup(endpoint: string, valueField: string, labelField: str
   const response = await fetch(endpoint);
   if (!response.ok) throw new Error('Nao foi possivel carregar lookup.');
   const data = await response.json() as Record<string, unknown>[];
-  return data.map((item) => ({
-    id: item[valueField] as string | number,
-    label: String(item[labelField] ?? item[valueField] ?? ''),
-    raw: item
-  }));
+  return data.map((item) => ({ id: item[valueField] as string | number, label: String(item[labelField] ?? item[valueField] ?? ''), raw: item }));
 }
 
 ${hooks || '// Nenhum lookup inferido.'}
@@ -46,19 +42,15 @@ export const ${entity}LookupHooks = { ${hookNames} };
 `;
 }
 
-function renderLookupHook(lookup: InferredLookup): string {
+function renderLookupHook(entity: string, lookup: InferredLookup, index: number): string {
   const hookName = `use${toPascalCase(lookup.fieldName)}Lookup`;
   return `export function ${hookName}() {
-  const lookup = ${toLookupAccessor(lookup.fieldName)};
+  const lookup = Array.from(${entity}Lookups)[${index}];
   return useQuery({
-    queryKey: ['lookup', lookup.fieldName],
+    queryKey: ['lookup', lookup.fieldName, lookup.endpoint],
     queryFn: () => fetchLookup(lookup.endpoint, lookup.valueField, lookup.labelField)
   });
 }`;
-}
-
-function toLookupAccessor(fieldName: string): string {
-  return `${toCamelCase(fieldName)}Lookup ?? ${toCamelCase(fieldName)}LookupFallback()`;
 }
 
 function toLookupEndpoint(lookup: InferredLookup): string {
@@ -68,11 +60,6 @@ function toLookupEndpoint(lookup: InferredLookup): string {
 
 function toPascalCase(value: string): string {
   return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]+/g, ' ').trim().split(/\s+/).filter(Boolean).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('');
-}
-
-function toCamelCase(value: string): string {
-  const pascal = toPascalCase(value);
-  return pascal.charAt(0).toLowerCase() + pascal.slice(1);
 }
 
 function toKebabPlural(value: string): string {
