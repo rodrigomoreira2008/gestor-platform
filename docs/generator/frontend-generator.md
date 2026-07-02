@@ -56,9 +56,13 @@ A página gerada agora usa:
 - colunas geradas em `table/<entidade>Columns.ts`;
 - hook de listagem;
 - hook de criação;
-- diálogo de cadastro com o formulário gerado.
+- hook de edição;
+- hook de exclusão;
+- diálogo de cadastro com o formulário gerado;
+- diálogo de edição reaproveitando o mesmo formulário;
+- confirmação de exclusão.
 
-Essa página já valida o fluxo funcional de cadastro/listagem. Edição e exclusão serão adicionadas em etapas seguintes.
+Essa página já valida o fluxo funcional básico de cadastro, listagem, edição e exclusão.
 
 ## Rotas e menu
 
@@ -66,6 +70,6 @@ O gerador emite snippets `.txt` para rota e item de menu, evitando editar automa
 
 ## Próximas etapas
 
-- Adicionar edição e exclusão na página gerada;
+- Adicionar filtros e pesquisa na página gerada;
 - Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada;
 - Aproveitar `sectionPath` para preservar agrupamentos do Delphi.
