@@ -29,6 +29,14 @@ export function generateFrontendFiles(resolved: ResolvedForm, options: FrontendG
       content: generateHooks(entityPascal, entity, plural)
     },
     {
+      path: `${outputRoot}/schema/${entity}Schema.ts`,
+      content: generateSchema(entityPascal, entity, resolved.fields)
+    },
+    {
+      path: `${outputRoot}/components/${entityPascal}Form.tsx`,
+      content: generateForm(entityPascal, entity, resolved.fields)
+    },
+    {
       path: `${outputRoot}/pages/${entityPascal}Page.tsx`,
       content: generatePage(entityPascal, plural, resolved.fields)
     }
@@ -88,6 +96,47 @@ export function useRemove${entityPascal}() {
 `;
 }
 
+function generateSchema(entityPascal: string, entity: string, fields: ResolvedField[]): string {
+  const shape = fields.map((field) => `  ${toCamelCase(field.name)}: ${zodExpression(field)}`).join(',\n');
+  return `import { z } from 'zod';
+
+export const ${entity}Schema = z.object({
+${shape}
+});
+
+export type ${entityPascal}FormData = z.infer<typeof ${entity}Schema>;
+`;
+}
+
+function generateForm(entityPascal: string, entity: string, fields: ResolvedField[]): string {
+  const initialState = fields.map((field) => `    ${toCamelCase(field.name)}: initialValue?.${toCamelCase(field.name)} ?? ${defaultValue(field)}`).join(',\n');
+  const inputs = fields.map((field) => generateInput(field)).join('\n');
+
+  return `import { Button, Stack, TextField } from '@mui/material';
+import { useState } from 'react';
+import type { ${entityPascal}Input } from '../types/${entity}';
+
+interface ${entityPascal}FormProps {
+  initialValue?: Partial<${entityPascal}Input>;
+  onSubmit: (input: ${entityPascal}Input) => void;
+  isSubmitting?: boolean;
+}
+
+export function ${entityPascal}Form({ initialValue, onSubmit, isSubmitting }: ${entityPascal}FormProps) {
+  const [form, setForm] = useState<${entityPascal}Input>({
+${initialState}
+  });
+
+  return (
+    <Stack spacing={2} component="form" onSubmit={(event) => { event.preventDefault(); onSubmit(form); }}>
+${inputs}
+      <Button type="submit" variant="contained" disabled={isSubmitting}>Salvar</Button>
+    </Stack>
+  );
+}
+`;
+}
+
 function generatePage(entityPascal: string, plural: string, fields: ResolvedField[]): string {
   const displayField = fields.find((field) => field.label)?.name ?? fields[0]?.name ?? 'id';
   return `import { Alert, Box, CircularProgress, Typography } from '@mui/material';
@@ -110,6 +159,31 @@ export function ${entityPascal}Page() {
   );
 }
 `;
+}
+
+function generateInput(field: ResolvedField): string {
+  const name = toCamelCase(field.name);
+  const label = escapeTsx(field.label ?? field.name);
+  const type = mapTsType(field) === 'number' ? 'number' : 'text';
+  return `      <TextField
+        label="${label}"
+        type="${type}"
+        value={form.${name} ?? ''}
+        required={${field.required ? 'true' : 'false'}}
+        onChange={(event) => setForm((current) => ({ ...current, ${name}: ${type === 'number' ? 'Number(event.target.value)' : 'event.target.value'} }))}
+      />`;
+}
+
+function zodExpression(field: ResolvedField): string {
+  const base = mapTsType(field) === 'number' ? 'z.number()' : 'z.string()';
+  if (!field.required) return `${base}.optional()`;
+  if (mapTsType(field) === 'number') return base;
+  const message = field.validationMessages[0] ?? `${field.label ?? field.name} é obrigatório.`;
+  return `${base}.min(1, '${escapeSingleQuote(message)}')`;
+}
+
+function defaultValue(field: ResolvedField): string {
+  return mapTsType(field) === 'number' ? 'undefined' : "''";
 }
 
 function mapTsType(field: ResolvedField): string {
@@ -148,4 +222,12 @@ function toKebabPlural(value: string): string {
     .toLowerCase();
 
   return kebab.endsWith('s') ? kebab : `${kebab}s`;
+}
+
+function escapeTsx(value: string): string {
+  return value.replace(/"/g, '&quot;');
+}
+
+function escapeSingleQuote(value: string): string {
+  return value.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 }
