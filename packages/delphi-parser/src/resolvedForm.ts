@@ -1,5 +1,6 @@
 import type { GestorForm } from '@gestor/dsl';
 import type { InferredSqlQuery } from './databaseInference';
+import type { InferredRelationship } from './relationshipInference';
 import type { DelphiActionBinding, DelphiFieldBinding } from './types';
 import type { PascalDatasetHint, PascalEventHint, PascalSqlSnippet, PascalValidationHint } from './pasParser';
 
@@ -10,6 +11,7 @@ export interface ResolvedForm {
   datasets: PascalDatasetHint[];
   queries: PascalSqlSnippet[];
   databaseQueries: InferredSqlQuery[];
+  relationships: InferredRelationship[];
   validations: PascalValidationHint[];
   warnings: string[];
 }
