@@ -2,6 +2,7 @@ import { inferDatabaseQueries } from './databaseInference';
 import { collectActionBindings, collectFieldBindings } from './dfmIntrospection';
 import { dfmToGestorForm } from './dfmToGestorForm';
 import { enrichGestorFormWithPascal } from './gestorPasEnrichment';
+import { inferLookups } from './lookupInference';
 import { parseDfm } from './dfmParser';
 import { parsePascalUnit } from './pasParser';
 import { inferRelationships } from './relationshipInference';
@@ -27,8 +28,7 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
   const dfmActions = collectActionBindings(parsedDfm.root);
   const databaseQueries = inferDatabaseQueries(pascal.sqlSnippets);
   const relationships = inferRelationships(databaseQueries);
-
-  return {
+  const partialResolved = {
     form: enriched,
     fields: dfmFields.map((field) => resolveField(field, pascal.validationHints)),
     actions: dfmActions.map((action) => {
@@ -47,6 +47,11 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
     relationships,
     validations: pascal.validationHints,
     warnings: [...parsedDfm.warnings, ...pascal.warnings]
+  };
+
+  return {
+    ...partialResolved,
+    lookups: inferLookups({ ...partialResolved, lookups: [] })
   };
 }
 
