@@ -7,7 +7,7 @@ Gerar artefatos React a partir do modelo intermediário `ResolvedForm`.
 A versão atual cria um módulo frontend mínimo para validar o fluxo:
 
 ```text
-ResolvedForm -> types + API + hooks + schema + form + columns + page
+ResolvedForm -> types + API + hooks + schema + form + columns + page + route/menu snippets
 ```
 
 ## Saída atual
@@ -22,6 +22,8 @@ apps/frontend/src/modules/<modulo>/schema/<entidade>Schema.ts
 apps/frontend/src/modules/<modulo>/components/<Entidade>Form.tsx
 apps/frontend/src/modules/<modulo>/table/<entidade>Columns.ts
 apps/frontend/src/modules/<modulo>/pages/<Entidade>Page.tsx
+apps/frontend/src/modules/<modulo>/Generated/<Entidade>Route.tsx.txt
+apps/frontend/src/modules/<modulo>/Generated/<Entidade>MenuItem.ts.txt
 ```
 
 ## CLI
@@ -52,8 +54,12 @@ Essa versão ainda é propositalmente simples para validar o pipeline antes de a
 
 O gerador também emite um arquivo `table/<entidade>Columns.ts` com colunas Material UI DataGrid para os primeiros campos encontrados no formulário.
 
+## Rotas e menu
+
+O gerador emite snippets `.txt` para rota e item de menu, evitando editar automaticamente arquivos centrais da aplicação nesta etapa.
+
 ## Próximas etapas
 
 - Integrar o formulário e as colunas geradas com `CrudPage`;
-- Gerar rotas e sugestão de item de menu;
+- Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada;
 - Aproveitar `sectionPath` para preservar agrupamentos do Delphi.
