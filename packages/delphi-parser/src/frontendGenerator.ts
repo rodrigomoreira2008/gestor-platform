@@ -16,42 +16,15 @@ export function generateFrontendFiles(resolved: ResolvedForm, options: FrontendG
   const outputRoot = options.outputRoot ?? `apps/frontend/src/modules/${plural}`;
 
   return [
-    {
-      path: `${outputRoot}/types/${entity}.ts`,
-      content: generateTypes(entityPascal, resolved.fields)
-    },
-    {
-      path: `${outputRoot}/api/index.ts`,
-      content: generateApi(entityPascal, entity, plural)
-    },
-    {
-      path: `${outputRoot}/hooks/index.ts`,
-      content: generateHooks(entityPascal, entity, plural)
-    },
-    {
-      path: `${outputRoot}/schema/${entity}Schema.ts`,
-      content: generateSchema(entityPascal, entity, resolved.fields)
-    },
-    {
-      path: `${outputRoot}/components/${entityPascal}Form.tsx`,
-      content: generateForm(entityPascal, entity, resolved.fields)
-    },
-    {
-      path: `${outputRoot}/table/${entity}Columns.ts`,
-      content: generateColumns(entityPascal, entity, resolved.fields)
-    },
-    {
-      path: `${outputRoot}/pages/${entityPascal}Page.tsx`,
-      content: generatePage(entityPascal, entity, plural)
-    },
-    {
-      path: `${outputRoot}/Generated/${entityPascal}Route.tsx.txt`,
-      content: generateRouteSnippet(entityPascal, plural)
-    },
-    {
-      path: `${outputRoot}/Generated/${entityPascal}MenuItem.ts.txt`,
-      content: generateMenuSnippet(entityPascal, plural)
-    }
+    { path: `${outputRoot}/types/${entity}.ts`, content: generateTypes(entityPascal, resolved.fields) },
+    { path: `${outputRoot}/api/index.ts`, content: generateApi(entityPascal, entity, plural) },
+    { path: `${outputRoot}/hooks/index.ts`, content: generateHooks(entityPascal, entity, plural) },
+    { path: `${outputRoot}/schema/${entity}Schema.ts`, content: generateSchema(entityPascal, entity, resolved.fields) },
+    { path: `${outputRoot}/components/${entityPascal}Form.tsx`, content: generateForm(entityPascal, entity, resolved.fields) },
+    { path: `${outputRoot}/table/${entity}Columns.ts`, content: generateColumns(entityPascal, entity, resolved.fields) },
+    { path: `${outputRoot}/pages/${entityPascal}Page.tsx`, content: generatePage(entityPascal, entity, plural) },
+    { path: `${outputRoot}/Generated/${entityPascal}Route.tsx.txt`, content: generateRouteSnippet(entityPascal, plural) },
+    { path: `${outputRoot}/Generated/${entityPascal}MenuItem.ts.txt`, content: generateMenuSnippet(entityPascal, plural) }
   ];
 }
 
@@ -166,8 +139,8 @@ ${columns}
 }
 
 function generatePage(entityPascal: string, entity: string, plural: string): string {
-  return `import { Add, Delete, Edit } from '@mui/icons-material';
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography } from '@mui/material';
+  return `import { Add, Delete, Edit, Search } from '@mui/icons-material';
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { useMemo, useState } from 'react';
 import { ${entityPascal}Form } from '../components/${entityPascal}Form';
@@ -179,10 +152,18 @@ export function ${entityPascal}Page() {
   const [isCreating, setIsCreating] = useState(false);
   const [editing, setEditing] = useState<${entityPascal} | null>(null);
   const [removing, setRemoving] = useState<${entityPascal} | null>(null);
+  const [search, setSearch] = useState('');
   const list = use${entityPascal}s();
   const create = useCreate${entityPascal}();
   const update = useUpdate${entityPascal}();
   const remove = useRemove${entityPascal}();
+
+  const rows = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    const data = list.data ?? [];
+    if (!term) return data;
+    return data.filter((item) => Object.values(item).some((value) => String(value ?? '').toLowerCase().includes(term)));
+  }, [list.data, search]);
 
   const columns = useMemo<GridColDef<${entityPascal}>[]>(() => [
     ...${entity}Columns,
@@ -203,16 +184,23 @@ export function ${entityPascal}Page() {
 
   return (
     <Stack spacing={2}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
         <Typography variant="h5">${entityPascal}</Typography>
         <Button startIcon={<Add />} variant="contained" onClick={() => setIsCreating(true)}>Novo</Button>
       </Box>
+
+      <TextField
+        placeholder="Pesquisar..."
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        InputProps={{ startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment> }}
+      />
 
       {list.isError && <Alert severity="warning">Não foi possível carregar ${plural}.</Alert>}
 
       <Box sx={{ height: 520 }}>
         <DataGrid
-          rows={list.data ?? []}
+          rows={rows}
           columns={columns}
           loading={list.isLoading}
           disableRowSelectionOnClick
