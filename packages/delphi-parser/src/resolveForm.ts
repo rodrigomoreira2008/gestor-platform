@@ -1,3 +1,4 @@
+import { inferDatabaseQueries } from './databaseInference';
 import { collectActionBindings, collectFieldBindings } from './dfmIntrospection';
 import { dfmToGestorForm } from './dfmToGestorForm';
 import { enrichGestorFormWithPascal } from './gestorPasEnrichment';
@@ -23,6 +24,7 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
   const enriched = enrichGestorFormWithPascal(baseForm, pascal).form;
   const dfmFields = collectFieldBindings(parsedDfm.root);
   const dfmActions = collectActionBindings(parsedDfm.root);
+  const databaseQueries = inferDatabaseQueries(pascal.sqlSnippets);
 
   return {
     form: enriched,
@@ -39,6 +41,7 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
     }),
     datasets: pascal.datasetHints,
     queries: pascal.sqlSnippets,
+    databaseQueries,
     validations: pascal.validationHints,
     warnings: [...parsedDfm.warnings, ...pascal.warnings]
   };
