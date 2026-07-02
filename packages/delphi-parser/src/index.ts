@@ -9,6 +9,7 @@ export * from './frontendGenerator';
 export * from './gestorPasEnrichment';
 export * from './migrationReportGenerator';
 export * from './pasParser';
+export * from './relationshipInference';
 export * from './resolvedForm';
 export * from './resolveForm';
 export * from './types';
