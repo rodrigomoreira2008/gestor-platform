@@ -1,4 +1,5 @@
 import type { GestorForm } from '@gestor/dsl';
+import type { InferredLookup } from './lookupInference';
 import type { InferredSqlQuery } from './databaseInference';
 import type { InferredRelationship } from './relationshipInference';
 import type { DelphiActionBinding, DelphiFieldBinding } from './types';
@@ -12,6 +13,7 @@ export interface ResolvedForm {
   queries: PascalSqlSnippet[];
   databaseQueries: InferredSqlQuery[];
   relationships: InferredRelationship[];
+  lookups: InferredLookup[];
   validations: PascalValidationHint[];
   warnings: string[];
 }
