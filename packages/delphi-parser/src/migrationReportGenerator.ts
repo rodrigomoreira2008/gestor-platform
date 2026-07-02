@@ -14,7 +14,7 @@ export interface MigrationReport {
 export function generateMigrationReport(resolved: ResolvedForm): MigrationReport {
   const inferredTables = unique(resolved.databaseQueries.flatMap((query) => query.tables.map((table) => table.alias ? `${table.name} (${table.alias})` : table.name)));
   const inferredJoins = resolved.databaseQueries.flatMap((query) => query.joins.map((join) => `${query.methodName}: ${join.type} join ${join.table.name}${join.condition ? ` on ${join.condition}` : ''}`));
-  const inferredRelationships = resolved.relationships.map((relationship) => `${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn} (${relationship.confidence})`);
+  const inferredRelationships = resolved.relationships.map((relationship) => `${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn}; confianca: ${relationship.confidence}; evidencia: ${relationship.evidence}`);
 
   const automatedItems = [
     resolved.fields.length > 0 ? `${resolved.fields.length} campo(s) resolvido(s)` : undefined,
@@ -35,8 +35,8 @@ export function generateMigrationReport(resolved: ResolvedForm): MigrationReport
       .filter((query) => query.tables.length === 0)
       .map((query) => `Consulta sem tabela inferida: ${query.methodName}`),
     ...resolved.relationships
-      .filter((relationship) => relationship.confidence === 'low')
-      .map((relationship) => `Revisar relacionamento de baixa confianca: ${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn}`),
+      .filter((relationship) => relationship.confidence !== 'high')
+      .map((relationship) => `Confirmar relacionamento ${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn} (${relationship.confidence})`),
     ...resolved.datasets
       .filter((dataset) => !dataset.tableName && !dataset.dataSource)
       .map((dataset) => `Dataset sem origem clara: ${dataset.name}`)
