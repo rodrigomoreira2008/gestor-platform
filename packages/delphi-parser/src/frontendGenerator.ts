@@ -166,18 +166,40 @@ ${columns}
 }
 
 function generatePage(entityPascal: string, entity: string, plural: string): string {
-  return `import { Add } from '@mui/icons-material';
-import { Alert, Box, Button, Dialog, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
-import { useState } from 'react';
+  return `import { Add, Delete, Edit } from '@mui/icons-material';
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography } from '@mui/material';
+import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+import { useMemo, useState } from 'react';
 import { ${entityPascal}Form } from '../components/${entityPascal}Form';
-import { useCreate${entityPascal}, use${entityPascal}s } from '../hooks';
+import { useCreate${entityPascal}, useRemove${entityPascal}, use${entityPascal}s, useUpdate${entityPascal} } from '../hooks';
 import { ${entity}Columns } from '../table/${entity}Columns';
+import type { ${entityPascal} } from '../types/${entity}';
 
 export function ${entityPascal}Page() {
   const [isCreating, setIsCreating] = useState(false);
+  const [editing, setEditing] = useState<${entityPascal} | null>(null);
+  const [removing, setRemoving] = useState<${entityPascal} | null>(null);
   const list = use${entityPascal}s();
   const create = useCreate${entityPascal}();
+  const update = useUpdate${entityPascal}();
+  const remove = useRemove${entityPascal}();
+
+  const columns = useMemo<GridColDef<${entityPascal}>[]>(() => [
+    ...${entity}Columns,
+    {
+      field: 'actions',
+      headerName: 'Ações',
+      width: 120,
+      sortable: false,
+      filterable: false,
+      renderCell: ({ row }) => (
+        <Stack direction="row" spacing={1}>
+          <IconButton size="small" aria-label="Editar" onClick={() => setEditing(row)}><Edit fontSize="small" /></IconButton>
+          <IconButton size="small" aria-label="Excluir" color="error" onClick={() => setRemoving(row)}><Delete fontSize="small" /></IconButton>
+        </Stack>
+      )
+    }
+  ], []);
 
   return (
     <Stack spacing={2}>
@@ -191,7 +213,7 @@ export function ${entityPascal}Page() {
       <Box sx={{ height: 520 }}>
         <DataGrid
           rows={list.data ?? []}
-          columns={${entity}Columns}
+          columns={columns}
           loading={list.isLoading}
           disableRowSelectionOnClick
           pageSizeOptions={[10, 25, 50]}
@@ -207,6 +229,37 @@ export function ${entityPascal}Page() {
             onSubmit={(input) => create.mutate(input, { onSuccess: () => setIsCreating(false) })}
           />
         </DialogContent>
+      </Dialog>
+
+      <Dialog open={Boolean(editing)} onClose={() => setEditing(null)} fullWidth maxWidth="md">
+        <DialogTitle>Editar ${entityPascal}</DialogTitle>
+        <DialogContent>
+          {editing && (
+            <${entityPascal}Form
+              initialValue={editing}
+              isSubmitting={update.isPending}
+              onSubmit={(input) => update.mutate({ id: editing.id, input }, { onSuccess: () => setEditing(null) })}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={Boolean(removing)} onClose={() => setRemoving(null)} fullWidth maxWidth="xs">
+        <DialogTitle>Excluir ${entityPascal}</DialogTitle>
+        <DialogContent>
+          <Typography>Confirma a exclusão deste registro?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRemoving(null)}>Cancelar</Button>
+          <Button
+            color="error"
+            variant="contained"
+            disabled={remove.isPending}
+            onClick={() => removing && remove.mutate(removing.id, { onSuccess: () => setRemoving(null) })}
+          >
+            Excluir
+          </Button>
+        </DialogActions>
       </Dialog>
     </Stack>
   );
