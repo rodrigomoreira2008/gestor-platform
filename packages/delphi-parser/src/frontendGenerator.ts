@@ -1,3 +1,4 @@
+import { renderFrontendFilterDefinitions } from './frontendFilterGenerator';
 import type { ResolvedField, ResolvedForm } from './resolvedForm';
 
 export interface FrontendGeneratedFile {
@@ -20,6 +21,7 @@ export function generateFrontendFiles(resolved: ResolvedForm, options: FrontendG
     { path: `${outputRoot}/api/index.ts`, content: generateApi(entityPascal, entity, plural) },
     { path: `${outputRoot}/hooks/index.ts`, content: generateHooks(entityPascal, entity, plural) },
     { path: `${outputRoot}/schema/${entity}Schema.ts`, content: generateSchema(entityPascal, entity, resolved.fields) },
+    { path: `${outputRoot}/filters/${entity}Filters.ts`, content: renderFrontendFilterDefinitions(resolved.fields, `${entity}Filters`) },
     { path: `${outputRoot}/components/${entityPascal}Form.tsx`, content: generateForm(entityPascal, entity, resolved.fields) },
     { path: `${outputRoot}/table/${entity}Columns.ts`, content: generateColumns(entityPascal, entity, resolved.fields) },
     { path: `${outputRoot}/pages/${entityPascal}Page.tsx`, content: generatePage(entityPascal, entity, plural) },
@@ -144,6 +146,7 @@ import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, 
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { useMemo, useState } from 'react';
 import { ${entityPascal}Form } from '../components/${entityPascal}Form';
+import { ${entity}Filters } from '../filters/${entity}Filters';
 import { useCreate${entityPascal}, useRemove${entityPascal}, use${entityPascal}s, useUpdate${entityPascal} } from '../hooks';
 import { ${entity}Columns } from '../table/${entity}Columns';
 import type { ${entityPascal} } from '../types/${entity}';
@@ -162,7 +165,8 @@ export function ${entityPascal}Page() {
     const term = search.trim().toLowerCase();
     const data = list.data ?? [];
     if (!term) return data;
-    return data.filter((item) => Object.values(item).some((value) => String(value ?? '').toLowerCase().includes(term)));
+    const filterNames = ${entity}Filters.map((filter) => filter.name as keyof ${entityPascal});
+    return data.filter((item) => filterNames.some((name) => String(item[name] ?? '').toLowerCase().includes(term)));
   }, [list.data, search]);
 
   const columns = useMemo<GridColDef<${entityPascal}>[]>(() => [
@@ -199,56 +203,14 @@ export function ${entityPascal}Page() {
       {list.isError && <Alert severity="warning">Não foi possível carregar ${plural}.</Alert>}
 
       <Box sx={{ height: 520 }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          loading={list.isLoading}
-          disableRowSelectionOnClick
-          pageSizeOptions={[10, 25, 50]}
-          initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-        />
+        <DataGrid rows={rows} columns={columns} loading={list.isLoading} disableRowSelectionOnClick pageSizeOptions={[10, 25, 50]} initialState={{ pagination: { paginationModel: { pageSize: 10 } } }} />
       </Box>
 
-      <Dialog open={isCreating} onClose={() => setIsCreating(false)} fullWidth maxWidth="md">
-        <DialogTitle>Novo ${entityPascal}</DialogTitle>
-        <DialogContent>
-          <${entityPascal}Form
-            isSubmitting={create.isPending}
-            onSubmit={(input) => create.mutate(input, { onSuccess: () => setIsCreating(false) })}
-          />
-        </DialogContent>
-      </Dialog>
+      <Dialog open={isCreating} onClose={() => setIsCreating(false)} fullWidth maxWidth="md"><DialogTitle>Novo ${entityPascal}</DialogTitle><DialogContent><${entityPascal}Form isSubmitting={create.isPending} onSubmit={(input) => create.mutate(input, { onSuccess: () => setIsCreating(false) })} /></DialogContent></Dialog>
 
-      <Dialog open={Boolean(editing)} onClose={() => setEditing(null)} fullWidth maxWidth="md">
-        <DialogTitle>Editar ${entityPascal}</DialogTitle>
-        <DialogContent>
-          {editing && (
-            <${entityPascal}Form
-              initialValue={editing}
-              isSubmitting={update.isPending}
-              onSubmit={(input) => update.mutate({ id: editing.id, input }, { onSuccess: () => setEditing(null) })}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <Dialog open={Boolean(editing)} onClose={() => setEditing(null)} fullWidth maxWidth="md"><DialogTitle>Editar ${entityPascal}</DialogTitle><DialogContent>{editing && (<${entityPascal}Form initialValue={editing} isSubmitting={update.isPending} onSubmit={(input) => update.mutate({ id: editing.id, input }, { onSuccess: () => setEditing(null) })} />)}</DialogContent></Dialog>
 
-      <Dialog open={Boolean(removing)} onClose={() => setRemoving(null)} fullWidth maxWidth="xs">
-        <DialogTitle>Excluir ${entityPascal}</DialogTitle>
-        <DialogContent>
-          <Typography>Confirma a exclusão deste registro?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setRemoving(null)}>Cancelar</Button>
-          <Button
-            color="error"
-            variant="contained"
-            disabled={remove.isPending}
-            onClick={() => removing && remove.mutate(removing.id, { onSuccess: () => setRemoving(null) })}
-          >
-            Excluir
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Dialog open={Boolean(removing)} onClose={() => setRemoving(null)} fullWidth maxWidth="xs"><DialogTitle>Excluir ${entityPascal}</DialogTitle><DialogContent><Typography>Confirma a exclusão deste registro?</Typography></DialogContent><DialogActions><Button onClick={() => setRemoving(null)}>Cancelar</Button><Button color="error" variant="contained" disabled={remove.isPending} onClick={() => removing && remove.mutate(removing.id, { onSuccess: () => setRemoving(null) })}>Excluir</Button></DialogActions></Dialog>
     </Stack>
   );
 }
@@ -327,14 +289,7 @@ function toCamelCase(value: string): string {
 }
 
 function toKebabPlural(value: string): string {
-  const kebab = value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/([a-z])([A-Z])/g, '$1-$2')
-    .replace(/[^a-zA-Z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .toLowerCase();
-
+  const kebab = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
   return kebab.endsWith('s') ? kebab : `${kebab}s`;
 }
 
