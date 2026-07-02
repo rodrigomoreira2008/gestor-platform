@@ -8,6 +8,7 @@ export * from './frontendFilterComponentGenerator';
 export * from './frontendFilterGenerator';
 export * from './frontendGenerator';
 export * from './gestorPasEnrichment';
+export * from './lookupInference';
 export * from './migrationReportGenerator';
 export * from './pasParser';
 export * from './relationshipInference';
