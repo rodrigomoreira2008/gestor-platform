@@ -15,4 +15,5 @@ export * from './pasParser';
 export * from './relationshipInference';
 export * from './resolvedForm';
 export * from './resolveForm';
+export * from './tabInference';
 export * from './types';
