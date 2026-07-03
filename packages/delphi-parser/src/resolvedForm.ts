@@ -2,6 +2,7 @@ import type { GestorForm } from '@gestor/dsl';
 import type { InferredLookup } from './lookupInference';
 import type { InferredSqlQuery } from './databaseInference';
 import type { InferredRelationship } from './relationshipInference';
+import type { InferredTab } from './tabInference';
 import type { DelphiActionBinding, DelphiFieldBinding } from './types';
 import type { PascalDatasetHint, PascalEventHint, PascalSqlSnippet, PascalValidationHint } from './pasParser';
 
@@ -14,6 +15,7 @@ export interface ResolvedForm {
   databaseQueries: InferredSqlQuery[];
   relationships: InferredRelationship[];
   lookups: InferredLookup[];
+  tabs: InferredTab[];
   validations: PascalValidationHint[];
   warnings: string[];
 }
