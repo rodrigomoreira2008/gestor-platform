@@ -1,3 +1,4 @@
+import { mapDelphiComponent } from './componentMapping';
 import type { ResolvedField } from './resolvedForm';
 import type { InferredTab } from './tabInference';
 
@@ -12,7 +13,7 @@ export function renderTabbedFormScaffold(input: RenderTabbedFormInput): string {
   const tabs = input.tabs.length > 0 ? input.tabs : [{ name: 'dados', label: 'Dados', fieldNames: input.fields.map((field) => field.name), confidence: 'low' as const, evidence: 'Fallback sem abas Delphi inferidas.' }];
   const tabPanels = tabs.map((tab, index) => renderTabPanel(tab, input.fields, index)).join('\n');
 
-  return `import { Box, Button, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
+  return `import { Button, Checkbox, FormControlLabel, MenuItem, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import type { ${input.entityPascal}Input } from '../types/${input.entity}';
 
@@ -25,7 +26,7 @@ interface ${input.entityPascal}TabbedFormProps {
 export function ${input.entityPascal}TabbedForm({ initialValue, onSubmit, isSubmitting }: ${input.entityPascal}TabbedFormProps) {
   const [tab, setTab] = useState(0);
   const [form, setForm] = useState<${input.entityPascal}Input>({
-${input.fields.map((field) => `    ${toCamelCase(field.name)}: initialValue?.${toCamelCase(field.name)} ?? ''`).join(',\n')}
+${input.fields.map((field) => `    ${toCamelCase(field.name)}: initialValue?.${toCamelCase(field.name)} ?? ${defaultValue(field)}`).join(',\n')}
   });
 
   const panels = useMemo(() => ${JSON.stringify(tabs.map((tab) => ({ name: tab.name, label: tab.label, fieldNames: tab.fieldNames })), null, 2)}, []);
@@ -47,7 +48,7 @@ function renderTabPanel(tab: InferredTab, fields: ResolvedField[], index: number
   const fieldControls = tab.fieldNames
     .map((fieldName) => fields.find((field) => field.name === fieldName))
     .filter((field): field is ResolvedField => Boolean(field))
-    .map((field) => renderTextField(field))
+    .map((field) => renderInput(field))
     .join('\n');
 
   return `      {tab === ${index} && (
@@ -58,15 +59,63 @@ ${fieldControls || '          <Typography variant="body2">Nenhum campo inferido 
       )}`;
 }
 
-function renderTextField(field: ResolvedField): string {
+function renderInput(field: ResolvedField): string {
+  const mapping = mapDelphiComponent(field.source?.componentClass);
+  if (mapping.role === 'checkbox') return renderCheckbox(field);
+  if (mapping.role === 'select') return renderSelect(field);
+  return renderTextField(field, mapping.role === 'date');
+}
+
+function renderCheckbox(field: ResolvedField): string {
+  const name = toCamelCase(field.name);
+  const label = escapeDoubleQuote(field.label ?? field.name);
+  return `          <FormControlLabel
+            label="${label}"
+            control={<Checkbox checked={Boolean(form.${name})} onChange={(event) => setForm((current) => ({ ...current, ${name}: event.target.checked as never }))} />}
+          />`;
+}
+
+function renderSelect(field: ResolvedField): string {
   const name = toCamelCase(field.name);
   const label = escapeDoubleQuote(field.label ?? field.name);
   return `          <TextField
+            select
             label="${label}"
             value={form.${name} ?? ''}
             required={${field.required ? 'true' : 'false'}}
-            onChange={(event) => setForm((current) => ({ ...current, ${name}: event.target.value }))}
+            helperText="Lookup Delphi preparado; revisar definicoes geradas."
+            onChange={(event) => setForm((current) => ({ ...current, ${name}: event.target.value as never }))}
+          >
+            <MenuItem value="">Selecione...</MenuItem>
+          </TextField>`;
+}
+
+function renderTextField(field: ResolvedField, isDate: boolean): string {
+  const name = toCamelCase(field.name);
+  const label = escapeDoubleQuote(field.label ?? field.name);
+  const isNumber = mapTsType(field) === 'number';
+  return `          <TextField
+            label="${label}"
+            type="${isDate ? 'date' : isNumber ? 'number' : 'text'}"
+            value={form.${name} ?? ''}
+            required={${field.required ? 'true' : 'false'}}
+            InputLabelProps={${isDate ? '{ shrink: true }' : 'undefined'}}
+            onChange={(event) => setForm((current) => ({ ...current, ${name}: ${isNumber ? 'Number(event.target.value) as never' : 'event.target.value as never'} }))}
           />`;
+}
+
+function defaultValue(field: ResolvedField): string {
+  const mapping = mapDelphiComponent(field.source?.componentClass);
+  if (mapping.role === 'checkbox') return 'false as never';
+  return mapTsType(field) === 'number' ? 'undefined' : "''";
+}
+
+function mapTsType(field: ResolvedField): string {
+  const normalized = field.name.toLowerCase();
+  if (normalized.includes('valor') || normalized.includes('preco') || normalized.includes('total')) return 'number';
+  if (normalized.includes('quantidade') || normalized.includes('qtd')) return 'number';
+  if (normalized === 'id' || normalized.endsWith('id') || normalized.includes('codigo')) return 'number';
+  return 'string';
 }
 
 function toPascalCase(value: string): string {
