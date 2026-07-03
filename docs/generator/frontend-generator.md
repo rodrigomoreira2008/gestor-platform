@@ -2,15 +2,15 @@
 
 ## Objetivo
 
-Gerar artefatos React a partir do modelo intermediário `ResolvedForm`.
+Gerar artefatos React a partir do modelo intermediario ResolvedForm.
 
-A versão atual cria um módulo frontend CRUD mínimo para validar o fluxo:
+A versao atual cria um modulo frontend CRUD minimo para validar o fluxo:
 
 ```text
-ResolvedForm -> types + API + hooks + schema + form + columns + CRUD page + route/menu snippets
+ResolvedForm -> types + API + hooks + schema + filters + lookups + form + columns + CRUD page + route/menu snippets
 ```
 
-## Saída atual
+## Saida atual
 
 Arquivos gerados:
 
@@ -19,6 +19,9 @@ apps/frontend/src/modules/<modulo>/types/<entidade>.ts
 apps/frontend/src/modules/<modulo>/api/index.ts
 apps/frontend/src/modules/<modulo>/hooks/index.ts
 apps/frontend/src/modules/<modulo>/schema/<entidade>Schema.ts
+apps/frontend/src/modules/<modulo>/filters/<entidade>Filters.ts
+apps/frontend/src/modules/<modulo>/lookups/<entidade>Lookups.ts
+apps/frontend/src/modules/<modulo>/lookups/<entidade>LookupHooks.ts
 apps/frontend/src/modules/<modulo>/components/<Entidade>Form.tsx
 apps/frontend/src/modules/<modulo>/table/<entidade>Columns.ts
 apps/frontend/src/modules/<modulo>/pages/<Entidade>Page.tsx
@@ -31,45 +34,72 @@ apps/frontend/src/modules/<modulo>/Generated/<Entidade>MenuItem.ts.txt
 Uso:
 
 ```bash
-pnpm --filter @gestor/delphi-parser gen:frontend <arquivo.dfm> <arquivo.pas> <entidade> [tabela] [saida]
+pnpm --filter @gestor/delphi-parser gen:frontend arquivo.dfm arquivo.pas entidade tabela saida
 ```
 
 ## Mapeamento inicial
 
-- Campo numérico inferido por nome (`valor`, `preco`, `total`, `quantidade`, `qtd`, `codigo`, `id`) -> `number`
-- Campo com `data` no nome -> `string`
-- Demais campos -> `string`
+- Campo numerico inferido por nome: valor, preco, total, quantidade, qtd, codigo, id -> number
+- Componentes checkbox Delphi -> boolean
+- Campo com data ou componente DateTimePicker -> campo de data
+- Demais campos -> string
 
-## Validação frontend
+## Componentes Delphi
 
-O gerador emite um schema Zod inicial. Campos obrigatórios vindos do `ResolvedForm` geram validações `.min(1, mensagem)` quando são strings.
+O gerador usa o catalogo de mapeamento para escolher componentes React/MUI:
 
-## Formulário
+- TEdit e TDBEdit -> TextField
+- TDBLookupComboBox e combos -> Select preparado para lookup
+- TCheckBox e TDBCheckBox -> Checkbox
+- TDateTimePicker -> TextField date
+- TDBGrid e TStringGrid -> DataGrid
+- TPageControl e TTabSheet -> estrutura futura de tabs
 
-O formulário inicial usa Material UI `TextField`, estado local com `useState` e callback `onSubmit`.
+## Validacao frontend
 
-## Página CRUD
+O gerador emite um schema Zod inicial. Campos obrigatorios vindos do ResolvedForm geram validacoes quando sao strings. Campos booleanos e numericos usam validacoes compativeis com o tipo inferido.
 
-A página gerada agora usa:
+## Filtros
 
-- Material UI `DataGrid`;
-- colunas geradas em `table/<entidade>Columns.ts`;
+O gerador emite filters/<entidade>Filters.ts com filtros tipados por campo. A pagina usa esses filtros para pesquisa textual local nos registros carregados.
+
+## Lookups
+
+Quando o parser detecta combos ou componentes de lookup, o gerador emite:
+
+- lookups/<entidade>Lookups.ts com endpoint, valueField, labelField, confianca e evidencia;
+- lookups/<entidade>LookupHooks.ts com hooks React Query para carregar opcoes remotas.
+
+Lookups com confianca media ou baixa tambem aparecem no relatorio de migracao para revisao manual.
+
+## Formulario
+
+O formulario inicial usa Material UI, estado local com useState e callback onSubmit. Ele ja diferencia TextField, Checkbox, Select e Date input conforme o componente Delphi inferido.
+
+## Pagina CRUD
+
+A pagina gerada usa:
+
+- Material UI DataGrid;
+- colunas geradas em table/<entidade>Columns.ts;
 - hook de listagem;
-- hook de criação;
-- hook de edição;
-- hook de exclusão;
-- diálogo de cadastro com o formulário gerado;
-- diálogo de edição reaproveitando o mesmo formulário;
-- confirmação de exclusão.
+- hook de criacao;
+- hook de edicao;
+- hook de exclusao;
+- pesquisa textual local;
+- dialogo de cadastro;
+- dialogo de edicao;
+- confirmacao de exclusao.
 
-Essa página já valida o fluxo funcional básico de cadastro, listagem, edição e exclusão.
+Essa pagina valida o fluxo funcional basico de cadastro, listagem, edicao, exclusao e pesquisa local.
 
 ## Rotas e menu
 
-O gerador emite snippets `.txt` para rota e item de menu, evitando editar automaticamente arquivos centrais da aplicação nesta etapa.
+O gerador emite snippets txt para rota e item de menu, evitando editar automaticamente arquivos centrais da aplicacao nesta etapa.
 
-## Próximas etapas
+## Proximas etapas
 
-- Adicionar filtros e pesquisa na página gerada;
-- Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada;
-- Aproveitar `sectionPath` para preservar agrupamentos do Delphi.
+- Trocar selects de lookup por Autocomplete completo;
+- Gerar tabs automaticamente a partir de PageControl e TabSheet;
+- Gerar grids detalhe para telas mestre/detalhe;
+- Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada.
