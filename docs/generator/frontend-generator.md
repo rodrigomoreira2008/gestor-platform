@@ -7,7 +7,7 @@ Gerar artefatos React a partir do modelo intermediario ResolvedForm.
 A versao atual cria um modulo frontend CRUD minimo para validar o fluxo:
 
 ```text
-ResolvedForm -> types + API + hooks + schema + filters + lookups + tabs + form + columns + CRUD page + route/menu snippets
+ResolvedForm -> types + API + hooks + schema + filters + lookups + tabs + form + tabbed form + columns + CRUD page + route/menu snippets
 ```
 
 ## Saida atual
@@ -24,6 +24,7 @@ apps/frontend/src/modules/<modulo>/lookups/<entidade>Lookups.ts
 apps/frontend/src/modules/<modulo>/lookups/<entidade>LookupHooks.ts
 apps/frontend/src/modules/<modulo>/tabs/<entidade>Tabs.ts
 apps/frontend/src/modules/<modulo>/components/<Entidade>Form.tsx
+apps/frontend/src/modules/<modulo>/components/<Entidade>TabbedForm.tsx
 apps/frontend/src/modules/<modulo>/table/<entidade>Columns.ts
 apps/frontend/src/modules/<modulo>/pages/<Entidade>Page.tsx
 apps/frontend/src/modules/<modulo>/Generated/<Entidade>Route.tsx.txt
@@ -79,11 +80,15 @@ Quando o parser detecta sectionPath, PageControl ou agrupamentos equivalentes, o
 
 - tabs/<entidade>Tabs.ts com nome da aba, label, campos associados, confianca e evidencia.
 
-A pagina gerada importa essa definicao e exibe a quantidade de abas inferidas. A etapa seguinte sera renderizar o formulario em abas reais com Material UI Tabs.
-
 ## Formulario
 
 O formulario inicial usa Material UI, estado local com useState e callback onSubmit. Ele ja diferencia TextField, Checkbox, Select e Date input conforme o componente Delphi inferido.
+
+## Formulario com tabs
+
+O gerador tambem emite components/<Entidade>TabbedForm.tsx. Esse arquivo cria um scaffold com Material UI Tabs usando as abas inferidas e reaproveita o formulario base.
+
+Nesta etapa, o TabbedForm ainda funciona como uma camada de estrutura para evolucao incremental. O proximo passo e mover/renderizar cada campo dentro do respectivo painel de aba.
 
 ## Pagina CRUD
 
@@ -110,6 +115,6 @@ O gerador emite snippets txt para rota e item de menu, evitando editar automatic
 ## Proximas etapas
 
 - Trocar selects de lookup por Autocomplete completo;
-- Renderizar formulario em Tabs reais;
+- Mover campos para os paineis corretos do TabbedForm;
 - Gerar grids detalhe para telas mestre/detalhe;
 - Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada.
