@@ -6,6 +6,7 @@ import { inferLookups } from './lookupInference';
 import { parseDfm } from './dfmParser';
 import { parsePascalUnit } from './pasParser';
 import { inferRelationships } from './relationshipInference';
+import { inferTabs } from './tabInference';
 import type { PascalValidationHint } from './pasParser';
 import type { ResolvedAction, ResolvedField, ResolvedForm } from './resolvedForm';
 
@@ -49,9 +50,14 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
     warnings: [...parsedDfm.warnings, ...pascal.warnings]
   };
 
-  return {
+  const withLookups = {
     ...partialResolved,
-    lookups: inferLookups({ ...partialResolved, lookups: [] })
+    lookups: inferLookups({ ...partialResolved, lookups: [], tabs: [] })
+  };
+
+  return {
+    ...withLookups,
+    tabs: inferTabs({ ...withLookups, tabs: [] })
   };
 }
 
