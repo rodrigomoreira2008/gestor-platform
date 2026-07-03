@@ -88,6 +88,14 @@ O formulario inicial usa Material UI, estado local com useState e callback onSub
 
 O gerador tambem emite components/<Entidade>TabbedForm.tsx. Esse arquivo cria Material UI Tabs usando as abas inferidas e renderiza os campos dentro dos paineis correspondentes.
 
+O TabbedForm tambem aplica componentes conforme o tipo inferido:
+
+- Checkbox para campos booleanos;
+- Select para combos e lookups;
+- Date para campos/data pickers;
+- Number para campos numericos;
+- TextField para os demais campos.
+
 Quando nenhuma aba e inferida, o gerador cria uma aba fallback chamada Dados com todos os campos resolvidos.
 
 ## Pagina CRUD
@@ -115,6 +123,6 @@ O gerador emite snippets txt para rota e item de menu, evitando editar automatic
 ## Proximas etapas
 
 - Trocar selects de lookup por Autocomplete completo;
-- Aplicar tipos corretos e componentes especificos dentro do TabbedForm;
+- Conectar TabbedForm diretamente na pagina CRUD;
 - Gerar grids detalhe para telas mestre/detalhe;
 - Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada.
