@@ -7,7 +7,7 @@ Gerar artefatos React a partir do modelo intermediario ResolvedForm.
 A versao atual cria um modulo frontend CRUD minimo para validar o fluxo:
 
 ```text
-ResolvedForm -> types + API + hooks + schema + filters + lookups + form + columns + CRUD page + route/menu snippets
+ResolvedForm -> types + API + hooks + schema + filters + lookups + tabs + form + columns + CRUD page + route/menu snippets
 ```
 
 ## Saida atual
@@ -22,6 +22,7 @@ apps/frontend/src/modules/<modulo>/schema/<entidade>Schema.ts
 apps/frontend/src/modules/<modulo>/filters/<entidade>Filters.ts
 apps/frontend/src/modules/<modulo>/lookups/<entidade>Lookups.ts
 apps/frontend/src/modules/<modulo>/lookups/<entidade>LookupHooks.ts
+apps/frontend/src/modules/<modulo>/tabs/<entidade>Tabs.ts
 apps/frontend/src/modules/<modulo>/components/<Entidade>Form.tsx
 apps/frontend/src/modules/<modulo>/table/<entidade>Columns.ts
 apps/frontend/src/modules/<modulo>/pages/<Entidade>Page.tsx
@@ -53,7 +54,7 @@ O gerador usa o catalogo de mapeamento para escolher componentes React/MUI:
 - TCheckBox e TDBCheckBox -> Checkbox
 - TDateTimePicker -> TextField date
 - TDBGrid e TStringGrid -> DataGrid
-- TPageControl e TTabSheet -> estrutura futura de tabs
+- TPageControl e TTabSheet -> tabs inferidas
 
 ## Validacao frontend
 
@@ -72,6 +73,14 @@ Quando o parser detecta combos ou componentes de lookup, o gerador emite:
 
 Lookups com confianca media ou baixa tambem aparecem no relatorio de migracao para revisao manual.
 
+## Tabs
+
+Quando o parser detecta sectionPath, PageControl ou agrupamentos equivalentes, o gerador emite:
+
+- tabs/<entidade>Tabs.ts com nome da aba, label, campos associados, confianca e evidencia.
+
+A pagina gerada importa essa definicao e exibe a quantidade de abas inferidas. A etapa seguinte sera renderizar o formulario em abas reais com Material UI Tabs.
+
 ## Formulario
 
 O formulario inicial usa Material UI, estado local com useState e callback onSubmit. Ele ja diferencia TextField, Checkbox, Select e Date input conforme o componente Delphi inferido.
@@ -87,6 +96,7 @@ A pagina gerada usa:
 - hook de edicao;
 - hook de exclusao;
 - pesquisa textual local;
+- metadata de tabs inferidas;
 - dialogo de cadastro;
 - dialogo de edicao;
 - confirmacao de exclusao.
@@ -100,6 +110,6 @@ O gerador emite snippets txt para rota e item de menu, evitando editar automatic
 ## Proximas etapas
 
 - Trocar selects de lookup por Autocomplete completo;
-- Gerar tabs automaticamente a partir de PageControl e TabSheet;
+- Renderizar formulario em Tabs reais;
 - Gerar grids detalhe para telas mestre/detalhe;
 - Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada.
