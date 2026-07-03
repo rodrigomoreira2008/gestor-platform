@@ -2,6 +2,7 @@ import { mapDelphiComponent } from './componentMapping';
 import { renderFrontendFilterDefinitions } from './frontendFilterGenerator';
 import { renderFrontendLookupDefinitions, renderFrontendLookupHooks } from './frontendLookupGenerator';
 import { renderFrontendTabDefinitions } from './frontendTabGenerator';
+import { renderTabbedFormScaffold } from './frontendTabbedFormGenerator';
 import type { ResolvedField, ResolvedForm } from './resolvedForm';
 
 export interface FrontendGeneratedFile { path: string; content: string; }
@@ -23,6 +24,7 @@ export function generateFrontendFiles(resolved: ResolvedForm, options: FrontendG
     { path: `${outputRoot}/lookups/${entity}LookupHooks.ts`, content: renderFrontendLookupHooks(entity, resolved.lookups) },
     { path: `${outputRoot}/tabs/${entity}Tabs.ts`, content: renderFrontendTabDefinitions(resolved.tabs, `${entity}Tabs`) },
     { path: `${outputRoot}/components/${entityPascal}Form.tsx`, content: generateForm(entityPascal, entity, resolved.fields) },
+    { path: `${outputRoot}/components/${entityPascal}TabbedForm.tsx`, content: renderTabbedFormScaffold({ entityPascal, entity, fields: resolved.fields, tabs: resolved.tabs }) },
     { path: `${outputRoot}/table/${entity}Columns.ts`, content: generateColumns(entityPascal, entity, resolved.fields) },
     { path: `${outputRoot}/pages/${entityPascal}Page.tsx`, content: generatePage(entityPascal, entity, plural) },
     { path: `${outputRoot}/Generated/${entityPascal}Route.tsx.txt`, content: generateRouteSnippet(entityPascal, plural) },
