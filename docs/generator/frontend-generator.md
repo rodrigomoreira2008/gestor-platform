@@ -7,7 +7,7 @@ Gerar artefatos React a partir do modelo intermediario ResolvedForm.
 A versao atual cria um modulo frontend CRUD minimo para validar o fluxo:
 
 ```text
-ResolvedForm -> types + API + hooks + schema + filters + lookups + tabs + form + tabbed form + columns + CRUD page + route/menu snippets
+ResolvedForm -> types + API + hooks + schema + filters + lookups + lookup field + tabs + form + tabbed form + columns + CRUD page + route/menu snippets
 ```
 
 ## Saida atual
@@ -22,6 +22,7 @@ apps/frontend/src/modules/<modulo>/schema/<entidade>Schema.ts
 apps/frontend/src/modules/<modulo>/filters/<entidade>Filters.ts
 apps/frontend/src/modules/<modulo>/lookups/<entidade>Lookups.ts
 apps/frontend/src/modules/<modulo>/lookups/<entidade>LookupHooks.ts
+apps/frontend/src/modules/<modulo>/components/<Entidade>LookupField.tsx
 apps/frontend/src/modules/<modulo>/tabs/<entidade>Tabs.ts
 apps/frontend/src/modules/<modulo>/components/<Entidade>Form.tsx
 apps/frontend/src/modules/<modulo>/components/<Entidade>TabbedForm.tsx
@@ -70,7 +71,8 @@ O gerador emite filters/<entidade>Filters.ts com filtros tipados por campo. A pa
 Quando o parser detecta combos ou componentes de lookup, o gerador emite:
 
 - lookups/<entidade>Lookups.ts com endpoint, valueField, labelField, confianca e evidencia;
-- lookups/<entidade>LookupHooks.ts com hooks React Query para carregar opcoes remotas.
+- lookups/<entidade>LookupHooks.ts com hooks React Query para carregar opcoes remotas;
+- components/<Entidade>LookupField.tsx com um campo reutilizavel baseado em Material UI Autocomplete.
 
 Lookups com confianca media ou baixa tambem aparecem no relatorio de migracao para revisao manual.
 
@@ -121,7 +123,7 @@ O gerador emite snippets txt para rota e item de menu, evitando editar automatic
 
 ## Proximas etapas
 
-- Trocar selects de lookup por Autocomplete completo;
+- Conectar LookupField diretamente nos formularios gerados;
 - Gerar grids detalhe para telas mestre/detalhe;
 - Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada;
 - Validar build dos artefatos frontend gerados.
