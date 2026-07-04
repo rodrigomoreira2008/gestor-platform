@@ -7,6 +7,7 @@ export * from './dfmToGestorForm';
 export * from './frontendFilterComponentGenerator';
 export * from './frontendFilterGenerator';
 export * from './frontendGenerator';
+export * from './frontendLookupComponentGenerator';
 export * from './frontendLookupGenerator';
 export * from './frontendTabGenerator';
 export * from './frontendTabbedFormGenerator';
