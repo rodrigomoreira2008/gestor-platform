@@ -110,8 +110,7 @@ A pagina gerada usa:
 - hook de exclusao;
 - pesquisa textual local;
 - metadata de tabs inferidas;
-- dialogo de cadastro;
-- dialogo de edicao;
+- TabbedForm nos dialogos de cadastro e edicao;
 - confirmacao de exclusao.
 
 Essa pagina valida o fluxo funcional basico de cadastro, listagem, edicao, exclusao e pesquisa local.
@@ -123,6 +122,6 @@ O gerador emite snippets txt para rota e item de menu, evitando editar automatic
 ## Proximas etapas
 
 - Trocar selects de lookup por Autocomplete completo;
-- Conectar TabbedForm diretamente na pagina CRUD;
 - Gerar grids detalhe para telas mestre/detalhe;
-- Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada.
+- Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada;
+- Validar build dos artefatos frontend gerados.
