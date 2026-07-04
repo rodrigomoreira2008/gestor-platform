@@ -11,10 +11,11 @@ export interface RenderTabbedFormInput {
 
 export function renderTabbedFormScaffold(input: RenderTabbedFormInput): string {
   const tabs = input.tabs.length > 0 ? input.tabs : [{ name: 'dados', label: 'Dados', fieldNames: input.fields.map((field) => field.name), confidence: 'low' as const, evidence: 'Fallback sem abas Delphi inferidas.' }];
-  const tabPanels = tabs.map((tab, index) => renderTabPanel(tab, input.fields, index)).join('\n');
+  const tabPanels = tabs.map((tab, index) => renderTabPanel(tab, input.fields, index, input.entityPascal)).join('\n');
 
-  return `import { Button, Checkbox, FormControlLabel, MenuItem, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
+  return `import { Button, Checkbox, FormControlLabel, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
+import { ${input.entityPascal}LookupField } from './${input.entityPascal}LookupField';
 import type { ${input.entityPascal}Input } from '../types/${input.entity}';
 
 interface ${input.entityPascal}TabbedFormProps {
@@ -44,11 +45,11 @@ ${tabPanels}
 `;
 }
 
-function renderTabPanel(tab: InferredTab, fields: ResolvedField[], index: number): string {
+function renderTabPanel(tab: InferredTab, fields: ResolvedField[], index: number, entityPascal: string): string {
   const fieldControls = tab.fieldNames
     .map((fieldName) => fields.find((field) => field.name === fieldName))
     .filter((field): field is ResolvedField => Boolean(field))
-    .map((field) => renderInput(field))
+    .map((field) => renderInput(field, entityPascal))
     .join('\n');
 
   return `      {tab === ${index} && (
@@ -59,10 +60,10 @@ ${fieldControls || '          <Typography variant="body2">Nenhum campo inferido 
       )}`;
 }
 
-function renderInput(field: ResolvedField): string {
+function renderInput(field: ResolvedField, entityPascal: string): string {
   const mapping = mapDelphiComponent(field.source?.componentClass);
   if (mapping.role === 'checkbox') return renderCheckbox(field);
-  if (mapping.role === 'select') return renderSelect(field);
+  if (mapping.role === 'select') return renderLookup(field, entityPascal);
   return renderTextField(field, mapping.role === 'date');
 }
 
@@ -75,19 +76,16 @@ function renderCheckbox(field: ResolvedField): string {
           />`;
 }
 
-function renderSelect(field: ResolvedField): string {
+function renderLookup(field: ResolvedField, entityPascal: string): string {
   const name = toCamelCase(field.name);
   const label = escapeDoubleQuote(field.label ?? field.name);
-  return `          <TextField
-            select
+  return `          <${entityPascal}LookupField
+            fieldName="${escapeDoubleQuote(field.name)}"
             label="${label}"
-            value={form.${name} ?? ''}
+            value={form.${name} as string | number | null | undefined}
             required={${field.required ? 'true' : 'false'}}
-            helperText="Lookup Delphi preparado; revisar definicoes geradas."
-            onChange={(event) => setForm((current) => ({ ...current, ${name}: event.target.value as never }))}
-          >
-            <MenuItem value="">Selecione...</MenuItem>
-          </TextField>`;
+            onChange={(value) => setForm((current) => ({ ...current, ${name}: value as never }))}
+          />`;
 }
 
 function renderTextField(field: ResolvedField, isDate: boolean): string {
