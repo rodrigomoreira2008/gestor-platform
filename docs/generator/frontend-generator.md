@@ -74,6 +74,8 @@ Quando o parser detecta combos ou componentes de lookup, o gerador emite:
 - lookups/<entidade>LookupHooks.ts com hooks React Query para carregar opcoes remotas;
 - components/<Entidade>LookupField.tsx com um campo reutilizavel baseado em Material UI Autocomplete.
 
+A inferencia de lookup tenta preencher valueField e labelField por relacionamentos, campos do mesmo DataSource e nomes comuns, como ID, CODIGO, CONTROLE, NOME e DESCRICAO.
+
 Lookups com confianca media ou baixa tambem aparecem no relatorio de migracao para revisao manual.
 
 ## Tabs
@@ -123,7 +125,7 @@ O gerador emite snippets txt para rota e item de menu, evitando editar automatic
 
 ## Proximas etapas
 
-- Refinar valueField/labelField dos lookups a partir de metadados reais;
 - Gerar grids detalhe para telas mestre/detalhe;
 - Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada;
-- Validar build dos artefatos frontend gerados.
+- Validar build dos artefatos frontend gerados;
+- Criar fixtures de DFM/PAS para validar lookups reais.
