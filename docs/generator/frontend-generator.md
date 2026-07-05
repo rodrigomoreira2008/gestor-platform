@@ -52,7 +52,7 @@ pnpm --filter @gestor/delphi-parser gen:frontend arquivo.dfm arquivo.pas entidad
 O gerador usa o catalogo de mapeamento para escolher componentes React/MUI:
 
 - TEdit e TDBEdit -> TextField
-- TDBLookupComboBox e combos -> Select preparado para lookup
+- TDBLookupComboBox e combos -> Autocomplete preparado por LookupField
 - TCheckBox e TDBCheckBox -> Checkbox
 - TDateTimePicker -> TextField date
 - TDBGrid e TStringGrid -> DataGrid
@@ -93,7 +93,7 @@ O gerador tambem emite components/<Entidade>TabbedForm.tsx. Esse arquivo cria Ma
 O TabbedForm tambem aplica componentes conforme o tipo inferido:
 
 - Checkbox para campos booleanos;
-- Select para combos e lookups;
+- LookupField/Autocomplete para combos e lookups;
 - Date para campos/data pickers;
 - Number para campos numericos;
 - TextField para os demais campos.
@@ -123,7 +123,7 @@ O gerador emite snippets txt para rota e item de menu, evitando editar automatic
 
 ## Proximas etapas
 
-- Conectar LookupField diretamente nos formularios gerados;
+- Refinar valueField/labelField dos lookups a partir de metadados reais;
 - Gerar grids detalhe para telas mestre/detalhe;
 - Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada;
 - Validar build dos artefatos frontend gerados.
