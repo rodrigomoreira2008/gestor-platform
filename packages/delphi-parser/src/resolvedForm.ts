@@ -1,4 +1,5 @@
 import type { GestorForm } from '@gestor/dsl';
+import type { InferredDetailGrid } from './detailGridInference';
 import type { InferredLookup } from './lookupInference';
 import type { InferredSqlQuery } from './databaseInference';
 import type { InferredRelationship } from './relationshipInference';
@@ -16,6 +17,7 @@ export interface ResolvedForm {
   relationships: InferredRelationship[];
   lookups: InferredLookup[];
   tabs: InferredTab[];
+  detailGrids: InferredDetailGrid[];
   validations: PascalValidationHint[];
   warnings: string[];
 }
