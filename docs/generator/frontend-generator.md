@@ -25,6 +25,7 @@ apps/frontend/src/modules/<modulo>/lookups/<entidade>LookupHooks.ts
 apps/frontend/src/modules/<modulo>/components/<Entidade>LookupField.tsx
 apps/frontend/src/modules/<modulo>/tabs/<entidade>Tabs.ts
 apps/frontend/src/modules/<modulo>/details/<entidade>DetailGrids.ts
+apps/frontend/src/modules/<modulo>/details/<entidade>DetailHooks.ts
 apps/frontend/src/modules/<modulo>/details/<Entidade><Grid>DetailGrid.tsx
 apps/frontend/src/modules/<modulo>/components/<Entidade>Form.tsx
 apps/frontend/src/modules/<modulo>/components/<Entidade>TabbedForm.tsx
@@ -99,9 +100,10 @@ O ResolvedForm tambem recebe detailGrids inferidos a partir de componentes Grid 
 O gerador frontend emite:
 
 - details/<entidade>DetailGrids.ts com metadados dos grids detalhe;
+- details/<entidade>DetailHooks.ts com hooks React Query para carregar detalhes por masterId;
 - details/<Entidade><Grid>DetailGrid.tsx com componente Material UI DataGrid para cada grid inferido.
 
-Nesta etapa os componentes recebem rows e isLoading por props, deixando a carga real dos dados para a integracao com endpoints mestre/detalhe.
+Nesta etapa os componentes recebem rows e isLoading por props. Os hooks gerados ja criam a consulta base por masterId, e a proxima etapa e conectar esses hooks automaticamente nos componentes/paginas mestre.
 
 ## Formulario
 
@@ -144,7 +146,7 @@ O gerador emite snippets txt para rota e item de menu, evitando editar automatic
 
 ## Proximas etapas
 
-- Conectar endpoints e hooks reais para grids detalhe;
+- Conectar hooks de detalhe automaticamente nas paginas mestre;
 - Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada;
 - Validar build dos artefatos frontend gerados;
 - Criar fixtures de DFM/PAS para validar lookups e grids reais.
