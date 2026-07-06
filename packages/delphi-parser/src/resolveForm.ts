@@ -1,4 +1,5 @@
 import { inferDatabaseQueries } from './databaseInference';
+import { inferDetailGrids } from './detailGridInference';
 import { collectActionBindings, collectFieldBindings } from './dfmIntrospection';
 import { dfmToGestorForm } from './dfmToGestorForm';
 import { enrichGestorFormWithPascal } from './gestorPasEnrichment';
@@ -52,12 +53,16 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
 
   const withLookups = {
     ...partialResolved,
-    lookups: inferLookups({ ...partialResolved, lookups: [], tabs: [] })
+    lookups: inferLookups({ ...partialResolved, lookups: [], tabs: [], detailGrids: [] })
+  };
+  const withTabs = {
+    ...withLookups,
+    tabs: inferTabs({ ...withLookups, tabs: [], detailGrids: [] })
   };
 
   return {
-    ...withLookups,
-    tabs: inferTabs({ ...withLookups, tabs: [] })
+    ...withTabs,
+    detailGrids: inferDetailGrids({ ...withTabs, detailGrids: [] })
   };
 }
 
