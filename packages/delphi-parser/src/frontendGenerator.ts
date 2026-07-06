@@ -1,4 +1,5 @@
 import { mapDelphiComponent } from './componentMapping';
+import { renderDetailGridComponent, renderFrontendDetailGridDefinitions } from './frontendDetailGridGenerator';
 import { renderFrontendFilterDefinitions } from './frontendFilterGenerator';
 import { renderFrontendLookupDefinitions, renderFrontendLookupHooks } from './frontendLookupGenerator';
 import { renderFrontendTabDefinitions } from './frontendTabGenerator';
@@ -13,6 +14,10 @@ export function generateFrontendFiles(resolved: ResolvedForm, options: FrontendG
   const entityPascal = toPascalCase(resolved.form.entity);
   const plural = toKebabPlural(entity);
   const outputRoot = options.outputRoot ?? `apps/frontend/src/modules/${plural}`;
+  const detailGridFiles = resolved.detailGrids.map((grid) => ({
+    path: `${outputRoot}/details/${entityPascal}${toPascalCase(grid.name)}DetailGrid.tsx`,
+    content: renderDetailGridComponent(entityPascal, entity, grid)
+  }));
 
   return [
     { path: `${outputRoot}/types/${entity}.ts`, content: generateTypes(entityPascal, resolved.fields) },
@@ -22,9 +27,11 @@ export function generateFrontendFiles(resolved: ResolvedForm, options: FrontendG
     { path: `${outputRoot}/filters/${entity}Filters.ts`, content: renderFrontendFilterDefinitions(resolved.fields, `${entity}Filters`) },
     { path: `${outputRoot}/lookups/${entity}Lookups.ts`, content: renderFrontendLookupDefinitions(resolved.lookups, `${entity}Lookups`) },
     { path: `${outputRoot}/lookups/${entity}LookupHooks.ts`, content: renderFrontendLookupHooks(entity, resolved.lookups) },
+    { path: `${outputRoot}/details/${entity}DetailGrids.ts`, content: renderFrontendDetailGridDefinitions(resolved.detailGrids, `${entity}DetailGrids`) },
     { path: `${outputRoot}/tabs/${entity}Tabs.ts`, content: renderFrontendTabDefinitions(resolved.tabs, `${entity}Tabs`) },
     { path: `${outputRoot}/components/${entityPascal}Form.tsx`, content: generateForm(entityPascal, entity, resolved.fields) },
     { path: `${outputRoot}/components/${entityPascal}TabbedForm.tsx`, content: renderTabbedFormScaffold({ entityPascal, entity, fields: resolved.fields, tabs: resolved.tabs }) },
+    ...detailGridFiles,
     { path: `${outputRoot}/table/${entity}Columns.ts`, content: generateColumns(entityPascal, entity, resolved.fields) },
     { path: `${outputRoot}/pages/${entityPascal}Page.tsx`, content: generatePage(entityPascal, entity, plural) },
     { path: `${outputRoot}/Generated/${entityPascal}Route.tsx.txt`, content: generateRouteSnippet(entityPascal, plural) },
