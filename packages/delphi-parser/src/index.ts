@@ -1,6 +1,7 @@
 export * from './backendGenerator';
 export * from './componentMapping';
 export * from './databaseInference';
+export * from './detailGridInference';
 export * from './dfmIntrospection';
 export * from './dfmParser';
 export * from './dfmToGestorForm';
