@@ -6,6 +6,7 @@ export * from './dfmIntrospection';
 export * from './dfmParser';
 export * from './dfmToGestorForm';
 export * from './frontendDetailGridGenerator';
+export * from './frontendDetailHookGenerator';
 export * from './frontendFilterComponentGenerator';
 export * from './frontendFilterGenerator';
 export * from './frontendGenerator';
