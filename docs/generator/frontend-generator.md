@@ -84,6 +84,18 @@ Quando o parser detecta sectionPath, PageControl ou agrupamentos equivalentes, o
 
 - tabs/<entidade>Tabs.ts com nome da aba, label, campos associados, confianca e evidencia.
 
+## Grids detalhe
+
+O ResolvedForm tambem recebe detailGrids inferidos a partir de componentes Grid Delphi. Cada grid detalhe tenta preservar:
+
+- nome do grid;
+- DataSource associado;
+- campos vinculados;
+- relacionamento mestre/detalhe quando inferido;
+- nivel de confianca e evidencia.
+
+Nesta etapa os grids detalhe aparecem no relatorio de migracao. A proxima etapa e emitir componentes DataGrid de detalhe para telas mestre/detalhe.
+
 ## Formulario
 
 O formulario inicial usa Material UI, estado local com useState e callback onSubmit. Ele ja diferencia TextField, Checkbox, Select e Date input conforme o componente Delphi inferido.
@@ -125,7 +137,7 @@ O gerador emite snippets txt para rota e item de menu, evitando editar automatic
 
 ## Proximas etapas
 
-- Gerar grids detalhe para telas mestre/detalhe;
+- Emitir componentes DataGrid de detalhe para telas mestre/detalhe;
 - Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada;
 - Validar build dos artefatos frontend gerados;
-- Criar fixtures de DFM/PAS para validar lookups reais.
+- Criar fixtures de DFM/PAS para validar lookups e grids reais.
