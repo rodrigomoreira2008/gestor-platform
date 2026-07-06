@@ -5,6 +5,7 @@ export * from './detailGridInference';
 export * from './dfmIntrospection';
 export * from './dfmParser';
 export * from './dfmToGestorForm';
+export * from './frontendDetailGridGenerator';
 export * from './frontendFilterComponentGenerator';
 export * from './frontendFilterGenerator';
 export * from './frontendGenerator';
