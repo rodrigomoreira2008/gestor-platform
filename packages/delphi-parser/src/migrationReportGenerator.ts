@@ -17,6 +17,7 @@ export function generateMigrationReport(resolved: ResolvedForm): MigrationReport
   const inferredRelationships = resolved.relationships.map((relationship) => `${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn}; confianca: ${relationship.confidence}; evidencia: ${relationship.evidence}`);
   const inferredLookups = resolved.lookups.map((lookup) => `${lookup.fieldName}; source: ${lookup.lookupSource ?? 'nao inferido'}; key: ${lookup.keyField ?? 'id'}; label: ${lookup.displayField ?? 'descricao'}; confianca: ${lookup.confidence}; evidencia: ${lookup.evidence}`);
   const inferredTabs = resolved.tabs.map((tab) => `${tab.label}; campos: ${tab.fieldNames.join(', ')}; confianca: ${tab.confidence}; evidencia: ${tab.evidence}`);
+  const inferredDetailGrids = resolved.detailGrids.map((grid) => `${grid.name}; DataSource: ${grid.dataSource ?? 'nao inferido'}; campos: ${grid.fieldNames.join(', ')}; relacionamento: ${grid.relationship ?? 'nao inferido'}; confianca: ${grid.confidence}; evidencia: ${grid.evidence}`);
 
   const automatedItems = [
     resolved.fields.length > 0 ? `${resolved.fields.length} campo(s) resolvido(s)` : undefined,
@@ -29,6 +30,7 @@ export function generateMigrationReport(resolved: ResolvedForm): MigrationReport
     inferredRelationships.length > 0 ? `${inferredRelationships.length} relacionamento(s) inferido(s) a partir de joins` : undefined,
     inferredLookups.length > 0 ? `${inferredLookups.length} lookup(s) inferido(s) a partir de componentes Delphi` : undefined,
     inferredTabs.length > 0 ? `${inferredTabs.length} aba(s)/secao(oes) inferida(s) a partir do layout Delphi` : undefined,
+    inferredDetailGrids.length > 0 ? `${inferredDetailGrids.length} grid(s) detalhe inferido(s) a partir do layout Delphi` : undefined,
     resolved.validations.length > 0 ? `${resolved.validations.length} validacao(oes) detectada(s)` : undefined
   ].filter(Boolean) as string[];
 
@@ -39,6 +41,7 @@ export function generateMigrationReport(resolved: ResolvedForm): MigrationReport
     ...resolved.relationships.filter((relationship) => relationship.confidence !== 'high').map((relationship) => `Confirmar relacionamento ${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn} (${relationship.confidence})`),
     ...resolved.lookups.filter((lookup) => lookup.confidence !== 'high').map((lookup) => `Confirmar lookup ${lookup.fieldName} (${lookup.confidence})`),
     ...resolved.tabs.filter((tab) => tab.confidence !== 'high').map((tab) => `Confirmar aba/secao ${tab.label} (${tab.confidence})`),
+    ...resolved.detailGrids.filter((grid) => grid.confidence !== 'high').map((grid) => `Confirmar grid detalhe ${grid.name} (${grid.confidence})`),
     ...resolved.datasets.filter((dataset) => !dataset.tableName && !dataset.dataSource).map((dataset) => `Dataset sem origem clara: ${dataset.name}`)
   ];
 
@@ -54,6 +57,7 @@ export function generateMigrationReport(resolved: ResolvedForm): MigrationReport
       { title: 'Relacionamentos inferidos', items: inferredRelationships.length > 0 ? inferredRelationships : ['Nenhum relacionamento inferido nesta etapa.'] },
       { title: 'Lookups inferidos', items: inferredLookups.length > 0 ? inferredLookups : ['Nenhum lookup inferido nesta etapa.'] },
       { title: 'Abas e secoes inferidas', items: inferredTabs.length > 0 ? inferredTabs : ['Nenhuma aba/secao inferida nesta etapa.'] },
+      { title: 'Grids detalhe inferidos', items: inferredDetailGrids.length > 0 ? inferredDetailGrids : ['Nenhum grid detalhe inferido nesta etapa.'] },
       { title: 'Revisao manual recomendada', items: reviewItems.length > 0 ? reviewItems : ['Nenhuma revisao manual detectada nesta etapa.'] }
     ]
   };
