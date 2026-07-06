@@ -7,7 +7,7 @@ Gerar artefatos React a partir do modelo intermediario ResolvedForm.
 A versao atual cria um modulo frontend CRUD minimo para validar o fluxo:
 
 ```text
-ResolvedForm -> types + API + hooks + schema + filters + lookups + lookup field + tabs + form + tabbed form + columns + CRUD page + route/menu snippets
+ResolvedForm -> types + API + hooks + schema + filters + lookups + lookup field + tabs + details + form + tabbed form + columns + CRUD page + route/menu snippets
 ```
 
 ## Saida atual
@@ -24,6 +24,8 @@ apps/frontend/src/modules/<modulo>/lookups/<entidade>Lookups.ts
 apps/frontend/src/modules/<modulo>/lookups/<entidade>LookupHooks.ts
 apps/frontend/src/modules/<modulo>/components/<Entidade>LookupField.tsx
 apps/frontend/src/modules/<modulo>/tabs/<entidade>Tabs.ts
+apps/frontend/src/modules/<modulo>/details/<entidade>DetailGrids.ts
+apps/frontend/src/modules/<modulo>/details/<Entidade><Grid>DetailGrid.tsx
 apps/frontend/src/modules/<modulo>/components/<Entidade>Form.tsx
 apps/frontend/src/modules/<modulo>/components/<Entidade>TabbedForm.tsx
 apps/frontend/src/modules/<modulo>/table/<entidade>Columns.ts
@@ -94,7 +96,12 @@ O ResolvedForm tambem recebe detailGrids inferidos a partir de componentes Grid 
 - relacionamento mestre/detalhe quando inferido;
 - nivel de confianca e evidencia.
 
-Nesta etapa os grids detalhe aparecem no relatorio de migracao. A proxima etapa e emitir componentes DataGrid de detalhe para telas mestre/detalhe.
+O gerador frontend emite:
+
+- details/<entidade>DetailGrids.ts com metadados dos grids detalhe;
+- details/<Entidade><Grid>DetailGrid.tsx com componente Material UI DataGrid para cada grid inferido.
+
+Nesta etapa os componentes recebem rows e isLoading por props, deixando a carga real dos dados para a integracao com endpoints mestre/detalhe.
 
 ## Formulario
 
@@ -137,7 +144,7 @@ O gerador emite snippets txt para rota e item de menu, evitando editar automatic
 
 ## Proximas etapas
 
-- Emitir componentes DataGrid de detalhe para telas mestre/detalhe;
+- Conectar endpoints e hooks reais para grids detalhe;
 - Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada;
 - Validar build dos artefatos frontend gerados;
 - Criar fixtures de DFM/PAS para validar lookups e grids reais.
