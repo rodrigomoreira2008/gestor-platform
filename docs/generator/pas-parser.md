@@ -2,28 +2,28 @@
 
 ## Objetivo
 
-O parser PAS inicia a análise automática das units Pascal associadas aos formulários Delphi.
+O parser PAS inicia a analise automatica das units Pascal associadas aos formularios Delphi.
 
-Ele complementa o parser DFM, que entende a estrutura visual, trazendo informações de comportamento e regra de negócio.
+Ele complementa o parser DFM, que entende a estrutura visual, trazendo informacoes de comportamento e regra de negocio.
 
-## Implementação inicial
+## Implementacao inicial
 
-A versão atual suporta:
+A versao atual suporta:
 
-- identificação de métodos `procedure`;
-- identificação de métodos `function` com tipo de retorno;
+- identificacao de metodos `procedure`;
+- identificacao de metodos `function` com tipo de retorno;
 - captura do corpo `begin ... end`;
-- extração simples de SQL em `SQL.Text` e `CommandText`;
-- extração de SQL por chamadas `SQL.Add(...)`;
-- normalização inicial de strings SQL concatenadas com `+`, inclusive em múltiplas linhas;
-- extração de mensagens em `ShowMessage`, `MessageDlg` e `Exception.Create`;
-- heurística inicial para campos obrigatórios com `FieldByName(...).IsNull` e `.Text = ''`;
-- extração inicial de componentes de dados como `TFDQuery`, `TQuery`, `TClientDataSet`, `TDataSource`, `TTable`, `TADOQuery`, `TADOTable`, `TIBQuery` e `TIBDataSet`;
-- extração inicial de eventos por atribuição (`Componente.OnClick := Handler`) e por convenção de nome (`BotaoClick`, `CampoExit`, etc.).
+- extracao simples de SQL em `SQL.Text` e `CommandText`;
+- extracao de SQL por chamadas `SQL.Add(...)`;
+- normalizacao inicial de strings SQL concatenadas com `+`, inclusive em multiplas linhas;
+- extracao de mensagens em `ShowMessage`, `MessageDlg` e `Exception.Create`;
+- heuristica inicial para campos obrigatorios com `FieldByName(...).IsNull` e `.Text = ''`;
+- extracao inicial de componentes de dados como `TFDQuery`, `TQuery`, `TClientDataSet`, `TDataSource`, `TTable`, `TADOQuery`, `TADOTable`, `TIBQuery` e `TIBDataSet`;
+- extracao inicial de eventos por atribuicao (`Componente.OnClick := Handler`) e por convencao de nome (`BotaoClick`, `CampoExit`, etc.).
 
 ## CLI
 
-Executar análise de uma unit Pascal:
+Executar analise de uma unit Pascal:
 
 ```bash
 pnpm --filter @gestor/delphi-parser parse:pas caminho/para/CadastroProdutos.pas
@@ -33,107 +33,47 @@ Validar todos os artefatos gerados a partir de um par DFM/PAS:
 
 ```bash
 pnpm --filter @gestor/delphi-parser validate:generated arquivo.dfm arquivo.pas Entidade tabela
+pnpm --filter @gestor/delphi-parser validate:fixture:produtos
 ```
 
-A validação unificada gera backend e frontend em memória, verifica paths duplicados, arquivos vazios e retorna um resumo de campos, ações, lookups, abas e grids detalhe.
+A validacao unificada gera backend e frontend em memoria, verifica paths duplicados, arquivos vazios e retorna um resumo de campos, acoes, lookups, abas e grids detalhe.
 
-A saída do parser é um JSON contendo:
+## Fixtures
 
-- `methods`;
-- `sqlSnippets`;
-- `validationHints`;
-- `datasetHints`;
-- `eventHints`;
-- `warnings`.
+A pasta fixtures inclui um cenario inicial de Cadastro de Produtos com:
 
-## Exemplo de saída
+- DFM com PageControl, abas, DBEdit, DBLookupComboBox, DBCheckBox e DBGrid;
+- PAS com validacao obrigatoria, SQL com join e SQL de detalhe por produto;
+- script validate:fixture:produtos para checar a geracao completa.
 
-```json
-{
-  "methods": [
-    {
-      "kind": "procedure",
-      "name": "BtnGravarClick",
-      "body": "begin\n  ...\nend"
-    }
-  ],
-  "sqlSnippets": [
-    {
-      "methodName": "BtnGravarClick",
-      "text": "select * from produtos"
-    }
-  ],
-  "validationHints": [
-    {
-      "methodName": "BtnGravarClick",
-      "field": "DESCRICAO",
-      "message": "Descrição é obrigatória."
-    }
-  ],
-  "datasetHints": [
-    {
-      "name": "QryProdutos",
-      "className": "TFDQuery",
-      "tableName": "PRODUTOS"
-    }
-  ],
-  "eventHints": [
-    {
-      "componentName": "BtnGravar",
-      "eventName": "OnClick",
-      "handlerName": "BtnGravarClick"
-    }
-  ],
-  "warnings": []
-}
-```
+## Validacao de artefatos
 
-## Eventos
-
-O parser detecta eventos de duas formas:
-
-1. Atribuições explícitas no código:
-
-```pascal
-BtnGravar.OnClick := BtnGravarClick;
-```
-
-2. Convenções comuns do Delphi:
-
-```pascal
-procedure TForm.BtnGravarClick(Sender: TObject);
-procedure TForm.CampoDescricaoExit(Sender: TObject);
-```
-
-Essas pistas ajudam a conectar ações da DSL aos métodos encontrados no PAS.
-
-## Validação de artefatos
-
-Os comandos de validação atuais são:
+Os comandos de validacao atuais sao:
 
 ```bash
 pnpm --filter @gestor/delphi-parser validate:backend arquivo.dfm arquivo.pas Entidade tabela
 pnpm --filter @gestor/delphi-parser validate:frontend arquivo.dfm arquivo.pas Entidade tabela
 pnpm --filter @gestor/delphi-parser validate:generated arquivo.dfm arquivo.pas Entidade tabela
+pnpm --filter @gestor/delphi-parser validate:fixture:produtos
 ```
 
-Eles foram criados para funcionar como uma checagem rápida antes de copiar artefatos para as aplicações reais.
+Eles foram criados para funcionar como uma checagem rapida antes de copiar artefatos para as aplicacoes reais.
 
-## Limitações conhecidas
+## Limitacoes conhecidas
 
-Esta versão ainda não interpreta completamente a linguagem Pascal. Ela usa heurísticas textuais para acelerar a migração.
+Esta versao ainda nao interpreta completamente a linguagem Pascal. Ela usa heuristicas textuais para acelerar a migracao.
 
-Limitações atuais:
+Limitacoes atuais:
 
-- não resolve herança ou includes;
-- não interpreta SQL montado por concatenação complexa com variáveis;
-- não diferencia todos os tipos de validação;
-- não faz análise semântica completa de variáveis;
-- não resolve todos os relacionamentos entre datasets criados dinamicamente.
+- nao resolve heranca ou includes;
+- nao interpreta SQL montado por concatenacao complexa com variaveis;
+- nao diferencia todos os tipos de validacao;
+- nao faz analise semantica completa de variaveis;
+- nao resolve todos os relacionamentos entre datasets criados dinamicamente.
 
-## Próximas melhorias
+## Proximas melhorias
 
-- criar fixtures reais de DFM/PAS para validar regressão;
-- gerar relatório de lacunas por módulo;
+- adicionar mais fixtures reais por modulo;
+- gerar relatorio de lacunas por modulo;
 - enriquecer automaticamente o `.gestor.json` gerado pelo parser DFM;
-- transformar validações rápidas em testes automatizados no pipeline.
+- transformar validacoes rapidas em testes automatizados no pipeline.
