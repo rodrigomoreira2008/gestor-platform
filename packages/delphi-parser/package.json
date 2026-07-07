@@ -17,7 +17,8 @@
     "gen:report": "tsx src/cli/generateMigrationReport.ts",
     "validate:backend": "tsx src/cli/validateGeneratedBackend.ts",
     "validate:frontend": "tsx src/cli/validateGeneratedFrontend.ts",
-    "validate:generated": "tsx src/cli/validateGeneratedArtifacts.ts"
+    "validate:generated": "tsx src/cli/validateGeneratedArtifacts.ts",
+    "validate:fixture:produtos": "tsx src/cli/validateGeneratedArtifacts.ts fixtures/cadastro-produtos.dfm fixtures/cadastro-produtos.pas Produto PRODUTOS"
   },
   "dependencies": {
     "@gestor/dsl": "workspace:*"
