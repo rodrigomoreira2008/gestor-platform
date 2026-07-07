@@ -5,8 +5,17 @@ export function renderFrontendDetailHooks(entityPascal: string, entity: string, 
 
   return `import { useQuery } from '@tanstack/react-query';
 
-async function fetchDetailRows(endpoint: string): Promise<Record<string, unknown>[]> {
-  const response = await fetch(endpoint);
+interface DetailQueryParams {
+  masterId?: string | number;
+  relationField?: string;
+}
+
+async function fetchDetailRows(endpoint: string, params: DetailQueryParams): Promise<Record<string, unknown>[]> {
+  const searchParams = new URLSearchParams();
+  if (params.masterId !== undefined && params.masterId !== null) searchParams.set(params.relationField ?? 'masterId', String(params.masterId));
+
+  const url = searchParams.toString() ? `${'${endpoint}'}?${'${searchParams.toString()}'}` : endpoint;
+  const response = await fetch(url);
   if (!response.ok) throw new Error('Falha ao carregar detalhes.');
   return response.json();
 }
@@ -18,14 +27,27 @@ ${hooks || '// Nenhum grid detalhe inferido nesta entidade.'}
 function renderDetailHook(entityPascal: string, grid: InferredDetailGrid): string {
   const hookName = `use${entityPascal}${toPascalCase(grid.name)}Details`;
   const endpoint = `/api/${toKebabPlural(grid.dataSource ?? grid.name)}`;
+  const relationField = inferRelationField(grid.relationship);
 
   return `export function ${hookName}(masterId?: string | number) {
   return useQuery({
-    queryKey: [${quote(grid.name)}, masterId],
-    queryFn: () => fetchDetailRows(\`${endpoint}?masterId=\${masterId}\`),
+    queryKey: [${quote(grid.name)}, ${quote(endpoint)}, ${quote(relationField)}, masterId],
+    queryFn: () => fetchDetailRows(${quote(endpoint)}, { masterId, relationField: ${quote(relationField)} }),
     enabled: masterId !== undefined && masterId !== null
   });
 }`;
+}
+
+function inferRelationField(relationship?: string): string {
+  if (!relationship) return 'masterId';
+  const [source] = relationship.split('->').map((part) => part.trim());
+  const column = source.includes('.') ? source.split('.').pop() : source;
+  return normalizeParamName(column ?? 'masterId');
+}
+
+function normalizeParamName(value: string): string {
+  const pascal = toPascalCase(value);
+  return pascal ? pascal.charAt(0).toLowerCase() + pascal.slice(1) : 'masterId';
 }
 
 function quote(value: string): string {
