@@ -103,7 +103,9 @@ O gerador frontend emite:
 - details/<entidade>DetailHooks.ts com hooks React Query para carregar detalhes por masterId;
 - details/<Entidade><Grid>DetailGrid.tsx com componente Material UI DataGrid para cada grid inferido.
 
-A pagina CRUD gerada agora conecta os detalhes de forma incremental: ao selecionar uma linha mestre, os hooks de detalhe recebem o id selecionado como masterId e a secao Detalhes renderiza os DataGrids inferidos.
+A pagina CRUD gerada conecta os detalhes de forma incremental: ao selecionar uma linha mestre, os hooks de detalhe recebem o id selecionado e a secao Detalhes renderiza os DataGrids inferidos.
+
+Os hooks de detalhe agora montam parametros de consulta a partir do relacionamento inferido quando disponivel. Quando nao ha relacionamento confiavel, usam masterId como fallback.
 
 ## Formulario
 
@@ -136,7 +138,7 @@ A pagina gerada usa:
 - pesquisa textual local;
 - metadata de tabs inferidas;
 - selecao do registro mestre;
-- hooks e DataGrids detalhe por masterId;
+- hooks e DataGrids detalhe por masterId/campo de relacionamento;
 - TabbedForm nos dialogos de cadastro e edicao;
 - confirmacao de exclusao.
 
@@ -148,7 +150,7 @@ O gerador emite snippets txt para rota e item de menu, evitando editar automatic
 
 ## Proximas etapas
 
-- Refinar endpoints mestre/detalhe usando relacionamento inferido;
-- Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada;
 - Validar build dos artefatos frontend gerados;
-- Criar fixtures de DFM/PAS para validar lookups e grids reais.
+- Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada;
+- Criar fixtures de DFM/PAS para validar lookups e grids reais;
+- Refinar endpoints mestre/detalhe a partir de metadados reais da API.
