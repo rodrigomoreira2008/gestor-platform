@@ -34,17 +34,17 @@ Validar todos os artefatos gerados a partir de um par DFM/PAS:
 ```bash
 pnpm --filter @gestor/delphi-parser validate:generated arquivo.dfm arquivo.pas Entidade tabela
 pnpm --filter @gestor/delphi-parser validate:fixture:produtos
+pnpm --filter @gestor/delphi-parser validate:fixture:parceiros
 ```
 
 A validacao unificada gera backend e frontend em memoria, verifica paths duplicados, arquivos vazios e retorna um resumo de campos, acoes, lookups, abas e grids detalhe.
 
 ## Fixtures
 
-A pasta fixtures inclui um cenario inicial de Cadastro de Produtos com:
+A pasta fixtures inclui cenarios iniciais de migracao:
 
-- DFM com PageControl, abas, DBEdit, DBLookupComboBox, DBCheckBox e DBGrid;
-- PAS com validacao obrigatoria, SQL com join e SQL de detalhe por produto;
-- script validate:fixture:produtos para checar a geracao completa.
+- Cadastro de Produtos: abas, lookup de grupo, checkbox, grid de movimentos, SQL com join e SQL de detalhe por produto;
+- Cadastro de Parceiros: abas, lookup de grupo, checkbox, grid de enderecos, SQL com join e SQL de detalhe por parceiro.
 
 ## Validacao de artefatos
 
@@ -55,6 +55,7 @@ pnpm --filter @gestor/delphi-parser validate:backend arquivo.dfm arquivo.pas Ent
 pnpm --filter @gestor/delphi-parser validate:frontend arquivo.dfm arquivo.pas Entidade tabela
 pnpm --filter @gestor/delphi-parser validate:generated arquivo.dfm arquivo.pas Entidade tabela
 pnpm --filter @gestor/delphi-parser validate:fixture:produtos
+pnpm --filter @gestor/delphi-parser validate:fixture:parceiros
 ```
 
 Eles foram criados para funcionar como uma checagem rapida antes de copiar artefatos para as aplicacoes reais.
