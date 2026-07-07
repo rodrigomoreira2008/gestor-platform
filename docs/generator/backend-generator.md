@@ -39,7 +39,10 @@ Uso:
 
 ```bash
 pnpm --filter @gestor/delphi-parser gen:backend arquivo.dfm arquivo.pas Entidade tabela saida
+pnpm --filter @gestor/delphi-parser validate:backend arquivo.dfm arquivo.pas Entidade tabela
 ```
+
+O comando validate:backend resolve o formulario, gera os artefatos em memoria e valida se os grupos obrigatorios foram emitidos, se ha arquivos vazios, paths duplicados e arquivos C# sem estrutura basica de namespace/blocos.
 
 ## Mapeamento inicial de tipos
 
@@ -78,9 +81,18 @@ Nesta etapa, o gerador ainda nao edita automaticamente o GestorDbContext para ev
 
 O gerador tambem emite Generated/EntidadeMigrationCommands.md com comandos sugeridos para criar migration e atualizar o banco.
 
+## Validacao dos artefatos
+
+O comando validate:backend foi criado para rodar antes de copiar artefatos para a aplicacao real. Ele verifica:
+
+- presenca de Entity, DTO, Validator, Service, Controller, Configuration e Generated;
+- arquivos vazios;
+- paths duplicados;
+- estrutura C# basica nos arquivos .cs.
+
 ## Proximas etapas
 
 - Gerar relacionamentos Fluent API reais quando a confianca for alta;
 - Melhorar inferencia de tipos por metadados de dataset;
 - Gerar indices e constraints a partir de SQL e eventos Delphi;
-- Incluir validacoes de build para os artefatos gerados.
+- Expandir validate:backend para compilacao temporaria dos arquivos gerados.
