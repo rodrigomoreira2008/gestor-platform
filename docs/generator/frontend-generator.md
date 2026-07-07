@@ -41,7 +41,10 @@ Uso:
 
 ```bash
 pnpm --filter @gestor/delphi-parser gen:frontend arquivo.dfm arquivo.pas entidade tabela saida
+pnpm --filter @gestor/delphi-parser validate:frontend arquivo.dfm arquivo.pas entidade tabela
 ```
+
+O comando validate:frontend resolve o formulario, gera os artefatos em memoria e valida se os grupos obrigatorios foram emitidos, se ha arquivos vazios e se ha paths duplicados.
 
 ## Mapeamento inicial
 
@@ -150,7 +153,7 @@ O gerador emite snippets txt para rota e item de menu, evitando editar automatic
 
 ## Proximas etapas
 
-- Validar build dos artefatos frontend gerados;
 - Aplicar rotas e menus automaticamente quando a estrutura final estiver estabilizada;
 - Criar fixtures de DFM/PAS para validar lookups e grids reais;
-- Refinar endpoints mestre/detalhe a partir de metadados reais da API.
+- Refinar endpoints mestre/detalhe a partir de metadados reais da API;
+- Expandir validate:frontend para checagem sintatica dos TSX gerados.
