@@ -14,7 +14,8 @@
     "resolve:form": "tsx src/cli/resolveDelphiForm.ts",
     "gen:backend": "tsx src/cli/generateBackend.ts",
     "gen:frontend": "tsx src/cli/generateFrontend.ts",
-    "gen:report": "tsx src/cli/generateMigrationReport.ts"
+    "gen:report": "tsx src/cli/generateMigrationReport.ts",
+    "validate:frontend": "tsx src/cli/validateGeneratedFrontend.ts"
   },
   "dependencies": {
     "@gestor/dsl": "workspace:*"
