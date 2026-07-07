@@ -29,7 +29,15 @@ Executar análise de uma unit Pascal:
 pnpm --filter @gestor/delphi-parser parse:pas caminho/para/CadastroProdutos.pas
 ```
 
-A saída é um JSON contendo:
+Validar todos os artefatos gerados a partir de um par DFM/PAS:
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:generated arquivo.dfm arquivo.pas Entidade tabela
+```
+
+A validação unificada gera backend e frontend em memória, verifica paths duplicados, arquivos vazios e retorna um resumo de campos, ações, lookups, abas e grids detalhe.
+
+A saída do parser é um JSON contendo:
 
 - `methods`;
 - `sqlSnippets`;
@@ -99,6 +107,18 @@ procedure TForm.CampoDescricaoExit(Sender: TObject);
 
 Essas pistas ajudam a conectar ações da DSL aos métodos encontrados no PAS.
 
+## Validação de artefatos
+
+Os comandos de validação atuais são:
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:backend arquivo.dfm arquivo.pas Entidade tabela
+pnpm --filter @gestor/delphi-parser validate:frontend arquivo.dfm arquivo.pas Entidade tabela
+pnpm --filter @gestor/delphi-parser validate:generated arquivo.dfm arquivo.pas Entidade tabela
+```
+
+Eles foram criados para funcionar como uma checagem rápida antes de copiar artefatos para as aplicações reais.
+
 ## Limitações conhecidas
 
 Esta versão ainda não interpreta completamente a linguagem Pascal. Ela usa heurísticas textuais para acelerar a migração.
@@ -113,6 +133,7 @@ Limitações atuais:
 
 ## Próximas melhorias
 
-- mapear validações para campos da DSL;
-- gerar relatório de lacunas;
-- enriquecer automaticamente o `.gestor.json` gerado pelo parser DFM.
+- criar fixtures reais de DFM/PAS para validar regressão;
+- gerar relatório de lacunas por módulo;
+- enriquecer automaticamente o `.gestor.json` gerado pelo parser DFM;
+- transformar validações rápidas em testes automatizados no pipeline.
