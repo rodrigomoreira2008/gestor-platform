@@ -2,6 +2,10 @@
 
 Use este checklist antes de mover artefatos gerados para as aplicacoes reais.
 
+## Resumo
+
+O resumo executivo do PR esta em `docs/generator/pr-summary.md`.
+
 ## Parser Delphi
 
 ```bash
