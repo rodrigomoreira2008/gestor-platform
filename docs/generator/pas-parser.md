@@ -68,6 +68,8 @@ pnpm validate:delphi-fixtures
 
 O workflow `.github/workflows/delphi-fixtures.yml` executa build do parser e a validacao agregada dos fixtures em pull requests que alteram o parser Delphi.
 
+O checklist consolidado do PR esta em `docs/generator/pr-validation-checklist.md`.
+
 ## Limitacoes conhecidas
 
 Esta versao ainda nao interpreta completamente a linguagem Pascal. Ela usa heuristicas textuais para acelerar a migracao.
