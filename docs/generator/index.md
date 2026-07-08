@@ -8,6 +8,7 @@ Indice dos documentos adicionados para o fluxo de migracao Delphi DFM/PAS.
 - `pr-summary.md`: resumo executivo das entregas do PR.
 - `pr-validation-checklist.md`: checklist final antes de mover artefatos para as aplicacoes reais.
 - `migration-gaps.md`: lacunas conhecidas e pontos que ainda exigem revisao manual.
+- `roadmap.md`: proximas evolucoes planejadas para o gerador.
 
 ## Componentes do gerador
 
