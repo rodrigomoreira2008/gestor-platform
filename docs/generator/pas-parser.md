@@ -35,6 +35,7 @@ Validar todos os artefatos gerados a partir de um par DFM/PAS:
 pnpm --filter @gestor/delphi-parser validate:generated arquivo.dfm arquivo.pas Entidade tabela
 pnpm --filter @gestor/delphi-parser validate:fixture:produtos
 pnpm --filter @gestor/delphi-parser validate:fixture:parceiros
+pnpm --filter @gestor/delphi-parser validate:fixture:grupo-produtos
 ```
 
 A validacao unificada gera backend e frontend em memoria, verifica paths duplicados, arquivos vazios e retorna um resumo de campos, acoes, lookups, abas e grids detalhe.
@@ -44,7 +45,8 @@ A validacao unificada gera backend e frontend em memoria, verifica paths duplica
 A pasta fixtures inclui cenarios iniciais de migracao:
 
 - Cadastro de Produtos: abas, lookup de grupo, checkbox, grid de movimentos, SQL com join e SQL de detalhe por produto;
-- Cadastro de Parceiros: abas, lookup de grupo, checkbox, grid de enderecos, SQL com join e SQL de detalhe por parceiro.
+- Cadastro de Parceiros: abas, lookup de grupo, checkbox, grid de enderecos, SQL com join e SQL de detalhe por parceiro;
+- Cadastro de Grupo de Produtos: tela simples com NOME, STATUS e CONTROLE para validar CRUD sem detalhe.
 
 ## Validacao de artefatos
 
@@ -56,6 +58,7 @@ pnpm --filter @gestor/delphi-parser validate:frontend arquivo.dfm arquivo.pas En
 pnpm --filter @gestor/delphi-parser validate:generated arquivo.dfm arquivo.pas Entidade tabela
 pnpm --filter @gestor/delphi-parser validate:fixture:produtos
 pnpm --filter @gestor/delphi-parser validate:fixture:parceiros
+pnpm --filter @gestor/delphi-parser validate:fixture:grupo-produtos
 ```
 
 Eles foram criados para funcionar como uma checagem rapida antes de copiar artefatos para as aplicacoes reais.
@@ -74,7 +77,7 @@ Limitacoes atuais:
 
 ## Proximas melhorias
 
-- adicionar mais fixtures reais por modulo;
+- adicionar fixture de Grupo de Parceiros;
 - gerar relatorio de lacunas por modulo;
 - enriquecer automaticamente o `.gestor.json` gerado pelo parser DFM;
 - transformar validacoes rapidas em testes automatizados no pipeline.
