@@ -10,6 +10,7 @@ Indice dos documentos adicionados para o fluxo de migracao Delphi DFM/PAS.
 - `migration-gaps.md`: lacunas conhecidas e pontos que ainda exigem revisao manual.
 - `roadmap.md`: proximas evolucoes planejadas para o gerador.
 - `review-guidelines.md`: guia de revisao tecnica dos artefatos gerados.
+- `release-notes.md`: notas desta entrega do gerador Delphi.
 
 ## Componentes do gerador
 
