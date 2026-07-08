@@ -37,6 +37,7 @@ pnpm --filter @gestor/delphi-parser validate:fixture:produtos
 pnpm --filter @gestor/delphi-parser validate:fixture:parceiros
 pnpm --filter @gestor/delphi-parser validate:fixture:grupo-produtos
 pnpm --filter @gestor/delphi-parser validate:fixture:grupo-parceiros
+pnpm validate:delphi-fixtures
 ```
 
 A validacao unificada gera backend e frontend em memoria, verifica paths duplicados, arquivos vazios e retorna um resumo de campos, acoes, lookups, abas e grids detalhe.
@@ -62,9 +63,10 @@ pnpm --filter @gestor/delphi-parser validate:fixture:produtos
 pnpm --filter @gestor/delphi-parser validate:fixture:parceiros
 pnpm --filter @gestor/delphi-parser validate:fixture:grupo-produtos
 pnpm --filter @gestor/delphi-parser validate:fixture:grupo-parceiros
+pnpm validate:delphi-fixtures
 ```
 
-Eles foram criados para funcionar como uma checagem rapida antes de copiar artefatos para as aplicacoes reais.
+O workflow `.github/workflows/delphi-fixtures.yml` executa build do parser e a validacao agregada dos fixtures em pull requests que alteram o parser Delphi.
 
 ## Limitacoes conhecidas
 
@@ -80,7 +82,7 @@ Limitacoes atuais:
 
 ## Proximas melhorias
 
-- rodar validacoes dos fixtures no pipeline;
 - gerar relatorio de lacunas por modulo;
 - enriquecer automaticamente o `.gestor.json` gerado pelo parser DFM;
-- transformar validacoes rapidas em testes automatizados no pipeline.
+- transformar validacoes rapidas em testes automatizados no pipeline;
+- ampliar fixtures com telas financeiras e locacoes.
