@@ -20,7 +20,8 @@
     "validate:generated": "tsx src/cli/validateGeneratedArtifacts.ts",
     "validate:fixture:produtos": "tsx src/cli/validateGeneratedArtifacts.ts fixtures/cadastro-produtos.dfm fixtures/cadastro-produtos.pas Produto PRODUTOS",
     "validate:fixture:parceiros": "tsx src/cli/validateGeneratedArtifacts.ts fixtures/cadastro-parceiros.dfm fixtures/cadastro-parceiros.pas Parceiro PARCEIROS",
-    "validate:fixture:grupo-produtos": "tsx src/cli/validateGeneratedArtifacts.ts fixtures/cadastro-grupo-produtos.dfm fixtures/cadastro-grupo-produtos.pas GrupoProduto GRUPOPRODUTOS"
+    "validate:fixture:grupo-produtos": "tsx src/cli/validateGeneratedArtifacts.ts fixtures/cadastro-grupo-produtos.dfm fixtures/cadastro-grupo-produtos.pas GrupoProduto GRUPOPRODUTOS",
+    "validate:fixture:grupo-parceiros": "tsx src/cli/validateGeneratedArtifacts.ts fixtures/cadastro-grupo-parceiros.dfm fixtures/cadastro-grupo-parceiros.pas GrupoParceiro GRUPOPARCEIROS"
   },
   "dependencies": {
     "@gestor/dsl": "workspace:*"
