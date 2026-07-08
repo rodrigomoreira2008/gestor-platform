@@ -2,6 +2,10 @@
 
 Este guia mostra o fluxo minimo para analisar uma tela Delphi e gerar artefatos Web.
 
+## Indice
+
+O indice completo da documentacao esta em `docs/generator/index.md`.
+
 ## 1. Build do parser
 
 ```bash
