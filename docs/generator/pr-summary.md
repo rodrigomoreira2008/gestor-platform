@@ -22,8 +22,13 @@ pnpm --filter @gestor/delphi-parser build
 pnpm validate:delphi-fixtures
 ```
 
+## Como usar
+
+O fluxo rapido esta documentado em `docs/generator/quickstart.md`.
+
 ## Arquivos de referencia
 
+- docs/generator/quickstart.md
 - docs/generator/pas-parser.md
 - docs/generator/backend-generator.md
 - docs/generator/frontend-generator.md
