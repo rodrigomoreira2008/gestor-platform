@@ -7,6 +7,7 @@ Indice dos documentos adicionados para o fluxo de migracao Delphi DFM/PAS.
 - `quickstart.md`: fluxo rapido de comandos para resolver formulario, gerar backend, gerar frontend, gerar relatorio e validar artefatos.
 - `pr-summary.md`: resumo executivo das entregas do PR.
 - `pr-validation-checklist.md`: checklist final antes de mover artefatos para as aplicacoes reais.
+- `migration-gaps.md`: lacunas conhecidas e pontos que ainda exigem revisao manual.
 
 ## Componentes do gerador
 
