@@ -20,6 +20,8 @@ pnpm --filter @gestor/delphi-parser gen:frontend tela.dfm tela.pas Entidade TABE
 pnpm --filter @gestor/delphi-parser gen:report tela.dfm tela.pas Entidade TABELA saida/relatorio.md
 ```
 
+Os validadores devem falhar quando nenhum campo e resolvido, quando houver arquivos vazios, paths duplicados ou grupos obrigatorios ausentes.
+
 ## Backend
 
 - Entity gerada com campos principais.
