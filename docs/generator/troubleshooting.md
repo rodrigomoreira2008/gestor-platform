@@ -20,6 +20,23 @@ Conferir:
 - permissao de leitura;
 - se o DFM e textual, nao binario.
 
+## resolve:form falha sem campos
+
+Possiveis causas:
+
+- DFM nao contem componentes de dados mapeados;
+- campos nao possuem `DataField`;
+- tela usa componentes herdados ou customizados;
+- DFM lido e diferente do formulario principal;
+- parser ainda nao reconhece o componente usado na tela.
+
+Acoes recomendadas:
+
+- conferir se o DFM e textual e completo;
+- procurar componentes DBEdit, DBComboBox, DBLookupComboBox, DBGrid ou equivalentes;
+- adicionar mapeamento no catalogo `componentMapping.ts`;
+- rodar novamente `resolve:form` antes de gerar backend/frontend.
+
 ## Nenhum campo gerado
 
 Possiveis causas:
