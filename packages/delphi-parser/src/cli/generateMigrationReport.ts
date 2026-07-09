@@ -1,5 +1,5 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { renderMigrationReportMarkdown } from '../migrationReportGenerator';
 import { resolveDelphiForm } from '../resolveForm';
 
@@ -10,14 +10,19 @@ if (!dfmPath || !pasPath || !entity) {
   process.exit(1);
 }
 
-const resolved = resolveDelphiForm(readFileSync(dfmPath, 'utf8'), readFileSync(pasPath, 'utf8'), {
+const resolvedForm = resolveDelphiForm(readFileSync(dfmPath, 'utf8'), readFileSync(pasPath, 'utf8'), {
   entity,
   table,
   dfmFile: dfmPath.split(/[\\/]/).at(-1),
   pasFile: pasPath.split(/[\\/]/).at(-1)
 });
 
-const target = join(process.cwd(), outputPath);
+if (resolvedForm.fields.length === 0) {
+  console.error('Nao foi possivel gerar o relatorio: nenhum campo foi resolvido a partir do DFM/PAS.');
+  process.exit(1);
+}
+
+const target = resolve(process.cwd(), outputPath);
 mkdirSync(dirname(target), { recursive: true });
-writeFileSync(target, renderMigrationReportMarkdown(resolved), 'utf8');
-console.log(`Gerado: ${outputPath}`);
+writeFileSync(target, renderMigrationReportMarkdown(resolvedForm), 'utf8');
+console.log(`Gerado: ${target}`);
