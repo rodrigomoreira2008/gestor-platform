@@ -8,11 +8,16 @@ if (!dfmPath || !pasPath || !entity) {
   process.exit(1);
 }
 
-const resolved = resolveDelphiForm(readFileSync(dfmPath, 'utf8'), readFileSync(pasPath, 'utf8'), {
+const resolvedForm = resolveDelphiForm(readFileSync(dfmPath, 'utf8'), readFileSync(pasPath, 'utf8'), {
   entity,
   table,
   dfmFile: dfmPath.split(/[\\/]/).at(-1),
   pasFile: pasPath.split(/[\\/]/).at(-1)
 });
 
-console.log(JSON.stringify(resolved, null, 2));
+if (resolvedForm.fields.length === 0) {
+  console.error('Formulario resolvido sem campos. Revise o DFM/PAS ou o mapeamento de componentes.');
+  process.exit(1);
+}
+
+console.log(JSON.stringify(resolvedForm, null, 2));
