@@ -16,10 +16,11 @@ const requiredFragments = ['types/', 'api/', 'hooks/', 'schema/', 'filters/', 'l
 const missingFragments = requiredFragments.filter((fragment) => !files.some((file) => file.path.includes(fragment)));
 const emptyFiles = files.filter((file) => file.content.trim().length === 0);
 const duplicatePaths = files.map((file) => file.path).filter((path, index, paths) => paths.indexOf(path) !== index);
+const missingFields = resolved.fields.length === 0;
 
-if (missingFragments.length > 0 || emptyFiles.length > 0 || duplicatePaths.length > 0) {
-  console.error(JSON.stringify({ missingFragments, emptyFiles: emptyFiles.map((file) => file.path), duplicatePaths }, null, 2));
+if (missingFragments.length > 0 || emptyFiles.length > 0 || duplicatePaths.length > 0 || missingFields) {
+  console.error(JSON.stringify({ missingFragments, emptyFiles: emptyFiles.map((file) => file.path), duplicatePaths, missingFields }, null, 2));
   process.exit(1);
 }
 
-console.log(JSON.stringify({ entity, generatedFiles: files.length, detailGrids: resolved.detailGrids.length, lookups: resolved.lookups.length, tabs: resolved.tabs.length }, null, 2));
+console.log(JSON.stringify({ entity, generatedFiles: files.length, fields: resolved.fields.length, detailGrids: resolved.detailGrids.length, lookups: resolved.lookups.length, tabs: resolved.tabs.length }, null, 2));
