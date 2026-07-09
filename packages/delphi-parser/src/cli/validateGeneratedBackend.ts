@@ -17,10 +17,11 @@ const missingFragments = requiredFragments.filter((fragment) => !files.some((fil
 const emptyFiles = files.filter((file) => file.content.trim().length === 0);
 const duplicatePaths = files.map((file) => file.path).filter((path, index, paths) => paths.indexOf(path) !== index);
 const invalidCSharp = files.filter((file) => file.path.endsWith('.cs') && (!file.content.includes('namespace ') || !file.content.includes('{') || !file.content.includes('}')));
+const missingFields = resolved.fields.length === 0;
 
-if (missingFragments.length > 0 || emptyFiles.length > 0 || duplicatePaths.length > 0 || invalidCSharp.length > 0) {
-  console.error(JSON.stringify({ missingFragments, emptyFiles: emptyFiles.map((file) => file.path), duplicatePaths, invalidCSharp: invalidCSharp.map((file) => file.path) }, null, 2));
+if (missingFragments.length > 0 || emptyFiles.length > 0 || duplicatePaths.length > 0 || invalidCSharp.length > 0 || missingFields) {
+  console.error(JSON.stringify({ missingFragments, emptyFiles: emptyFiles.map((file) => file.path), duplicatePaths, invalidCSharp: invalidCSharp.map((file) => file.path), missingFields }, null, 2));
   process.exit(1);
 }
 
-console.log(JSON.stringify({ entity, generatedFiles: files.length, relationships: resolved.relationships.length, databaseQueries: resolved.databaseQueries.length }, null, 2));
+console.log(JSON.stringify({ entity, generatedFiles: files.length, fields: resolved.fields.length, relationships: resolved.relationships.length, databaseQueries: resolved.databaseQueries.length }, null, 2));
