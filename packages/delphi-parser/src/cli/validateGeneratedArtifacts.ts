@@ -21,9 +21,16 @@ const warnings = [
   ...resolved.tabs.filter((tab) => tab.confidence !== 'high').map((tab) => `tab:${tab.name}:${tab.confidence}`),
   ...resolved.detailGrids.filter((grid) => grid.confidence !== 'high').map((grid) => `detailGrid:${grid.name}:${grid.confidence}`)
 ];
+const issues = {
+  duplicatePaths,
+  emptyFiles: emptyFiles.map((file) => file.path),
+  missingFields: resolved.fields.length === 0,
+  missingBackendFiles: backendFiles.length === 0,
+  missingFrontendFiles: frontendFiles.length === 0
+};
 
-if (duplicatePaths.length > 0 || emptyFiles.length > 0) {
-  console.error(JSON.stringify({ duplicatePaths, emptyFiles: emptyFiles.map((file) => file.path), warnings }, null, 2));
+if (issues.duplicatePaths.length > 0 || issues.emptyFiles.length > 0 || issues.missingFields || issues.missingBackendFiles || issues.missingFrontendFiles) {
+  console.error(JSON.stringify({ ...issues, warnings }, null, 2));
   process.exit(1);
 }
 
