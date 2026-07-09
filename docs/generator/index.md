@@ -8,6 +8,7 @@ Indice dos documentos adicionados para o fluxo de migracao Delphi DFM/PAS.
 - `pr-summary.md`: resumo executivo das entregas do PR.
 - `pr-validation-checklist.md`: checklist final antes de mover artefatos para as aplicacoes reais.
 - `acceptance-criteria.md`: criterios objetivos para considerar uma tela pronta para revisao funcional.
+- `component-mapping.md`: guia para mapear componentes Delphi customizados ou herdados.
 - `migration-gaps.md`: lacunas conhecidas e pontos que ainda exigem revisao manual.
 - `roadmap.md`: proximas evolucoes planejadas para o gerador.
 - `review-guidelines.md`: guia de revisao tecnica dos artefatos gerados.
