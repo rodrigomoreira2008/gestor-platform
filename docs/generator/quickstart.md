@@ -24,29 +24,33 @@ pnpm validate:delphi-fixtures
 pnpm --filter @gestor/delphi-parser resolve:form caminho/tela.dfm caminho/tela.pas Entidade TABELA
 ```
 
-## 4. Gerar backend
+## 4. Validar antes de gerar arquivos
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:generated caminho/tela.dfm caminho/tela.pas Entidade TABELA
+```
+
+Esse comando falha quando nenhum campo e resolvido, quando ha arquivos vazios, paths duplicados ou grupos obrigatorios ausentes.
+
+## 5. Gerar backend
 
 ```bash
 pnpm --filter @gestor/delphi-parser gen:backend caminho/tela.dfm caminho/tela.pas Entidade TABELA saida/backend
 ```
 
-## 5. Gerar frontend
+## 6. Gerar frontend
 
 ```bash
 pnpm --filter @gestor/delphi-parser gen:frontend caminho/tela.dfm caminho/tela.pas Entidade TABELA saida/frontend
 ```
 
-## 6. Gerar relatorio de migracao
+## 7. Gerar relatorio de migracao
 
 ```bash
 pnpm --filter @gestor/delphi-parser gen:report caminho/tela.dfm caminho/tela.pas Entidade TABELA saida/relatorio.md
 ```
 
-## 7. Validar artefatos gerados em memoria
-
-```bash
-pnpm --filter @gestor/delphi-parser validate:generated caminho/tela.dfm caminho/tela.pas Entidade TABELA
-```
+Os comandos de geracao tambem falham quando nenhum campo e resolvido.
 
 ## 8. Revisar antes de aplicar
 
