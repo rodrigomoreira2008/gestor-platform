@@ -26,5 +26,7 @@
   "dependencies": {
     "@gestor/dsl": "workspace:*"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "tsx": "latest"
+  }
 }
