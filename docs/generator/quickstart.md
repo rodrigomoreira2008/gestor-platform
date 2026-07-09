@@ -24,6 +24,8 @@ pnpm validate:delphi-fixtures
 pnpm --filter @gestor/delphi-parser resolve:form caminho/tela.dfm caminho/tela.pas Entidade TABELA
 ```
 
+O comando de resolucao falha quando nenhum campo e encontrado. Nesse caso, revise o DFM/PAS ou adicione o componente customizado ao mapeamento.
+
 ## 4. Validar antes de gerar arquivos
 
 ```bash
