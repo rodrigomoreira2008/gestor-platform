@@ -9,15 +9,31 @@ Esta pasta contem exemplos sinteticos de telas Delphi usados para validar o flux
 - `cadastro-grupo-produtos.dfm` + `cadastro-grupo-produtos.pas`: CRUD simples sem detalhe.
 - `cadastro-grupo-parceiros.dfm` + `cadastro-grupo-parceiros.pas`: CRUD simples sem detalhe.
 
-## Validacao
+## Validacao completa
 
-Rodar todos os fixtures:
+Rodar catalogo, auditoria estrutural dos DFM e geracao de todos os fixtures:
 
 ```bash
 pnpm validate:delphi-fixtures
 ```
 
-Rodar fixture especifico:
+## Auditoria dos componentes
+
+Validar somente o catalogo de mapeamentos:
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:components
+```
+
+Auditar os componentes usados pelos quatro DFM com modo estrito:
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:fixture-components
+```
+
+Essa auditoria falha quando houver classe desconhecida ou warning estrutural no parser DFM.
+
+## Validacao de geracao por fixture
 
 ```bash
 pnpm --filter @gestor/delphi-parser validate:fixture:produtos
@@ -30,7 +46,9 @@ pnpm --filter @gestor/delphi-parser validate:fixture:grupo-parceiros
 
 Os fixtures foram criados para garantir regressao minima em:
 
-- parsing DFM;
+- integridade do catalogo de componentes;
+- parsing estrutural DFM sem warnings;
+- ausencia de classes Delphi desconhecidas nos fixtures;
 - parsing PAS;
 - inferencia de SQL, tabelas, joins e relacionamentos;
 - inferencia de lookups;
