@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'packages/delphi-parser/**'
+      - 'docs/generator/**'
       - '.github/workflows/delphi-fixtures.yml'
       - 'package.json'
       - 'pnpm-lock.yaml'
@@ -41,6 +42,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Diagnose parser environment
+        run: pnpm --filter @gestor/delphi-parser doctor
+
+      - name: Validate package scripts
+        run: pnpm --filter @gestor/delphi-parser validate:scripts
+
+      - name: Validate parser documentation
+        run: pnpm --filter @gestor/delphi-parser validate:docs
+
       - name: Build parser
         run: pnpm --filter @gestor/delphi-parser build
 
@@ -51,8 +61,4 @@ jobs:
         run: pnpm --filter @gestor/delphi-parser validate:fixture-components
 
       - name: Validate generated fixture artifacts
-        run: |
-          pnpm --filter @gestor/delphi-parser validate:fixture:produtos
-          pnpm --filter @gestor/delphi-parser validate:fixture:parceiros
-          pnpm --filter @gestor/delphi-parser validate:fixture:grupo-produtos
-          pnpm --filter @gestor/delphi-parser validate:fixture:grupo-parceiros
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-artifacts
