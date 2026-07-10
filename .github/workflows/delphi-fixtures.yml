@@ -33,5 +33,15 @@ jobs:
       - name: Build parser
         run: pnpm --filter @gestor/delphi-parser build
 
-      - name: Validate Delphi fixtures
-        run: pnpm validate:delphi-fixtures
+      - name: Validate component catalog
+        run: pnpm --filter @gestor/delphi-parser validate:components
+
+      - name: Audit fixture DFM components
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-components
+
+      - name: Validate generated fixture artifacts
+        run: |
+          pnpm --filter @gestor/delphi-parser validate:fixture:produtos
+          pnpm --filter @gestor/delphi-parser validate:fixture:parceiros
+          pnpm --filter @gestor/delphi-parser validate:fixture:grupo-produtos
+          pnpm --filter @gestor/delphi-parser validate:fixture:grupo-parceiros
