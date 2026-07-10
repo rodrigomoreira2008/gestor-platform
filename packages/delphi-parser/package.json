@@ -7,6 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "help": "tsx src/cli/showHelp.ts",
+    "doctor": "tsx src/cli/doctor.ts",
     "build": "tsc -p tsconfig.json",
     "parse:dfm": "tsx src/cli/parseDfm.ts",
     "dfm:gestor": "tsx src/cli/dfmToGestor.ts",
@@ -32,7 +33,7 @@
     "validate:fixture:grupo-produtos": "tsx src/cli/validateGeneratedArtifacts.ts fixtures/cadastro-grupo-produtos.dfm fixtures/cadastro-grupo-produtos.pas GrupoProduto GRUPOPRODUTOS",
     "validate:fixture:grupo-parceiros": "tsx src/cli/validateGeneratedArtifacts.ts fixtures/cadastro-grupo-parceiros.dfm fixtures/cadastro-grupo-parceiros.pas GrupoParceiro GRUPOPARCEIROS",
     "validate:fixture-artifacts": "pnpm validate:fixture:produtos && pnpm validate:fixture:parceiros && pnpm validate:fixture:grupo-produtos && pnpm validate:fixture:grupo-parceiros",
-    "validate:all": "pnpm build && pnpm validate:components && pnpm validate:fixture-components && pnpm validate:fixture-artifacts"
+    "validate:all": "pnpm doctor && pnpm build && pnpm validate:components && pnpm validate:fixture-components && pnpm validate:fixture-artifacts"
   },
   "dependencies": {
     "@gestor/dsl": "workspace:*"
