@@ -6,12 +6,14 @@ import type { DelphiFormNode } from '../types';
 const [dfmPath] = process.argv.slice(2).filter((argument) => !argument.startsWith('--'));
 const json = process.argv.includes('--json');
 const failOnUnknown = process.argv.includes('--fail-on-unknown');
+const failOnWarnings = process.argv.includes('--fail-on-warnings');
+const failOnEmpty = process.argv.includes('--fail-on-empty');
 const unknownOnly = process.argv.includes('--unknown-only');
 const dataBoundOnly = process.argv.includes('--data-bound-only');
 const roleFilter = process.argv.slice(2).find((argument) => argument.startsWith('--role='))?.split('=')[1]?.trim().toLowerCase();
 
 if (!dfmPath) {
-  console.error('Uso: analyze:components <arquivo.dfm> [--json] [--unknown-only] [--data-bound-only] [--role=<papel>] [--fail-on-unknown]');
+  console.error('Uso: analyze:components <arquivo.dfm> [--json] [--unknown-only] [--data-bound-only] [--role=<papel>] [--fail-on-unknown] [--fail-on-warnings] [--fail-on-empty]');
   process.exit(1);
 }
 
@@ -54,6 +56,7 @@ const result = {
   dataBoundComponents: nodes.filter((node) => Boolean(node.properties.DataField)).length,
   distinctClasses: entries.length,
   unknownClasses: unknown.length,
+  displayedClasses: displayedEntries.length,
   filters: {
     unknownOnly,
     dataBoundOnly,
@@ -77,7 +80,12 @@ if (json) {
   if (displayedEntries.length === 0) console.log('Nenhuma classe encontrada para os filtros informados.');
 }
 
-if (failOnUnknown && unknown.length > 0) process.exit(1);
+const shouldFail =
+  (failOnUnknown && unknown.length > 0) ||
+  (failOnWarnings && parsed.warnings.length > 0) ||
+  (failOnEmpty && displayedEntries.length === 0);
+
+if (shouldFail) process.exit(1);
 
 function flatten(root: DelphiFormNode): DelphiFormNode[] {
   return [root, ...root.children.flatMap(flatten)];
