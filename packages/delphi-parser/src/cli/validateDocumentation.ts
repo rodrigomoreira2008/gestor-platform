@@ -14,6 +14,14 @@ const packageJsonPath = resolve(packageRoot, 'package.json');
 const packageReadmePath = resolve(packageRoot, 'README.md');
 const docsIndexPath = resolve(repositoryRoot, 'docs/generator/index.md');
 
+for (const [name, path] of [
+  ['package.json', packageJsonPath],
+  ['README do pacote', packageReadmePath],
+  ['indice da documentacao', docsIndexPath]
+] as const) {
+  checks.push({ name, ok: existsSync(path), detail: path });
+}
+
 const requiredDocs = [
   'quickstart.md',
   'acceptance-criteria.md',
@@ -29,15 +37,11 @@ for (const filename of requiredDocs) {
   checks.push({ name: `documento ${filename}`, ok: existsSync(path), detail: path });
 }
 
-checks.push({ name: 'README do pacote', ok: existsSync(packageReadmePath), detail: packageReadmePath });
-checks.push({ name: 'indice da documentacao', ok: existsSync(docsIndexPath), detail: docsIndexPath });
-checks.push({ name: 'package.json do pacote', ok: existsSync(packageJsonPath), detail: packageJsonPath });
-
 if (existsSync(packageJsonPath) && existsSync(packageReadmePath)) {
   try {
     const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as { scripts?: Record<string, string> };
     const readme = readFileSync(packageReadmePath, 'utf8');
-    const documentedCommands = ['help', 'doctor', 'version', 'resolve:form', 'gen:backend', 'gen:frontend', 'gen:report', 'validate:generated', 'validate:docs', 'validate:all'];
+    const documentedCommands = ['help', 'doctor', 'version', 'resolve:form', 'gen:backend', 'gen:frontend', 'gen:report', 'validate:docs', 'validate:scripts', 'validate:generated', 'validate:all'];
 
     for (const command of documentedCommands) {
       checks.push({
@@ -77,7 +81,7 @@ const output = {
   total: checks.length,
   passed: checks.length - failed.length,
   failed: failed.length,
-  failures: failed.map((check) => ({ name: check.name, detail: check.detail })),
+  failures: failed.map((check) => check.name),
   checks
 };
 
@@ -88,9 +92,9 @@ if (process.argv.includes('--json')) {
   for (const check of checks) {
     console.log(`[${check.ok ? 'OK' : 'ERRO'}] ${check.name}: ${check.detail}`);
   }
-  console.log(`Resumo: ${output.passed}/${checks.length} verificacoes OK`);
+  console.log(`Resumo: ${output.passed}/${output.total} verificacoes OK`);
   if (failed.length > 0) {
-    console.error(`Falhas: ${failed.map((check) => check.name).join(', ')}`);
+    console.error(`Falhas: ${output.failures.join(', ')}`);
   }
 }
 
