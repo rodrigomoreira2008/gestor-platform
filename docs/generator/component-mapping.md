@@ -54,10 +54,19 @@ pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --role=g
 pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --role=select --data-bound-only
 pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --json
 pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --fail-on-unknown
-pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --unknown-only --json
+pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --fail-on-warnings
+pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --unknown-only --fail-on-empty
 ```
 
-`--unknown-only` reduz a saida para classes ainda nao reconhecidas. `--data-bound-only` exibe somente classes com pelo menos um componente ligado a `DataField`. `--role=<papel>` filtra pelo papel inferido. Os filtros podem ser combinados e aparecem no resultado JSON. `--fail-on-unknown` retorna codigo de erro quando houver classes nao mapeadas, sendo util para auditorias e pipelines de migracao.
+`--unknown-only` reduz a saida para classes ainda nao reconhecidas. `--data-bound-only` exibe somente classes com pelo menos um componente ligado a `DataField`. `--role=<papel>` filtra pelo papel inferido. Os filtros podem ser combinados e aparecem no resultado JSON.
+
+Modos estritos:
+
+- `--fail-on-unknown`: falha quando houver classes nao mapeadas;
+- `--fail-on-warnings`: falha quando o parser DFM emitir avisos estruturais;
+- `--fail-on-empty`: falha quando nenhum item corresponder aos filtros aplicados.
+
+Esses modos sao uteis em auditorias e pipelines de migracao.
 
 ## Quando adicionar um mapeamento
 
@@ -101,7 +110,7 @@ ListField = 'NOME'
 4. Se houver classes nao mapeadas, use `--unknown-only` para isolar o inventario.
 5. Identifique os equivalentes visuais e de dados.
 6. Adicione os componentes relevantes em `componentMapping.ts`.
-7. Rode novamente `analyze:components --fail-on-unknown`.
+7. Rode novamente `analyze:components --fail-on-unknown --fail-on-warnings`.
 8. Rode `resolve:form` no DFM/PAS real.
 9. Rode `validate:generated` antes de gerar arquivos.
 
