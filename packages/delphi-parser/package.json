@@ -7,6 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "help": "tsx src/cli/showHelp.ts",
+    "version": "tsx src/cli/showVersion.ts",
     "doctor": "tsx src/cli/doctor.ts",
     "build": "tsc -p tsconfig.json",
     "parse:dfm": "tsx src/cli/parseDfm.ts",
