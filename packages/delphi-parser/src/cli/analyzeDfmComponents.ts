@@ -7,9 +7,11 @@ const [dfmPath] = process.argv.slice(2).filter((argument) => !argument.startsWit
 const json = process.argv.includes('--json');
 const failOnUnknown = process.argv.includes('--fail-on-unknown');
 const unknownOnly = process.argv.includes('--unknown-only');
+const dataBoundOnly = process.argv.includes('--data-bound-only');
+const roleFilter = process.argv.slice(2).find((argument) => argument.startsWith('--role='))?.split('=')[1]?.trim().toLowerCase();
 
 if (!dfmPath) {
-  console.error('Uso: analyze:components <arquivo.dfm> [--json] [--unknown-only] [--fail-on-unknown]');
+  console.error('Uso: analyze:components <arquivo.dfm> [--json] [--unknown-only] [--data-bound-only] [--role=<papel>] [--fail-on-unknown]');
   process.exit(1);
 }
 
@@ -42,13 +44,21 @@ const entries = Object.entries(classes)
   .map(([delphiClass, details]) => ({ delphiClass, ...details }))
   .sort((left, right) => Number(left.known) - Number(right.known) || left.delphiClass.localeCompare(right.delphiClass));
 const unknown = entries.filter((entry) => !entry.known);
-const displayedEntries = unknownOnly ? unknown : entries;
+const displayedEntries = entries
+  .filter((entry) => !unknownOnly || !entry.known)
+  .filter((entry) => !dataBoundOnly || entry.dataBound > 0)
+  .filter((entry) => !roleFilter || entry.role.toLowerCase() === roleFilter);
 const result = {
   file: dfmPath,
   totalComponents: nodes.length,
   dataBoundComponents: nodes.filter((node) => Boolean(node.properties.DataField)).length,
   distinctClasses: entries.length,
   unknownClasses: unknown.length,
+  filters: {
+    unknownOnly,
+    dataBoundOnly,
+    role: roleFilter ?? null
+  },
   warnings: parsed.warnings,
   components: displayedEntries
 };
@@ -57,14 +67,14 @@ if (json) {
   console.log(JSON.stringify(result, null, 2));
 } else {
   console.log(`DFM: ${dfmPath}`);
-  console.log(`Componentes: ${nodes.length} | Ligados a dados: ${result.dataBoundComponents} | Classes: ${entries.length} | Nao mapeadas: ${unknown.length}`);
+  console.log(`Componentes: ${nodes.length} | Ligados a dados: ${result.dataBoundComponents} | Classes: ${entries.length} | Nao mapeadas: ${unknown.length} | Exibidas: ${displayedEntries.length}`);
   for (const entry of displayedEntries) {
     const status = entry.known ? 'OK' : 'REVISAR';
     const binding = entry.dataBound > 0 ? ` | data-bound: ${entry.dataBound}` : '';
     console.log(`[${status}] ${entry.delphiClass} x${entry.total} => ${entry.role} => ${entry.frontendComponent}${binding} (${entry.examples.join(', ')})`);
   }
   for (const warning of parsed.warnings) console.warn(`Aviso: ${warning}`);
-  if (unknownOnly && unknown.length === 0) console.log('Nenhuma classe desconhecida encontrada.');
+  if (displayedEntries.length === 0) console.log('Nenhuma classe encontrada para os filtros informados.');
 }
 
 if (failOnUnknown && unknown.length > 0) process.exit(1);
