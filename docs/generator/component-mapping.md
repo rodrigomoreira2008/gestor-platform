@@ -49,12 +49,15 @@ Opcoes uteis:
 
 ```bash
 pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --unknown-only
+pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --data-bound-only
+pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --role=grid
+pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --role=select --data-bound-only
 pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --json
 pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --fail-on-unknown
 pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --unknown-only --json
 ```
 
-`--unknown-only` reduz a saida para classes ainda nao reconhecidas. `--fail-on-unknown` retorna codigo de erro quando houver classes nao mapeadas, sendo util para auditorias e pipelines de migracao.
+`--unknown-only` reduz a saida para classes ainda nao reconhecidas. `--data-bound-only` exibe somente classes com pelo menos um componente ligado a `DataField`. `--role=<papel>` filtra pelo papel inferido. Os filtros podem ser combinados e aparecem no resultado JSON. `--fail-on-unknown` retorna codigo de erro quando houver classes nao mapeadas, sendo util para auditorias e pipelines de migracao.
 
 ## Quando adicionar um mapeamento
 
@@ -94,12 +97,13 @@ ListField = 'NOME'
 
 1. Rode `list:components` para conferir o catalogo atual.
 2. Rode `analyze:components` no DFM real.
-3. Se houver classes nao mapeadas, use `--unknown-only` para isolar o inventario.
-4. Identifique os equivalentes visuais e de dados.
-5. Adicione os componentes relevantes em `componentMapping.ts`.
-6. Rode novamente `analyze:components --fail-on-unknown`.
-7. Rode `resolve:form` no DFM/PAS real.
-8. Rode `validate:generated` antes de gerar arquivos.
+3. Use `--data-bound-only` para focar nos controles que podem gerar campos.
+4. Se houver classes nao mapeadas, use `--unknown-only` para isolar o inventario.
+5. Identifique os equivalentes visuais e de dados.
+6. Adicione os componentes relevantes em `componentMapping.ts`.
+7. Rode novamente `analyze:components --fail-on-unknown`.
+8. Rode `resolve:form` no DFM/PAS real.
+9. Rode `validate:generated` antes de gerar arquivos.
 
 ## Cuidado
 
