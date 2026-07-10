@@ -24,6 +24,23 @@ pnpm --filter @gestor/delphi-parser list:components --role=select --json
 
 O comando retorna erro quando nenhum componente corresponde aos filtros, facilitando uso em scripts de diagnostico.
 
+## Analisar os componentes de um DFM real
+
+```bash
+pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm
+```
+
+O comando informa quantos componentes e classes existem no DFM, quais classes ja estao mapeadas e quais precisam de revisao. Ele tambem mostra exemplos de nomes de componentes encontrados.
+
+Opcoes uteis:
+
+```bash
+pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --json
+pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --fail-on-unknown
+```
+
+`--fail-on-unknown` retorna codigo de erro quando houver classes nao mapeadas, sendo util para auditorias e pipelines de migracao.
+
 ## Quando adicionar um mapeamento
 
 Adicione ou revise o mapeamento quando:
@@ -61,13 +78,12 @@ ListField = 'NOME'
 ## Processo recomendado
 
 1. Rode `list:components` para conferir o catalogo atual.
-2. Rode `resolve:form` no DFM/PAS real.
-3. Se nenhum campo for encontrado, confira se o DFM e textual e completo.
-4. Procure os componentes customizados usados na tela.
-5. Compare com os componentes ja mapeados em `componentMapping.ts`.
-6. Adicione o componente equivalente.
-7. Rode novamente `resolve:form`.
-8. Rode `validate:generated` antes de gerar arquivos.
+2. Rode `analyze:components` no DFM real.
+3. Se houver classes nao mapeadas, identifique os equivalentes visuais e de dados.
+4. Adicione os componentes relevantes em `componentMapping.ts`.
+5. Rode novamente `analyze:components --fail-on-unknown`.
+6. Rode `resolve:form` no DFM/PAS real.
+7. Rode `validate:generated` antes de gerar arquivos.
 
 ## Cuidado
 
