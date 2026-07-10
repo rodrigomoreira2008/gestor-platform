@@ -18,11 +18,24 @@ Tambem e possivel filtrar por papel ou texto:
 
 ```bash
 pnpm --filter @gestor/delphi-parser list:components --role=grid
+pnpm --filter @gestor/delphi-parser list:components --role=container
+pnpm --filter @gestor/delphi-parser list:components --role=data
 pnpm --filter @gestor/delphi-parser list:components --search=devexpress
 pnpm --filter @gestor/delphi-parser list:components --role=select --json
 ```
 
 O comando retorna erro quando nenhum componente corresponde aos filtros, facilitando uso em scripts de diagnostico.
+
+## Papeis reconhecidos
+
+O catalogo diferencia componentes editaveis, estruturais e nao visuais:
+
+- campos: `text`, `number`, `date`, `select`, `checkbox` e `radio`;
+- visualizacao: `grid`, `tabs`, `tree` e `button`;
+- estrutura: `container` e `label`;
+- acesso a dados: `data`.
+
+Componentes estruturais e de dados sao reconhecidos para reduzir falsos positivos na auditoria, mas nao viram campos persistidos automaticamente.
 
 ## Analisar os componentes de um DFM real
 
