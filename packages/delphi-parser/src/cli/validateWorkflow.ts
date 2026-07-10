@@ -23,16 +23,26 @@ if (existsSync(workflowPath)) {
   const requiredFragments = [
     'pull_request:',
     'workflow_dispatch:',
+    "- 'packages/delphi-parser/**'",
+    "- 'docs/generator/**'",
+    "- '.github/workflows/delphi-fixtures.yml'",
     'permissions:',
     'contents: read',
     'concurrency:',
+    'github.workflow',
+    'github.ref',
     'cancel-in-progress: true',
+    'CI: true',
+    'runs-on: ubuntu-latest',
     'timeout-minutes:',
     'actions/checkout@v4',
     'pnpm/action-setup@v4',
     'actions/setup-node@v4',
     'node-version: 20',
+    'cache: pnpm',
     'pnpm install',
+    'doctor',
+    'validate:workflow',
     'validate:scripts',
     'validate:docs',
     'validate:components',
@@ -50,15 +60,43 @@ if (existsSync(workflowPath)) {
 
   checks.push({
     name: 'workflow sem permissao de escrita',
-    ok: !/contents:\s*write/i.test(workflow) && !/pull-requests:\s*write/i.test(workflow),
+    ok: !/(contents|pull-requests|issues|actions|checks|packages|statuses):\s*write/i.test(workflow),
     detail: workflowPath
   });
 
   checks.push({
-    name: 'workflow usa cache do pnpm',
-    ok: /cache:\s*pnpm/.test(workflow),
+    name: 'workflow sem continue-on-error',
+    ok: !/continue-on-error:\s*true/i.test(workflow),
     detail: workflowPath
   });
+
+  const timeoutMatch = workflow.match(/timeout-minutes:\s*(\d+)/);
+  const timeout = Number(timeoutMatch?.[1] ?? 0);
+  checks.push({
+    name: 'timeout entre 5 e 30 minutos',
+    ok: timeout >= 5 && timeout <= 30,
+    detail: timeoutMatch ? `${timeout} minutos` : 'timeout ausente'
+  });
+
+  const requiredCommands = [
+    'doctor',
+    'validate:workflow',
+    'validate:scripts',
+    'validate:docs',
+    'build',
+    'validate:components',
+    'validate:fixture-components',
+    'validate:fixture-artifacts'
+  ];
+
+  for (const command of requiredCommands) {
+    const occurrences = [...workflow.matchAll(new RegExp(`@gestor/delphi-parser ${command.replace(':', '\\:')}`, 'g'))].length;
+    checks.push({
+      name: `comando ${command} executado uma vez`,
+      ok: occurrences === 1,
+      detail: `${occurrences} ocorrencia(s)`
+    });
+  }
 }
 
 const failed = checks.filter((check) => !check.ok);
