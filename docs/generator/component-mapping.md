@@ -8,7 +8,21 @@ Este documento orienta como expandir o reconhecimento de componentes DFM usados 
 pnpm --filter @gestor/delphi-parser list:components
 ```
 
-O comando retorna JSON ordenado por classe Delphi, incluindo papel, componente frontend e observacoes.
+A saida padrao e legivel por linha. Para JSON:
+
+```bash
+pnpm --filter @gestor/delphi-parser list:components --json
+```
+
+Tambem e possivel filtrar por papel ou texto:
+
+```bash
+pnpm --filter @gestor/delphi-parser list:components --role=grid
+pnpm --filter @gestor/delphi-parser list:components --search=devexpress
+pnpm --filter @gestor/delphi-parser list:components --role=select --json
+```
+
+O comando retorna erro quando nenhum componente corresponde aos filtros, facilitando uso em scripts de diagnostico.
 
 ## Quando adicionar um mapeamento
 
