@@ -23,11 +23,15 @@ pnpm install
 pnpm --filter @gestor/delphi-parser build
 ```
 
-## Ajuda
+## Ajuda e diagnostico
 
 ```bash
 pnpm --filter @gestor/delphi-parser help
+pnpm --filter @gestor/delphi-parser doctor
+pnpm --filter @gestor/delphi-parser doctor --json
 ```
+
+O comando `doctor` verifica a versao do Node.js, o diretorio de execucao e a presenca dos arquivos essenciais do pacote. Ele tambem faz parte de `validate:all`.
 
 ## Analise
 
@@ -53,7 +57,7 @@ pnpm --filter @gestor/delphi-parser validate:generated tela.dfm tela.pas Entidad
 pnpm --filter @gestor/delphi-parser validate:all
 ```
 
-`validate:all` executa build, validacao do catalogo de componentes, auditoria estrutural dos fixtures e validacao dos artefatos gerados.
+`validate:all` executa diagnostico do ambiente, build, validacao do catalogo de componentes, auditoria estrutural dos fixtures e validacao dos artefatos gerados.
 
 ## Estrutura
 
