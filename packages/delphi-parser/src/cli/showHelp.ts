@@ -27,6 +27,7 @@ const sections = [
   {
     title: 'Validacao',
     commands: [
+      ['validate:package [--json]', 'Valida package.json, tsconfig e metadados de build.'],
       ['validate:docs [--json]', 'Valida arquivos, indice e comandos documentados.'],
       ['validate:scripts [--json]', 'Valida referencias e dependencias entre scripts do pacote.'],
       ['validate:workflow [--json]', 'Valida seguranca e etapas obrigatorias do workflow de CI.'],
@@ -37,7 +38,7 @@ const sections = [
       ['validate:generated <dfm> <pas> <entidade> [tabela]', 'Valida todos os artefatos gerados.'],
       ['validate:fixture-components', 'Audita os DFM dos fixtures.'],
       ['validate:fixture-artifacts', 'Valida os artefatos dos fixtures.'],
-      ['validate:all', 'Executa doctor, build e toda a suite de validacao do pacote.']
+      ['validate:all', 'Executa doctor, metadados, build e toda a suite de validacao do pacote.']
     ]
   }
 ] as const;
