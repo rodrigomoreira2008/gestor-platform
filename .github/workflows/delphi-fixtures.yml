@@ -45,6 +45,9 @@ jobs:
       - name: Diagnose parser environment
         run: pnpm --filter @gestor/delphi-parser doctor
 
+      - name: Validate package metadata
+        run: pnpm --filter @gestor/delphi-parser validate:package
+
       - name: Validate package scripts
         run: pnpm --filter @gestor/delphi-parser validate:scripts
 
