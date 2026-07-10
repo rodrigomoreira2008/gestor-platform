@@ -1,5 +1,11 @@
 const sections = [
   {
+    title: 'Diagnostico',
+    commands: [
+      ['doctor [--json]', 'Verifica versao do Node, diretorio de execucao e arquivos essenciais.']
+    ]
+  },
+  {
     title: 'Analise',
     commands: [
       ['parse:dfm <arquivo.dfm>', 'Converte o DFM textual em arvore JSON.'],
@@ -26,7 +32,7 @@ const sections = [
       ['validate:generated <dfm> <pas> <entidade> [tabela]', 'Valida todos os artefatos gerados.'],
       ['validate:fixture-components', 'Audita os DFM dos fixtures.'],
       ['validate:fixture-artifacts', 'Valida os artefatos dos fixtures.'],
-      ['validate:all', 'Executa build e toda a suite de validacao do pacote.']
+      ['validate:all', 'Executa doctor, build e toda a suite de validacao do pacote.']
     ]
   }
 ] as const;
