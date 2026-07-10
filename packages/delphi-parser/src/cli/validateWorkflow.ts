@@ -45,6 +45,7 @@ if (existsSync(workflowPath)) {
     'validate:workflow',
     'validate:scripts',
     'validate:docs',
+    'validate:fixtures',
     'validate:components',
     'validate:fixture-components',
     'validate:fixture-artifacts'
@@ -83,6 +84,7 @@ if (existsSync(workflowPath)) {
     'validate:workflow',
     'validate:scripts',
     'validate:docs',
+    'validate:fixtures',
     'build',
     'validate:components',
     'validate:fixture-components',
