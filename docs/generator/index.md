@@ -5,6 +5,7 @@ Indice dos documentos adicionados para o fluxo de migracao Delphi DFM/PAS.
 ## Comece aqui
 
 - `quickstart.md`: fluxo rapido de comandos para resolver formulario, gerar backend, gerar frontend, gerar relatorio e validar artefatos.
+- `../../packages/delphi-parser/README.md`: visao geral do pacote, comandos e estrutura interna.
 - `pr-summary.md`: resumo executivo das entregas do PR.
 - `pr-validation-checklist.md`: checklist final antes de mover artefatos para as aplicacoes reais.
 - `acceptance-criteria.md`: criterios objetivos para considerar uma tela pronta para revisao funcional.
@@ -24,9 +25,10 @@ Indice dos documentos adicionados para o fluxo de migracao Delphi DFM/PAS.
 ## Validacao recomendada
 
 ```bash
-pnpm --filter @gestor/delphi-parser build
-pnpm validate:delphi-fixtures
+pnpm --filter @gestor/delphi-parser validate:all
 ```
+
+O comando executa build, validacao do catalogo, auditoria dos DFM de fixture e validacao dos artefatos gerados.
 
 ## Observacao
 
