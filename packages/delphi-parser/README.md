@@ -56,10 +56,12 @@ pnpm --filter @gestor/delphi-parser gen:report tela.dfm tela.pas Entidade TABELA
 
 ```bash
 pnpm --filter @gestor/delphi-parser validate:generated tela.dfm tela.pas Entidade TABELA
+pnpm --filter @gestor/delphi-parser validate:docs
+pnpm --filter @gestor/delphi-parser validate:scripts
 pnpm --filter @gestor/delphi-parser validate:all
 ```
 
-`validate:all` executa diagnostico do ambiente, build, validacao do catalogo de componentes, auditoria estrutural dos fixtures e validacao dos artefatos gerados.
+`validate:docs` confere arquivos e comandos documentados. `validate:scripts` verifica se os arquivos CLI e scripts encadeados existem. `validate:all` executa diagnostico do ambiente, build, validacao da documentacao, scripts, catalogo de componentes, auditoria estrutural dos fixtures e validacao dos artefatos gerados.
 
 ## Estrutura
 
