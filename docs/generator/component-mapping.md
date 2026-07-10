@@ -2,6 +2,14 @@
 
 Este documento orienta como expandir o reconhecimento de componentes DFM usados pelo gerador.
 
+## Consultar o catalogo atual
+
+```bash
+pnpm --filter @gestor/delphi-parser list:components
+```
+
+O comando retorna JSON ordenado por classe Delphi, incluindo papel, componente frontend e observacoes.
+
 ## Quando adicionar um mapeamento
 
 Adicione ou revise o mapeamento quando:
@@ -38,13 +46,14 @@ ListField = 'NOME'
 
 ## Processo recomendado
 
-1. Rode `resolve:form` no DFM/PAS real.
-2. Se nenhum campo for encontrado, confira se o DFM e textual e completo.
-3. Procure os componentes customizados usados na tela.
-4. Compare com os componentes ja mapeados em `componentMapping.ts`.
-5. Adicione o componente equivalente.
-6. Rode novamente `resolve:form`.
-7. Rode `validate:generated` antes de gerar arquivos.
+1. Rode `list:components` para conferir o catalogo atual.
+2. Rode `resolve:form` no DFM/PAS real.
+3. Se nenhum campo for encontrado, confira se o DFM e textual e completo.
+4. Procure os componentes customizados usados na tela.
+5. Compare com os componentes ja mapeados em `componentMapping.ts`.
+6. Adicione o componente equivalente.
+7. Rode novamente `resolve:form`.
+8. Rode `validate:generated` antes de gerar arquivos.
 
 ## Cuidado
 
