@@ -6,6 +6,14 @@ Este guia mostra o fluxo minimo para analisar uma tela Delphi e gerar artefatos 
 
 O indice completo da documentacao esta em `docs/generator/index.md`.
 
+## Consultar comandos disponiveis
+
+```bash
+pnpm --filter @gestor/delphi-parser help
+```
+
+O comando apresenta os grupos de analise, geracao e validacao com os principais argumentos.
+
 ## 1. Build do parser
 
 ```bash
@@ -16,6 +24,12 @@ pnpm --filter @gestor/delphi-parser build
 
 ```bash
 pnpm validate:delphi-fixtures
+```
+
+Para executar diretamente no pacote:
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:all
 ```
 
 ## 3. Resolver um formulario Delphi
