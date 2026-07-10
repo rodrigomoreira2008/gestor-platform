@@ -27,11 +27,13 @@ pnpm --filter @gestor/delphi-parser build
 
 ```bash
 pnpm --filter @gestor/delphi-parser help
+pnpm --filter @gestor/delphi-parser version
+pnpm --filter @gestor/delphi-parser version --json
 pnpm --filter @gestor/delphi-parser doctor
 pnpm --filter @gestor/delphi-parser doctor --json
 ```
 
-O comando `doctor` verifica a versao do Node.js, o diretorio de execucao e a presenca dos arquivos essenciais do pacote. Ele tambem faz parte de `validate:all`.
+O comando `version` mostra a versao do pacote e o ambiente Node.js atual. O comando `doctor` verifica a versao do Node.js, o diretorio de execucao, os scripts criticos e a presenca dos arquivos essenciais do pacote. Ele tambem faz parte de `validate:all`.
 
 ## Analise
 
