@@ -1,7 +1,8 @@
 const sections = [
   {
-    title: 'Diagnostico',
+    title: 'Informacoes',
     commands: [
+      ['version [--json]', 'Mostra versao do pacote, Node.js, plataforma e arquitetura.'],
       ['doctor [--json]', 'Verifica versao do Node, diretorio de execucao e arquivos essenciais.']
     ]
   },
