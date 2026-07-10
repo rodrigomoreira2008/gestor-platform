@@ -13,6 +13,7 @@
     "dfm-pas:gestor": "tsx src/cli/dfmPasToGestor.ts",
     "resolve:form": "tsx src/cli/resolveDelphiForm.ts",
     "list:components": "tsx src/cli/listComponentMappings.ts",
+    "analyze:components": "tsx src/cli/analyzeDfmComponents.ts",
     "gen:backend": "tsx src/cli/generateBackend.ts",
     "gen:frontend": "tsx src/cli/generateFrontend.ts",
     "gen:report": "tsx src/cli/generateMigrationReport.ts",
