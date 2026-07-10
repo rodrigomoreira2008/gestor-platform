@@ -54,6 +54,9 @@ jobs:
       - name: Validate CI workflow
         run: pnpm --filter @gestor/delphi-parser validate:workflow
 
+      - name: Validate fixture structure
+        run: pnpm --filter @gestor/delphi-parser validate:fixtures
+
       - name: Build parser
         run: pnpm --filter @gestor/delphi-parser build
 
