@@ -42,6 +42,7 @@ if (existsSync(workflowPath)) {
     'cache: pnpm',
     'pnpm install',
     'doctor',
+    'validate:package',
     'validate:workflow',
     'validate:scripts',
     'validate:docs',
@@ -81,6 +82,7 @@ if (existsSync(workflowPath)) {
 
   const requiredCommands = [
     'doctor',
+    'validate:package',
     'validate:workflow',
     'validate:scripts',
     'validate:docs',
