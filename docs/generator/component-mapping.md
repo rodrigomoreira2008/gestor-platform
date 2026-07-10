@@ -30,16 +30,18 @@ O comando retorna erro quando nenhum componente corresponde aos filtros, facilit
 pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm
 ```
 
-O comando informa quantos componentes e classes existem no DFM, quais classes ja estao mapeadas e quais precisam de revisao. Ele tambem mostra exemplos de nomes de componentes encontrados.
+O comando informa quantidade total de componentes, componentes ligados a `DataField`, classes distintas, classes mapeadas e classes que precisam de revisao. Ele tambem mostra exemplos de nomes encontrados.
 
 Opcoes uteis:
 
 ```bash
+pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --unknown-only
 pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --json
 pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --fail-on-unknown
+pnpm --filter @gestor/delphi-parser analyze:components caminho/tela.dfm --unknown-only --json
 ```
 
-`--fail-on-unknown` retorna codigo de erro quando houver classes nao mapeadas, sendo util para auditorias e pipelines de migracao.
+`--unknown-only` reduz a saida para classes ainda nao reconhecidas. `--fail-on-unknown` retorna codigo de erro quando houver classes nao mapeadas, sendo util para auditorias e pipelines de migracao.
 
 ## Quando adicionar um mapeamento
 
@@ -79,11 +81,12 @@ ListField = 'NOME'
 
 1. Rode `list:components` para conferir o catalogo atual.
 2. Rode `analyze:components` no DFM real.
-3. Se houver classes nao mapeadas, identifique os equivalentes visuais e de dados.
-4. Adicione os componentes relevantes em `componentMapping.ts`.
-5. Rode novamente `analyze:components --fail-on-unknown`.
-6. Rode `resolve:form` no DFM/PAS real.
-7. Rode `validate:generated` antes de gerar arquivos.
+3. Se houver classes nao mapeadas, use `--unknown-only` para isolar o inventario.
+4. Identifique os equivalentes visuais e de dados.
+5. Adicione os componentes relevantes em `componentMapping.ts`.
+6. Rode novamente `analyze:components --fail-on-unknown`.
+7. Rode `resolve:form` no DFM/PAS real.
+8. Rode `validate:generated` antes de gerar arquivos.
 
 ## Cuidado
 
