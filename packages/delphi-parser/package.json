@@ -25,6 +25,7 @@
     "gen:backend": "tsx src/cli/generateBackend.ts",
     "gen:frontend": "tsx src/cli/generateFrontend.ts",
     "gen:report": "tsx src/cli/generateMigrationReport.ts",
+    "validate:docs": "tsx src/cli/validateDocumentation.ts",
     "validate:components": "tsx src/cli/validateComponentMappings.ts",
     "validate:backend": "tsx src/cli/validateGeneratedBackend.ts",
     "validate:frontend": "tsx src/cli/validateGeneratedFrontend.ts",
@@ -34,7 +35,7 @@
     "validate:fixture:grupo-produtos": "tsx src/cli/validateGeneratedArtifacts.ts fixtures/cadastro-grupo-produtos.dfm fixtures/cadastro-grupo-produtos.pas GrupoProduto GRUPOPRODUTOS",
     "validate:fixture:grupo-parceiros": "tsx src/cli/validateGeneratedArtifacts.ts fixtures/cadastro-grupo-parceiros.dfm fixtures/cadastro-grupo-parceiros.pas GrupoParceiro GRUPOPARCEIROS",
     "validate:fixture-artifacts": "pnpm validate:fixture:produtos && pnpm validate:fixture:parceiros && pnpm validate:fixture:grupo-produtos && pnpm validate:fixture:grupo-parceiros",
-    "validate:all": "pnpm doctor && pnpm build && pnpm validate:components && pnpm validate:fixture-components && pnpm validate:fixture-artifacts"
+    "validate:all": "pnpm doctor && pnpm build && pnpm validate:docs && pnpm validate:components && pnpm validate:fixture-components && pnpm validate:fixture-artifacts"
   },
   "dependencies": {
     "@gestor/dsl": "workspace:*"
