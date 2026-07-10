@@ -9,6 +9,9 @@ export type DelphiComponentRole =
   | 'tabs'
   | 'tree'
   | 'button'
+  | 'container'
+  | 'label'
+  | 'data'
   | 'unknown';
 
 export interface DelphiComponentMapping {
@@ -19,6 +22,19 @@ export interface DelphiComponentMapping {
 }
 
 const mappings: DelphiComponentMapping[] = [
+  { delphiClass: 'TForm', role: 'container', frontendComponent: 'Page' },
+  { delphiClass: 'TFrame', role: 'container', frontendComponent: 'Component' },
+  { delphiClass: 'TPanel', role: 'container', frontendComponent: 'Box' },
+  { delphiClass: 'TGroupBox', role: 'container', frontendComponent: 'Card' },
+  { delphiClass: 'TScrollBox', role: 'container', frontendComponent: 'Box overflow=auto' },
+  { delphiClass: 'TSplitter', role: 'container', frontendComponent: 'Divider' },
+  { delphiClass: 'TLabel', role: 'label', frontendComponent: 'Typography' },
+  { delphiClass: 'TStaticText', role: 'label', frontendComponent: 'Typography' },
+  { delphiClass: 'TDataSource', role: 'data', frontendComponent: 'DataBinding', notes: 'Componente nao visual usado para ligar datasets a controles.' },
+  { delphiClass: 'TQuery', role: 'data', frontendComponent: 'ApiQuery', notes: 'Dataset SQL legado; revisar SQL e parametros.' },
+  { delphiClass: 'TADOQuery', role: 'data', frontendComponent: 'ApiQuery', notes: 'Dataset ADO legado; revisar SQL e parametros.' },
+  { delphiClass: 'TFDQuery', role: 'data', frontendComponent: 'ApiQuery', notes: 'Dataset FireDAC; revisar SQL e parametros.' },
+  { delphiClass: 'TClientDataSet', role: 'data', frontendComponent: 'ClientState', notes: 'Dataset em memoria; revisar origem e persistencia.' },
   { delphiClass: 'TEdit', role: 'text', frontendComponent: 'TextField' },
   { delphiClass: 'TDBEdit', role: 'text', frontendComponent: 'TextField', notes: 'Campo ligado a DataSource/DataField.' },
   { delphiClass: 'TMaskEdit', role: 'text', frontendComponent: 'TextField', notes: 'Revisar mascara Delphi.' },
