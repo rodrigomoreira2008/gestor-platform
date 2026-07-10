@@ -29,6 +29,7 @@ const sections = [
     commands: [
       ['validate:docs [--json]', 'Valida arquivos, indice e comandos documentados.'],
       ['validate:scripts [--json]', 'Valida referencias e dependencias entre scripts do pacote.'],
+      ['validate:workflow [--json]', 'Valida seguranca e etapas obrigatorias do workflow de CI.'],
       ['validate:components', 'Valida a integridade do catalogo de componentes.'],
       ['validate:backend <dfm> <pas> <entidade> [tabela]', 'Valida a geracao backend em memoria.'],
       ['validate:frontend <dfm> <pas> <entidade> [tabela]', 'Valida a geracao frontend em memoria.'],
