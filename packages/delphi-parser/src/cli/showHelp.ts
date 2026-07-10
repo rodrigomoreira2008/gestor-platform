@@ -27,6 +27,7 @@ const sections = [
   {
     title: 'Validacao',
     commands: [
+      ['validate:docs [--json]', 'Valida arquivos, indice e comandos documentados.'],
       ['validate:components', 'Valida a integridade do catalogo de componentes.'],
       ['validate:backend <dfm> <pas> <entidade> [tabela]', 'Valida a geracao backend em memoria.'],
       ['validate:frontend <dfm> <pas> <entidade> [tabela]', 'Valida a geracao frontend em memoria.'],
