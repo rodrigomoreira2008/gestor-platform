@@ -16,16 +16,33 @@ if (!existsSync(packageJsonPath)) {
   process.exit(1);
 }
 
-const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as {
-  scripts?: Record<string, string>;
-};
+let packageJson: { scripts?: Record<string, string> };
+try {
+  packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as { scripts?: Record<string, string> };
+} catch (error) {
+  console.error(`package.json invalido: ${error instanceof Error ? error.message : 'erro desconhecido'}`);
+  process.exit(1);
+}
+
 const scripts = packageJson.scripts ?? {};
 const scriptEntries = Object.entries(scripts);
+
+checks.push({
+  name: 'catalogo de scripts nao vazio',
+  ok: scriptEntries.length > 0,
+  detail: `${scriptEntries.length} script(s)`
+});
 
 for (const [name, command] of scriptEntries) {
   checks.push({
     name: `script ${name} nao vazio`,
     ok: command.trim().length > 0,
+    detail: command
+  });
+
+  checks.push({
+    name: `script ${name} sem espacos externos`,
+    ok: command === command.trim(),
     detail: command
   });
 
@@ -63,6 +80,16 @@ checks.push({
   detail: duplicateCommands.length === 0 ? 'nenhum' : duplicateCommands.join(', ')
 });
 
+const selfReferences = scriptEntries.filter(([name, command]) => {
+  const references = [...command.matchAll(/(?:^|&&\s*)pnpm\s+([A-Za-z0-9:_-]+)/g)].map((match) => match[1]);
+  return references.includes(name);
+});
+checks.push({
+  name: 'scripts sem autorreferencia direta',
+  ok: selfReferences.length === 0,
+  detail: selfReferences.length === 0 ? 'nenhuma' : selfReferences.map(([name]) => name).join(', ')
+});
+
 const failed = checks.filter((check) => !check.ok);
 const output = {
   ok: failed.length === 0,
@@ -82,6 +109,9 @@ if (process.argv.includes('--json')) {
     console.log(`[${check.ok ? 'OK' : 'ERRO'}] ${check.name}: ${check.detail}`);
   }
   console.log(`Resumo: ${output.passed}/${output.total} verificacoes OK em ${output.scripts} scripts`);
+  if (failed.length > 0) {
+    console.error(`Falhas: ${output.failures.join(', ')}`);
+  }
 }
 
 if (failed.length > 0) {
