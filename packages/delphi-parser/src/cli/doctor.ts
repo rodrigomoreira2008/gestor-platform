@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 interface CheckResult {
@@ -22,6 +22,8 @@ const requiredPaths = [
   'src/index.ts',
   'src/dfmParser.ts',
   'src/pasParser.ts',
+  'src/componentMapping.ts',
+  'src/resolveForm.ts',
   'fixtures'
 ];
 
@@ -32,6 +34,34 @@ for (const relativePath of requiredPaths) {
     ok: existsSync(absolutePath),
     detail: absolutePath
   });
+}
+
+const packagePath = resolve(process.cwd(), 'package.json');
+if (existsSync(packagePath)) {
+  try {
+    const packageJson = JSON.parse(readFileSync(packagePath, 'utf8')) as {
+      name?: string;
+      scripts?: Record<string, string>;
+    };
+    checks.push({
+      name: 'package name',
+      ok: packageJson.name === '@gestor/delphi-parser',
+      detail: packageJson.name ?? 'nome ausente'
+    });
+    for (const script of ['build', 'resolve:form', 'validate:components', 'validate:all']) {
+      checks.push({
+        name: `script ${script}`,
+        ok: Boolean(packageJson.scripts?.[script]),
+        detail: packageJson.scripts?.[script] ?? 'script ausente'
+      });
+    }
+  } catch (error) {
+    checks.push({
+      name: 'package.json valido',
+      ok: false,
+      detail: error instanceof Error ? error.message : 'erro desconhecido'
+    });
+  }
 }
 
 checks.push({
@@ -46,6 +76,8 @@ const json = process.argv.includes('--json');
 if (json) {
   console.log(JSON.stringify({
     ok: failed.length === 0,
+    total: checks.length,
+    failed: failed.length,
     cwd: process.cwd(),
     platform: process.platform,
     architecture: process.arch,
@@ -57,6 +89,7 @@ if (json) {
   for (const check of checks) {
     console.log(`[${check.ok ? 'OK' : 'ERRO'}] ${check.name}: ${check.detail}`);
   }
+  console.log(`Resumo: ${checks.length - failed.length}/${checks.length} verificacoes OK`);
 }
 
 if (failed.length > 0) {
