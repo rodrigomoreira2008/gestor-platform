@@ -4,10 +4,13 @@ export function renderFrontendDetailGridDefinitions(detailGrids: InferredDetailG
   const entries = detailGrids
     .map((grid) => `  {
     name: ${quote(grid.name)},
+    label: ${quote(grid.label)},
     componentName: ${grid.componentName ? quote(grid.componentName) : 'undefined'},
     dataSource: ${grid.dataSource ? quote(grid.dataSource) : 'undefined'},
     fieldNames: [${grid.fieldNames.map(quote).join(', ')}],
     relationship: ${grid.relationship ? quote(grid.relationship) : 'undefined'},
+    masterField: ${grid.masterField ? quote(grid.masterField) : 'undefined'},
+    detailField: ${grid.detailField ? quote(grid.detailField) : 'undefined'},
     confidence: ${quote(grid.confidence)},
     evidence: ${quote(grid.evidence)}
   }`)
@@ -17,26 +20,61 @@ export function renderFrontendDetailGridDefinitions(detailGrids: InferredDetailG
 }
 
 export function renderDetailGridComponent(entityPascal: string, entity: string, detailGrid: InferredDetailGrid): string {
-  const columns = detailGrid.fieldNames.map((fieldName) => `  { field: ${quote(toCamelCase(fieldName))}, headerName: ${quote(fieldName)}, flex: 1 }`).join(',\n');
+  const columns = detailGrid.fieldNames.map((fieldName) => `  { field: ${quote(toCamelCase(fieldName))}, headerName: ${quote(humanize(fieldName))}, flex: 1, minWidth: 140 }`).join(',\n');
+  const componentName = `${entityPascal}${toPascalCase(detailGrid.name)}DetailGrid`;
 
-  return `import { Box, Typography } from '@mui/material';
-import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+  return `import { Alert, Box, Stack, Typography } from '@mui/material';
+import { DataGrid, GridToolbar, type GridColDef, type GridRowId } from '@mui/x-data-grid';
+import { useMemo } from 'react';
 
-interface ${entityPascal}${toPascalCase(detailGrid.name)}DetailGridProps {
+interface ${componentName}Props {
   rows?: Record<string, unknown>[];
   isLoading?: boolean;
+  error?: unknown;
+  height?: number;
 }
 
 const columns: GridColDef[] = [
-${columns || '  { field: \'id\', headerName: \'ID\', width: 90 }'}
+${columns || "  { field: 'id', headerName: 'ID', width: 100 }"}
 ];
 
-export function ${entityPascal}${toPascalCase(detailGrid.name)}DetailGrid({ rows = [], isLoading }: ${entityPascal}${toPascalCase(detailGrid.name)}DetailGridProps) {
+function resolveRowId(row: Record<string, unknown>): GridRowId {
+  const candidates = ['id', 'ID', 'Id', 'codigo', 'CODIGO', 'controle', 'CONTROLE'];
+  for (const candidate of candidates) {
+    const value = row[candidate];
+    if (typeof value === 'string' || typeof value === 'number') return value;
+  }
+  return JSON.stringify(row);
+}
+
+export function ${componentName}({ rows = [], isLoading, error, height = 380 }: ${componentName}Props) {
+  const normalizedRows = useMemo(() => rows.filter(Boolean), [rows]);
+
   return (
-    <Box sx={{ height: 360 }}>
-      <Typography variant="subtitle2" sx={{ mb: 1 }}>${escapeDoubleQuote(detailGrid.name)}</Typography>
-      <DataGrid rows={rows} columns={columns} loading={isLoading} disableRowSelectionOnClick pageSizeOptions={[5, 10, 25]} initialState={{ pagination: { paginationModel: { pageSize: 5 } } }} />
-    </Box>
+    <Stack spacing={1}>
+      <Box>
+        <Typography variant="subtitle1">${escapeDoubleQuote(detailGrid.label)}</Typography>
+        <Typography variant="caption" color="text.secondary">
+          ${escapeDoubleQuote(detailGrid.evidence)}
+        </Typography>
+      </Box>
+      {error && <Alert severity="warning">Nao foi possivel carregar os detalhes.</Alert>}
+      <Box sx={{ height, minHeight: 280, width: '100%' }}>
+        <DataGrid
+          rows={normalizedRows}
+          columns={columns}
+          loading={isLoading}
+          getRowId={resolveRowId}
+          disableRowSelectionOnClick
+          density="compact"
+          pageSizeOptions={[5, 10, 25, 50]}
+          initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+          slots={{ toolbar: GridToolbar }}
+          slotProps={{ toolbar: { showQuickFilter: true } }}
+          sx={{ '& .MuiDataGrid-cell': { alignItems: 'center' } }}
+        />
+      </Box>
+    </Stack>
   );
 }
 `;
@@ -44,6 +82,11 @@ export function ${entityPascal}${toPascalCase(detailGrid.name)}DetailGrid({ rows
 
 function quote(value: string): string {
   return JSON.stringify(value);
+}
+
+function humanize(value: string): string {
+  const words = value.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').trim().toLowerCase();
+  return words ? words.charAt(0).toUpperCase() + words.slice(1) : value;
 }
 
 function toPascalCase(value: string): string {
