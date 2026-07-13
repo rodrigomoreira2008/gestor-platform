@@ -22,34 +22,32 @@ export type ${entityPascal}FormData = z.infer<typeof ${entity}Schema>;
 function renderFieldSchema(field: ResolvedField): string {
   const type = inferType(field);
   const messages = uniqueMessages(field.validationMessages);
-  const requiredMessage = messages.find((message) => /obrigat|inform|preench|necessar/i.test(message)) ?? `${field.label ?? field.name} é obrigatório.`;
-  let expression: string;
+  const label = field.label ?? field.name;
+  const requiredMessage = messages.find((message) => /obrigat|inform|preench|necessar/i.test(message)) ?? `${label} é obrigatório.`;
 
   if (type === 'boolean') {
-    expression = 'z.boolean()';
-  } else if (type === 'number') {
-    expression = `z.preprocess(emptyStringToUndefined, z.coerce.number({ invalid_type_error: '${escapeSingleQuote(`${field.label ?? field.name} deve ser numérico.`)}' }))`;
+    return field.required ? 'z.boolean()' : 'z.boolean().optional()';
+  }
+
+  if (type === 'number') {
+    let inner = `z.coerce.number({ invalid_type_error: '${escapeSingleQuote(`${label} deve ser numérico.`)}' }).optional()`;
     if (messages.some((message) => /maior que zero|positivo|superior a zero/i.test(message))) {
-      expression += `.refine((value) => value > 0, '${escapeSingleQuote(findMessage(messages, /maior que zero|positivo|superior a zero/i) ?? `${field.label ?? field.name} deve ser maior que zero.`)}')`;
+      inner += `.refine((value) => value === undefined || value > 0, '${escapeSingleQuote(findMessage(messages, /maior que zero|positivo|superior a zero/i) ?? `${label} deve ser maior que zero.`)}')`;
     } else if (messages.some((message) => /não pode ser negativo|nao pode ser negativo|maior ou igual a zero/i.test(message))) {
-      expression += `.refine((value) => value >= 0, '${escapeSingleQuote(findMessage(messages, /não pode ser negativo|nao pode ser negativo|maior ou igual a zero/i) ?? `${field.label ?? field.name} não pode ser negativo.`)}')`;
+      inner += `.refine((value) => value === undefined || value >= 0, '${escapeSingleQuote(findMessage(messages, /não pode ser negativo|nao pode ser negativo|maior ou igual a zero/i) ?? `${label} não pode ser negativo.`)}')`;
     }
-  } else {
-    expression = 'z.string()';
-    const maxLength = inferMaximumLength(messages);
-    if (field.required) expression += `.trim().min(1, '${escapeSingleQuote(requiredMessage)}')`;
-    if (maxLength) expression += `.max(${maxLength}, '${escapeSingleQuote(`${field.label ?? field.name} deve ter no máximo ${maxLength} caracteres.`)}')`;
-    if (isEmailField(field, messages)) expression += `.email('${escapeSingleQuote(`${field.label ?? field.name} deve conter um e-mail válido.`)}')`;
-    if (inferType(field) === 'date') expression += `.refine((value) => value === '' || !Number.isNaN(Date.parse(value)), '${escapeSingleQuote(`${field.label ?? field.name} deve conter uma data válida.`)}')`;
+    if (field.required) inner += `.refine((value) => value !== undefined, '${escapeSingleQuote(requiredMessage)}')`;
+    return `z.preprocess(emptyStringToUndefined, ${inner})`;
   }
 
-  if (!field.required) {
-    if (type === 'string' || type === 'date') return `z.preprocess(emptyStringToUndefined, ${expression}.optional())`;
-    return `${expression}.optional()`;
-  }
+  let expression = 'z.string()';
+  const maxLength = inferMaximumLength(messages);
+  if (field.required) expression += `.trim().min(1, '${escapeSingleQuote(requiredMessage)}')`;
+  if (maxLength) expression += `.max(${maxLength}, '${escapeSingleQuote(`${label} deve ter no máximo ${maxLength} caracteres.`)}')`;
+  if (isEmailField(field, messages)) expression += `.email('${escapeSingleQuote(`${label} deve conter um e-mail válido.`)}')`;
+  if (type === 'date') expression += `.refine((value) => value === '' || !Number.isNaN(Date.parse(value)), '${escapeSingleQuote(`${label} deve conter uma data válida.`)}')`;
 
-  if (type === 'number') return `${expression}.refine((value) => value !== undefined, '${escapeSingleQuote(requiredMessage)}')`;
-  return expression;
+  return field.required ? expression : `z.preprocess(emptyStringToUndefined, ${expression}.optional())`;
 }
 
 function inferType(field: ResolvedField): 'string' | 'number' | 'boolean' | 'date' {
