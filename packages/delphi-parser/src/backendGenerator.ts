@@ -1,3 +1,4 @@
+import type { InferredRelationship } from './relationshipInference';
 import type { ResolvedField, ResolvedForm } from './resolvedForm';
 
 export interface BackendGeneratedFile {
@@ -10,24 +11,38 @@ export interface BackendGeneratorOptions {
   outputRoot?: string;
 }
 
+interface EntityRelationshipPlan {
+  relatedEntity: string;
+  navigationProperty: string;
+  foreignKeyProperty: string;
+  principalProperty: string;
+  evidence: string;
+}
+
 export function generateBackendFiles(resolved: ResolvedForm, options: BackendGeneratorOptions = {}): BackendGeneratedFile[] {
   const entityName = toPascalCase(resolved.form.entity);
   const namespace = options.namespace ?? 'Gestor.Api';
   const outputRoot = options.outputRoot ?? 'apps/backend';
+  const fields = resolved.fields.filter((field) => !isIdentityField(field));
+  const relationshipPlans = buildEntityRelationshipPlans(entityName, resolved);
 
   return [
-    { path: `${outputRoot}/Entities/${entityName}.cs`, content: generateEntity(entityName, resolved.fields, namespace) },
-    { path: `${outputRoot}/DTO/${entityName}Dto.cs`, content: generateDto(entityName, resolved.fields, namespace) },
-    { path: `${outputRoot}/Validators/${entityName}Validator.cs`, content: generateValidator(entityName, resolved.fields, namespace) },
-    { path: `${outputRoot}/Services/${entityName}Service.cs`, content: generateService(entityName, resolved.fields, namespace) },
+    { path: `${outputRoot}/Entities/${entityName}.cs`, content: generateEntity(entityName, fields, relationshipPlans, namespace) },
+    { path: `${outputRoot}/DTO/${entityName}Dto.cs`, content: generateDto(entityName, fields, namespace) },
+    { path: `${outputRoot}/Validators/${entityName}Validator.cs`, content: generateValidator(entityName, fields, namespace) },
+    { path: `${outputRoot}/Services/${entityName}Service.cs`, content: generateService(entityName, fields, namespace) },
     { path: `${outputRoot}/Controllers/${entityName}Controller.cs`, content: generateController(entityName, resolved.form.entity, namespace) },
-    { path: `${outputRoot}/Configurations/${entityName}Configuration.cs`, content: generateEntityConfiguration(entityName, resolved, namespace) },
-    { path: `${outputRoot}/Generated/${entityName}DbContextRegistration.cs.txt`, content: generateDbContextRegistration(entityName) },
-    { path: `${outputRoot}/Generated/${entityName}MigrationCommands.md`, content: generateMigrationCommands(entityName) }
+    { path: `${outputRoot}/Configurations/${entityName}Configuration.cs`, content: generateEntityConfiguration(entityName, fields, relationshipPlans, resolved, namespace) },
+    { path: `${outputRoot}/Generated/${entityName}DbContextRegistration.cs.txt`, content: generateDbContextRegistration(entityName, relationshipPlans) },
+    { path: `${outputRoot}/Generated/${entityName}MigrationCommands.md`, content: generateMigrationCommands(entityName, relationshipPlans) }
   ];
 }
 
-function generateEntity(entityName: string, fields: ResolvedField[], namespace: string): string {
+function generateEntity(entityName: string, fields: ResolvedField[], relationships: EntityRelationshipPlan[], namespace: string): string {
+  const navigationProperties = relationships
+    .map((relationship) => `    public ${relationship.relatedEntity}? ${relationship.navigationProperty} { get; set; }`)
+    .join('\n');
+
   return `using ${namespace}.Common;
 
 namespace ${namespace}.Entities;
@@ -36,6 +51,7 @@ public class ${entityName} : IEntity
 {
     public int Id { get; set; }
 ${fields.map((field) => `    public ${mapCSharpType(field)} ${toPascalCase(field.name)} { get; set; }`).join('\n')}
+${navigationProperties ? `\n${navigationProperties}` : ''}
 }
 `;
 }
@@ -95,11 +111,8 @@ function generateFieldValidationRules(field: ResolvedField): string[] {
   const rules: string[] = [];
 
   if (field.required) {
-    if (type === 'string?') {
-      rules.push(`        if (string.IsNullOrWhiteSpace(input.${propertyName})) errors.Add("${escapeCSharpString(requiredMessage)}");`);
-    } else {
-      rules.push(`        if (input.${propertyName} is null) errors.Add("${escapeCSharpString(requiredMessage)}");`);
-    }
+    if (type === 'string?') rules.push(`        if (string.IsNullOrWhiteSpace(input.${propertyName})) errors.Add("${escapeCSharpString(requiredMessage)}");`);
+    else rules.push(`        if (input.${propertyName} is null) errors.Add("${escapeCSharpString(requiredMessage)}");`);
   }
 
   if (type === 'string?') {
@@ -194,9 +207,17 @@ public class ${entityName}Controller : CrudControllerBase<${entityName}, ${entit
 `;
 }
 
-function generateEntityConfiguration(entityName: string, resolved: ResolvedForm, namespace: string): string {
+function generateEntityConfiguration(entityName: string, fields: ResolvedField[], relationships: EntityRelationshipPlan[], resolved: ResolvedForm, namespace: string): string {
   const tableName = resolved.databaseQueries[0]?.tables[0]?.name ?? resolved.form.table ?? entityName;
-  const relationshipNotes = resolved.relationships.map((relationship) => `        // Relacionamento inferido (${relationship.confidence}): ${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn}`).join('\n');
+  const fluentRelationships = relationships.map((relationship) => `        builder.HasOne(entity => entity.${relationship.navigationProperty})
+            .WithMany()
+            .HasForeignKey(entity => entity.${relationship.foreignKeyProperty})
+            .HasPrincipalKey(entity => entity.${relationship.principalProperty})
+            .OnDelete(DeleteBehavior.Restrict); // ${escapeCSharpComment(relationship.evidence)}`).join('\n');
+  const reviewNotes = resolved.relationships
+    .filter((relationship) => !relationships.some((plan) => relationshipMatchesPlan(relationship, plan)))
+    .map((relationship) => `        // Relacionamento para revisão (${relationship.confidence}): ${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn}`)
+    .join('\n');
 
   return `using ${namespace}.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -210,19 +231,57 @@ public class ${entityName}Configuration : IEntityTypeConfiguration<${entityName}
     {
         builder.ToTable("${escapeCSharpString(tableName)}");
         builder.HasKey(entity => entity.Id);
-${resolved.fields.map((field) => `        builder.Property(entity => entity.${toPascalCase(field.name)}).HasColumnName("${escapeCSharpString(field.dataField ?? field.name)}");`).join('\n')}
-${relationshipNotes || '        // Nenhum relacionamento inferido automaticamente.'}
+${fields.map((field) => `        builder.Property(entity => entity.${toPascalCase(field.name)}).HasColumnName("${escapeCSharpString(field.dataField ?? field.name)}");`).join('\n')}
+${fluentRelationships || '        // Nenhum relacionamento de alta confiança aplicável a esta entidade.'}
+${reviewNotes}
     }
 }
 `;
 }
 
-function generateDbContextRegistration(entityName: string): string {
+function buildEntityRelationshipPlans(entityName: string, resolved: ResolvedForm): EntityRelationshipPlan[] {
+  const currentTableCandidates = [resolved.form.table, resolved.databaseQueries[0]?.tables[0]?.name, resolved.form.entity, entityName].filter(Boolean) as string[];
+  const fieldByColumn = new Map<string, ResolvedField>();
+  for (const field of resolved.fields) fieldByColumn.set(normalizeName(field.dataField ?? field.name), field);
+  const plans: EntityRelationshipPlan[] = [];
+
+  for (const relationship of resolved.relationships) {
+    if (relationship.confidence !== 'high' || !relationship.dependentTable || !relationship.dependentColumn || !relationship.principalTable || !relationship.principalColumn) continue;
+    if (!currentTableCandidates.some((candidate) => sameName(candidate, relationship.dependentTable))) continue;
+    const foreignKeyField = fieldByColumn.get(normalizeName(relationship.dependentColumn));
+    if (!foreignKeyField) continue;
+
+    const relatedEntity = toPascalCase(singularizeTableName(relationship.principalTable));
+    if (!relatedEntity || sameName(relatedEntity, entityName)) continue;
+    const foreignKeyProperty = toPascalCase(foreignKeyField.name);
+    const principalProperty = isIdentityName(relationship.principalColumn) ? 'Id' : toPascalCase(relationship.principalColumn);
+    const navigationProperty = uniqueNavigationName(relatedEntity, plans);
+
+    plans.push({ relatedEntity, navigationProperty, foreignKeyProperty, principalProperty, evidence: relationship.evidence });
+  }
+
+  return plans;
+}
+
+function uniqueNavigationName(base: string, plans: EntityRelationshipPlan[]): string {
+  let candidate = base;
+  let suffix = 2;
+  while (plans.some((plan) => plan.navigationProperty === candidate)) candidate = `${base}${suffix++}`;
+  return candidate;
+}
+
+function relationshipMatchesPlan(relationship: InferredRelationship, plan: EntityRelationshipPlan): boolean {
+  return Boolean(relationship.dependentColumn && sameName(toPascalCase(relationship.dependentColumn), plan.foreignKeyProperty) && relationship.principalTable && sameName(toPascalCase(singularizeTableName(relationship.principalTable)), plan.relatedEntity));
+}
+
+function generateDbContextRegistration(entityName: string, relationships: EntityRelationshipPlan[]): string {
+  const relatedNotes = relationships.map((relationship) => `// Confirmar DbSet<${relationship.relatedEntity}> e configuração da chave ${relationship.principalProperty}.`).join('\n');
   return `// Adicionar em GestorDbContext.cs
 public DbSet<${entityName}> ${entityName}s => Set<${entityName}>();
 
 // Adicionar em OnModelCreating:
 // modelBuilder.ApplyConfiguration(new ${entityName}Configuration());
+${relatedNotes ? `\n${relatedNotes}` : ''}
 
 // Conferir usings:
 // using Gestor.Api.Entities;
@@ -230,7 +289,8 @@ public DbSet<${entityName}> ${entityName}s => Set<${entityName}>();
 `;
 }
 
-function generateMigrationCommands(entityName: string): string {
+function generateMigrationCommands(entityName: string, relationships: EntityRelationshipPlan[]): string {
+  const relationshipChecklist = relationships.map((relationship) => `- Conferir FK \`${relationship.foreignKeyProperty}\` para \`${relationship.relatedEntity}.${relationship.principalProperty}\`.`).join('\n');
   return `# Migration EF Core para ${entityName}
 
 Depois de copiar os arquivos gerados para o projeto backend e registrar a entidade no DbContext, execute:
@@ -246,17 +306,43 @@ dotnet ef database update --project apps/backend --startup-project apps/backend
 - Conferir \`DbSet<${entityName}>\` no DbContext.
 - Conferir \`modelBuilder.ApplyConfiguration(new ${entityName}Configuration())\`.
 - Revisar tipos inferidos automaticamente.
+${relationshipChecklist || '- Nenhuma FK de alta confiança foi gerada automaticamente.'}
 - Revisar relacionamentos marcados como \`medium\` ou \`low\` no relatorio de migracao.
 `;
 }
 
+function isIdentityField(field: ResolvedField): boolean {
+  return isIdentityName(field.dataField ?? field.name);
+}
+
+function isIdentityName(value: string): boolean {
+  return normalizeName(value) === 'id';
+}
+
 function mapCSharpType(field: ResolvedField): string {
-  const normalized = field.name.toLowerCase();
+  const normalized = normalizeName(field.name);
   if (normalized.includes('valor') || normalized.includes('preco') || normalized.includes('total')) return 'decimal?';
   if (normalized.includes('quantidade') || normalized.includes('qtd')) return 'decimal?';
-  if (normalized === 'id' || normalized.endsWith('id') || normalized.includes('codigo')) return 'int?';
+  if (normalized.endsWith('id') || normalized.includes('codigo')) return 'int?';
   if (normalized.includes('data')) return 'DateTime?';
   return 'string?';
+}
+
+function singularizeTableName(value: string): string {
+  const normalized = value.replace(/^[\["`]|[\]"`]$/g, '');
+  if (/oes$/i.test(normalized)) return `${normalized.slice(0, -3)}ao`;
+  if (/ais$/i.test(normalized)) return `${normalized.slice(0, -3)}al`;
+  if (/is$/i.test(normalized)) return normalized.slice(0, -1);
+  if (/s$/i.test(normalized)) return normalized.slice(0, -1);
+  return normalized;
+}
+
+function sameName(left: string, right: string): boolean {
+  return normalizeName(left) === normalizeName(right);
+}
+
+function normalizeName(value: string): string {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 }
 
 function toPascalCase(value: string): string {
