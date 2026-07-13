@@ -10,14 +10,27 @@ interface DetailQueryParams {
   relationField?: string;
 }
 
-async function fetchDetailRows(endpoint: string, params: DetailQueryParams): Promise<Record<string, unknown>[]> {
+function unwrapRows(payload: unknown): Record<string, unknown>[] {
+  if (Array.isArray(payload)) return payload as Record<string, unknown>[];
+  if (!payload || typeof payload !== 'object') return [];
+  const envelope = payload as Record<string, unknown>;
+  for (const key of ['items', 'data', 'results', 'rows']) {
+    if (Array.isArray(envelope[key])) return envelope[key] as Record<string, unknown>[];
+  }
+  return [];
+}
+
+async function fetchDetailRows(endpoint: string, params: DetailQueryParams, signal?: AbortSignal): Promise<Record<string, unknown>[]> {
   const searchParams = new URLSearchParams();
   if (params.masterId !== undefined && params.masterId !== null) searchParams.set(params.relationField ?? 'masterId', String(params.masterId));
 
-  const url = searchParams.toString() ? `${'${endpoint}'}?${'${searchParams.toString()}'}` : endpoint;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Falha ao carregar detalhes.');
-  return response.json();
+  const url = searchParams.toString() ? \`${'${endpoint}'}?${'${searchParams.toString()}'}\` : endpoint;
+  const response = await fetch(url, { signal });
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '');
+    throw new Error(detail || \`Falha ao carregar detalhes (${ '${response.status}' }).\`);
+  }
+  return unwrapRows(await response.json());
 }
 
 ${hooks || '// Nenhum grid detalhe inferido nesta entidade.'}
@@ -26,14 +39,17 @@ ${hooks || '// Nenhum grid detalhe inferido nesta entidade.'}
 
 function renderDetailHook(entityPascal: string, grid: InferredDetailGrid): string {
   const hookName = `use${entityPascal}${toPascalCase(grid.name)}Details`;
-  const endpoint = `/api/${toKebabPlural(grid.dataSource ?? grid.name)}`;
-  const relationField = inferRelationField(grid.relationship);
+  const endpoint = `/api/${toKebabPlural(stripDatasetPrefix(grid.dataSource ?? grid.name))}`;
+  const relationField = grid.detailField ? normalizeParamName(grid.detailField) : inferRelationField(grid.relationship);
 
   return `export function ${hookName}(masterId?: string | number) {
   return useQuery({
-    queryKey: [${quote(grid.name)}, ${quote(endpoint)}, ${quote(relationField)}, masterId],
-    queryFn: () => fetchDetailRows(${quote(endpoint)}, { masterId, relationField: ${quote(relationField)} }),
-    enabled: masterId !== undefined && masterId !== null
+    queryKey: ['detail', ${quote(grid.name)}, ${quote(endpoint)}, ${quote(relationField)}, masterId],
+    queryFn: ({ signal }) => fetchDetailRows(${quote(endpoint)}, { masterId, relationField: ${quote(relationField)} }, signal),
+    enabled: masterId !== undefined && masterId !== null,
+    staleTime: 30_000,
+    retry: 1,
+    refetchOnWindowFocus: false
   });
 }`;
 }
@@ -43,6 +59,10 @@ function inferRelationField(relationship?: string): string {
   const [source] = relationship.split('->').map((part) => part.trim());
   const column = source.includes('.') ? source.split('.').pop() : source;
   return normalizeParamName(column ?? 'masterId');
+}
+
+function stripDatasetPrefix(value: string): string {
+  return value.replace(/^(?:ds|qry|cds|fdq|ado|tbl|tb)/i, '') || value;
 }
 
 function normalizeParamName(value: string): string {
