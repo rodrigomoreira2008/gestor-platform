@@ -20,6 +20,7 @@ apps/frontend/src/modules/<modulo>/api/index.ts
 apps/frontend/src/modules/<modulo>/hooks/index.ts
 apps/frontend/src/modules/<modulo>/schema/<entidade>Schema.ts
 apps/frontend/src/modules/<modulo>/filters/<entidade>Filters.ts
+apps/frontend/src/modules/<modulo>/components/<Entidade>Filters.tsx
 apps/frontend/src/modules/<modulo>/lookups/<entidade>Lookups.ts
 apps/frontend/src/modules/<modulo>/lookups/<entidade>LookupHooks.ts
 apps/frontend/src/modules/<modulo>/components/<Entidade>LookupField.tsx
@@ -70,7 +71,22 @@ O gerador emite um schema Zod inicial. Campos obrigatorios vindos do ResolvedFor
 
 ## Filtros
 
-O gerador emite filters/<entidade>Filters.ts com filtros tipados por campo. A pagina usa esses filtros para pesquisa textual local nos registros carregados.
+O gerador emite dois artefatos:
+
+- `filters/<entidade>Filters.ts`, com nome, label, tipo, operadores, coluna original, obrigatoriedade e confianca;
+- `components/<Entidade>Filters.tsx`, com o painel Material UI responsivo.
+
+Os tipos suportados sao texto, numero, data, booleano e lookup. O painel permite aplicar filtros ao pressionar Enter, limpar todos os valores, tratar campos vazios e sincronizar seu estado quando filtros externos mudam.
+
+A pagina CRUD importa o painel automaticamente e combina:
+
+- pesquisa textual global em todos os campos pesquisaveis;
+- filtros avancados por campo;
+- comparacao booleana e numerica tipada;
+- comparacao textual sem diferenciar maiusculas e minusculas em `pt-BR`;
+- contador de registros atualmente exibidos.
+
+Os botoes de editar e excluir interrompem a propagacao do clique, evitando trocar acidentalmente o registro mestre selecionado. Ao excluir o registro selecionado, a secao de detalhes e limpa.
 
 ## Lookups
 
@@ -179,13 +195,14 @@ A pagina gerada usa:
 - hook de edicao;
 - hook de exclusao;
 - pesquisa textual local;
+- painel de filtros avancados por campo;
 - metadata de tabs inferidas;
 - selecao do registro mestre;
 - hooks e DataGrids detalhe por masterId/campo de relacionamento;
 - TabbedForm nos dialogos de cadastro e edicao;
 - confirmacao de exclusao.
 
-Essa pagina valida o fluxo funcional basico de cadastro, listagem, edicao, exclusao, pesquisa local e visualizacao inicial de detalhes mestre/detalhe.
+Essa pagina valida o fluxo funcional basico de cadastro, listagem, edicao, exclusao, pesquisa local, filtragem avancada e visualizacao inicial de detalhes mestre/detalhe.
 
 ## Rotas e menu
 
