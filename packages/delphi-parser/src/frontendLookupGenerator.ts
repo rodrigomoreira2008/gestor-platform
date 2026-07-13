@@ -5,7 +5,8 @@ export function renderFrontendLookupDefinitions(lookups: InferredLookup[], expor
     .map((lookup) => `  {
     fieldName: '${escapeSingleQuote(lookup.fieldName)}',
     componentName: ${lookup.componentName ? `'${escapeSingleQuote(lookup.componentName)}'` : 'undefined'},
-    endpoint: '${toLookupEndpoint(lookup)}',
+    lookupSource: ${lookup.lookupSource ? `'${escapeSingleQuote(lookup.lookupSource)}'` : 'undefined'},
+    endpoint: '${escapeSingleQuote(lookup.endpointHint ?? toLookupEndpoint(lookup))}',
     valueField: '${escapeSingleQuote(lookup.keyField ?? 'id')}',
     labelField: '${escapeSingleQuote(lookup.displayField ?? 'descricao')}',
     confidence: '${lookup.confidence}',
@@ -26,14 +27,31 @@ import { ${entity}Lookups } from '../lookups/${entity}Lookups';
 export interface LookupOption {
   id: string | number;
   label: string;
-  raw: unknown;
+  raw: Record<string, unknown>;
 }
 
-async function fetchLookup(endpoint: string, valueField: string, labelField: string): Promise<LookupOption[]> {
-  const response = await fetch(endpoint);
-  if (!response.ok) throw new Error('Nao foi possivel carregar lookup.');
-  const data = await response.json() as Record<string, unknown>[];
-  return data.map((item) => ({ id: item[valueField] as string | number, label: String(item[labelField] ?? item[valueField] ?? ''), raw: item }));
+function unwrapLookupData(payload: unknown): Record<string, unknown>[] {
+  if (Array.isArray(payload)) return payload as Record<string, unknown>[];
+  if (!payload || typeof payload !== 'object') return [];
+  const record = payload as Record<string, unknown>;
+  for (const key of ['items', 'data', 'results', 'rows']) {
+    if (Array.isArray(record[key])) return record[key] as Record<string, unknown>[];
+  }
+  return [];
+}
+
+async function fetchLookup(endpoint: string, valueField: string, labelField: string, signal?: AbortSignal): Promise<LookupOption[]> {
+  const response = await fetch(endpoint, { signal });
+  if (!response.ok) throw new Error(\`Nao foi possivel carregar lookup (\${response.status}).\`);
+  const payload = await response.json() as unknown;
+  return unwrapLookupData(payload)
+    .map((item) => ({
+      id: item[valueField] as string | number,
+      label: String(item[labelField] ?? item[valueField] ?? ''),
+      raw: item
+    }))
+    .filter((option) => option.id !== undefined && option.id !== null)
+    .sort((left, right) => left.label.localeCompare(right.label, 'pt-BR'));
 }
 
 ${hooks || '// Nenhum lookup inferido.'}
@@ -44,11 +62,14 @@ export const ${entity}LookupHooks = { ${hookNames} };
 
 function renderLookupHook(entity: string, lookup: InferredLookup, index: number): string {
   const hookName = `use${toPascalCase(lookup.fieldName)}Lookup`;
-  return `export function ${hookName}() {
+  return `export function ${hookName}(enabled = true) {
   const lookup = Array.from(${entity}Lookups)[${index}];
   return useQuery({
-    queryKey: ['lookup', lookup.fieldName, lookup.endpoint],
-    queryFn: () => fetchLookup(lookup.endpoint, lookup.valueField, lookup.labelField)
+    queryKey: ['lookup', lookup.fieldName, lookup.endpoint, lookup.valueField, lookup.labelField],
+    queryFn: ({ signal }) => fetchLookup(lookup.endpoint, lookup.valueField, lookup.labelField, signal),
+    enabled,
+    staleTime: 5 * 60 * 1000,
+    retry: 1
   });
 }`;
 }
