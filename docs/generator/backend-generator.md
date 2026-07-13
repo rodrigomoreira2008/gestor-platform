@@ -53,20 +53,21 @@ A primeira heuristica usa o nome do campo:
 - data -> DateTime opcional
 - demais campos -> string opcional
 
+O campo ID resolvido no DFM nao e emitido novamente, porque a entidade e o DTO ja possuem a propriedade Id estrutural. Isso evita propriedades duplicadas no C# gerado.
+
 ## Validacoes
 
-O validator gerado agora aplica regras de acordo com o tipo inferido:
+Campos marcados como obrigatorios no ResolvedForm geram checks no validator. As mensagens sao aproveitadas dos hints de validacao extraidos do PAS quando disponiveis.
 
-- strings obrigatorias usam `IsNullOrWhiteSpace`;
-- numeros e datas obrigatorios verificam valor nulo;
-- mensagens Pascal duplicadas sao removidas;
-- hints com limite de caracteres geram verificacao de tamanho maximo;
-- campos de e-mail geram validacao com `MailAddress`;
-- mensagens como maior que zero, positivo ou nao pode ser negativo geram regras numericas;
-- regras Pascal nao convertidas com seguranca permanecem como comentarios para revisao manual;
-- o resultado final remove erros duplicados sem diferenciar maiusculas e minusculas.
+O validator distingue strings, numeros e datas e tenta converter textos Pascal em regras concretas para:
 
-O validator tambem rejeita entrada nula com `ArgumentNullException.ThrowIfNull`, evitando falhas silenciosas durante o processamento.
+- obrigatoriedade;
+- tamanho maximo;
+- e-mail valido;
+- valor maior que zero;
+- valor nao negativo.
+
+Regras que nao podem ser convertidas com seguranca permanecem como comentarios para revisao manual.
 
 ## EF Core Configuration
 
@@ -75,7 +76,37 @@ O gerador emite Configurations/EntidadeConfiguration.cs com:
 - mapeamento de tabela inferida do SQL quando disponivel;
 - chave primaria Id;
 - mapeamento de colunas para os campos resolvidos;
-- comentarios para relacionamentos inferidos automaticamente.
+- relacionamentos Fluent API reais quando a direcao e a FK possuem alta confianca;
+- comentarios para relacionamentos ambiguos ou de confianca media/baixa.
+
+### Direcao dos relacionamentos
+
+A inferencia analisa as igualdades dos JOINs e tenta identificar:
+
+- tabela dependente;
+- coluna de chave estrangeira;
+- tabela principal;
+- coluna principal.
+
+A direcao tem maior confianca quando um lado usa ID, CODIGO ou CONTROLE e o outro lado parece uma FK, por exemplo GRUPO_ID.
+
+Quando o formulario atual representa a tabela dependente e o campo de FK existe entre os campos resolvidos, o gerador adiciona:
+
+```csharp
+public GrupoProduto? GrupoProduto { get; set; }
+```
+
+E gera configuracao equivalente a:
+
+```csharp
+builder.HasOne(entity => entity.GrupoProduto)
+    .WithMany()
+    .HasForeignKey(entity => entity.GrupoId)
+    .HasPrincipalKey(entity => entity.Id)
+    .OnDelete(DeleteBehavior.Restrict);
+```
+
+A exclusao usa Restrict por seguranca, evitando cascatas inferidas automaticamente.
 
 ## Registro no DbContext
 
@@ -86,11 +117,15 @@ public DbSet<Entidade> Entidades => Set<Entidade>();
 modelBuilder.ApplyConfiguration(new EntidadeConfiguration());
 ```
 
+Quando uma FK de alta confianca e gerada, o snippet tambem lembra de confirmar o DbSet e a chave da entidade relacionada.
+
 Nesta etapa, o gerador ainda nao edita automaticamente o GestorDbContext para evitar sobrescrever codigo manual.
 
 ## Migrations
 
 O gerador tambem emite Generated/EntidadeMigrationCommands.md com comandos sugeridos para criar migration e atualizar o banco.
+
+O checklist da migration inclui cada FK gerada, facilitando a revisao antes de aplicar alteracoes no banco.
 
 ## Validacao dos artefatos
 
@@ -103,7 +138,7 @@ O comando validate:backend foi criado para rodar antes de copiar artefatos para 
 
 ## Proximas etapas
 
-- Gerar relacionamentos Fluent API reais quando a confianca for alta;
 - Melhorar inferencia de tipos por metadados de dataset;
 - Gerar indices e constraints a partir de SQL e eventos Delphi;
+- Inferir cardinalidade um-para-um e colecoes de navegacao;
 - Expandir validate:backend para compilacao temporaria dos arquivos gerados.
