@@ -16,38 +16,14 @@ export function generateBackendFiles(resolved: ResolvedForm, options: BackendGen
   const outputRoot = options.outputRoot ?? 'apps/backend';
 
   return [
-    {
-      path: `${outputRoot}/Entities/${entityName}.cs`,
-      content: generateEntity(entityName, resolved.fields, namespace)
-    },
-    {
-      path: `${outputRoot}/DTO/${entityName}Dto.cs`,
-      content: generateDto(entityName, resolved.fields, namespace)
-    },
-    {
-      path: `${outputRoot}/Validators/${entityName}Validator.cs`,
-      content: generateValidator(entityName, resolved.fields, namespace)
-    },
-    {
-      path: `${outputRoot}/Services/${entityName}Service.cs`,
-      content: generateService(entityName, resolved.fields, namespace)
-    },
-    {
-      path: `${outputRoot}/Controllers/${entityName}Controller.cs`,
-      content: generateController(entityName, resolved.form.entity, namespace)
-    },
-    {
-      path: `${outputRoot}/Configurations/${entityName}Configuration.cs`,
-      content: generateEntityConfiguration(entityName, resolved, namespace)
-    },
-    {
-      path: `${outputRoot}/Generated/${entityName}DbContextRegistration.cs.txt`,
-      content: generateDbContextRegistration(entityName)
-    },
-    {
-      path: `${outputRoot}/Generated/${entityName}MigrationCommands.md`,
-      content: generateMigrationCommands(entityName)
-    }
+    { path: `${outputRoot}/Entities/${entityName}.cs`, content: generateEntity(entityName, resolved.fields, namespace) },
+    { path: `${outputRoot}/DTO/${entityName}Dto.cs`, content: generateDto(entityName, resolved.fields, namespace) },
+    { path: `${outputRoot}/Validators/${entityName}Validator.cs`, content: generateValidator(entityName, resolved.fields, namespace) },
+    { path: `${outputRoot}/Services/${entityName}Service.cs`, content: generateService(entityName, resolved.fields, namespace) },
+    { path: `${outputRoot}/Controllers/${entityName}Controller.cs`, content: generateController(entityName, resolved.form.entity, namespace) },
+    { path: `${outputRoot}/Configurations/${entityName}Configuration.cs`, content: generateEntityConfiguration(entityName, resolved, namespace) },
+    { path: `${outputRoot}/Generated/${entityName}DbContextRegistration.cs.txt`, content: generateDbContextRegistration(entityName) },
+    { path: `${outputRoot}/Generated/${entityName}MigrationCommands.md`, content: generateMigrationCommands(entityName) }
   ];
 }
 
@@ -76,16 +52,10 @@ ${fields.map((field) => `    public ${mapCSharpType(field)} ${toPascalCase(field
 }
 
 function generateValidator(entityName: string, fields: ResolvedField[], namespace: string): string {
-  const requiredChecks = fields
-    .filter((field) => field.required)
-    .map((field) => {
-      const propertyName = toPascalCase(field.name);
-      const message = field.validationMessages[0] ?? `${field.label ?? propertyName} é obrigatório.`;
-      return `        if (string.IsNullOrWhiteSpace(input.${propertyName}?.ToString())) errors.Add("${escapeCSharpString(message)}");`;
-    })
-    .join('\n');
+  const rules = fields.flatMap(generateFieldValidationRules).join('\n');
 
-  return `using ${namespace}.Common;
+  return `using System.Net.Mail;
+using ${namespace}.Common;
 using ${namespace}.DTO;
 
 namespace ${namespace}.Validators;
@@ -94,12 +64,79 @@ public class ${entityName}Validator : IValidator<${entityName}Dto>
 {
     public IReadOnlyList<string> Validate(${entityName}Dto input)
     {
+        ArgumentNullException.ThrowIfNull(input);
         var errors = new List<string>();
-${requiredChecks || '        // Nenhuma validação obrigatória inferida automaticamente.'}
-        return errors;
+${rules || '        // Nenhuma validação inferida automaticamente.'}
+        return errors.Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+    }
+
+    private static bool IsValidEmail(string value)
+    {
+        try
+        {
+            _ = new MailAddress(value);
+            return true;
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
     }
 }
 `;
+}
+
+function generateFieldValidationRules(field: ResolvedField): string[] {
+  const propertyName = toPascalCase(field.name);
+  const type = mapCSharpType(field);
+  const label = field.label ?? propertyName;
+  const messages = Array.from(new Set(field.validationMessages.map((message) => message.trim()).filter(Boolean)));
+  const requiredMessage = messages.find((message) => /obrigat|inform|preench|necessar/i.test(message)) ?? `${label} é obrigatório.`;
+  const rules: string[] = [];
+
+  if (field.required) {
+    if (type === 'string?') {
+      rules.push(`        if (string.IsNullOrWhiteSpace(input.${propertyName})) errors.Add("${escapeCSharpString(requiredMessage)}");`);
+    } else {
+      rules.push(`        if (input.${propertyName} is null) errors.Add("${escapeCSharpString(requiredMessage)}");`);
+    }
+  }
+
+  if (type === 'string?') {
+    const maxLength = inferMaximumLength(messages);
+    if (maxLength) rules.push(`        if (input.${propertyName}?.Length > ${maxLength}) errors.Add("${escapeCSharpString(`${label} deve ter no máximo ${maxLength} caracteres.`)}");`);
+    if (isEmailField(field, messages)) rules.push(`        if (!string.IsNullOrWhiteSpace(input.${propertyName}) && !IsValidEmail(input.${propertyName})) errors.Add("${escapeCSharpString(`${label} deve conter um e-mail válido.`)}");`);
+  }
+
+  if (type === 'decimal?' || type === 'int?') {
+    if (messages.some((message) => /maior que zero|positivo|superior a zero/i.test(message))) {
+      const message = messages.find((item) => /maior que zero|positivo|superior a zero/i.test(item)) ?? `${label} deve ser maior que zero.`;
+      rules.push(`        if (input.${propertyName} is not null && input.${propertyName} <= 0) errors.Add("${escapeCSharpString(message)}");`);
+    } else if (messages.some((message) => /não pode ser negativo|nao pode ser negativo|maior ou igual a zero/i.test(message))) {
+      const message = messages.find((item) => /não pode ser negativo|nao pode ser negativo|maior ou igual a zero/i.test(item)) ?? `${label} não pode ser negativo.`;
+      rules.push(`        if (input.${propertyName} is not null && input.${propertyName} < 0) errors.Add("${escapeCSharpString(message)}");`);
+    }
+  }
+
+  for (const message of messages) {
+    if (message === requiredMessage) continue;
+    if (/maior que zero|positivo|superior a zero|não pode ser negativo|nao pode ser negativo|maior ou igual a zero|caracter|e-mail|email/i.test(message)) continue;
+    rules.push(`        // Regra Pascal para revisão manual em ${propertyName}: ${escapeCSharpComment(message)}`);
+  }
+
+  return rules;
+}
+
+function inferMaximumLength(messages: string[]): number | undefined {
+  for (const message of messages) {
+    const match = message.match(/(?:máximo|maximo|até|ate)\s+(\d+)\s+caracter/i) ?? message.match(/(\d+)\s+caracter/i);
+    if (match?.[1]) return Number.parseInt(match[1], 10);
+  }
+  return undefined;
+}
+
+function isEmailField(field: ResolvedField, messages: string[]): boolean {
+  return /email|e-mail/i.test(field.name) || messages.some((message) => /email|e-mail/i.test(message));
 }
 
 function generateService(entityName: string, fields: ResolvedField[], namespace: string): string {
@@ -159,9 +196,7 @@ public class ${entityName}Controller : CrudControllerBase<${entityName}, ${entit
 
 function generateEntityConfiguration(entityName: string, resolved: ResolvedForm, namespace: string): string {
   const tableName = resolved.databaseQueries[0]?.tables[0]?.name ?? resolved.form.table ?? entityName;
-  const relationshipNotes = resolved.relationships
-    .map((relationship) => `        // Relacionamento inferido (${relationship.confidence}): ${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn}`)
-    .join('\n');
+  const relationshipNotes = resolved.relationships.map((relationship) => `        // Relacionamento inferido (${relationship.confidence}): ${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn}`).join('\n');
 
   return `using ${namespace}.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -225,29 +260,18 @@ function mapCSharpType(field: ResolvedField): string {
 }
 
 function toPascalCase(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9]+/g, ' ')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('');
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]+/g, ' ').trim().split(/\s+/).filter(Boolean).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('');
 }
 
 function toKebabPlural(value: string): string {
-  const kebab = value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/([a-z])([A-Z])/g, '$1-$2')
-    .replace(/[^a-zA-Z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .toLowerCase();
-
+  const kebab = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
   return kebab.endsWith('s') ? kebab : `${kebab}s`;
 }
 
 function escapeCSharpString(value: string): string {
-  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r?\n/g, ' ');
+}
+
+function escapeCSharpComment(value: string): string {
+  return value.replace(/\r?\n/g, ' ').replace(/\*\//g, '* /').trim();
 }
