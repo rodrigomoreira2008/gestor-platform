@@ -55,7 +55,18 @@ A primeira heuristica usa o nome do campo:
 
 ## Validacoes
 
-Campos marcados como obrigatorios no ResolvedForm geram checks no validator. As mensagens sao aproveitadas dos hints de validacao extraidos do PAS quando disponiveis.
+O validator gerado agora aplica regras de acordo com o tipo inferido:
+
+- strings obrigatorias usam `IsNullOrWhiteSpace`;
+- numeros e datas obrigatorios verificam valor nulo;
+- mensagens Pascal duplicadas sao removidas;
+- hints com limite de caracteres geram verificacao de tamanho maximo;
+- campos de e-mail geram validacao com `MailAddress`;
+- mensagens como maior que zero, positivo ou nao pode ser negativo geram regras numericas;
+- regras Pascal nao convertidas com seguranca permanecem como comentarios para revisao manual;
+- o resultado final remove erros duplicados sem diferenciar maiusculas e minusculas.
+
+O validator tambem rejeita entrada nula com `ArgumentNullException.ThrowIfNull`, evitando falhas silenciosas durante o processamento.
 
 ## EF Core Configuration
 
