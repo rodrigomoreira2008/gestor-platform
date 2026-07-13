@@ -23,7 +23,7 @@ export function renderDetailGridComponent(entityPascal: string, entity: string, 
   const columns = detailGrid.fieldNames.map((fieldName) => `  { field: ${quote(toCamelCase(fieldName))}, headerName: ${quote(humanize(fieldName))}, flex: 1, minWidth: 140 }`).join(',\n');
   const componentName = `${entityPascal}${toPascalCase(detailGrid.name)}DetailGrid`;
 
-  return `import { Alert, Box, Stack, Typography } from '@mui/material';
+  return `import { Alert, Box, Chip, Stack, Typography } from '@mui/material';
 import { DataGrid, GridToolbar, type GridColDef, type GridRowId } from '@mui/x-data-grid';
 import { useMemo } from 'react';
 
@@ -38,39 +38,53 @@ const columns: GridColDef[] = [
 ${columns || "  { field: 'id', headerName: 'ID', width: 100 }"}
 ];
 
-function resolveRowId(row: Record<string, unknown>): GridRowId {
+function resolveNaturalRowId(row: Record<string, unknown>): GridRowId | undefined {
   const candidates = ['id', 'ID', 'Id', 'codigo', 'CODIGO', 'controle', 'CONTROLE'];
   for (const candidate of candidates) {
     const value = row[candidate];
     if (typeof value === 'string' || typeof value === 'number') return value;
   }
-  return JSON.stringify(row);
+  return undefined;
+}
+
+function describeError(error: unknown): string {
+  if (error instanceof Error && error.message.trim()) return error.message;
+  return 'Nao foi possivel carregar os detalhes.';
 }
 
 export function ${componentName}({ rows = [], isLoading, error, height = 380 }: ${componentName}Props) {
-  const normalizedRows = useMemo(() => rows.filter(Boolean), [rows]);
+  const normalizedRows = useMemo(
+    () => rows.filter(Boolean).map((row, index) => ({ ...row, __generatedRowId: resolveNaturalRowId(row) ?? \`${'${index}'}:${'${JSON.stringify(row)}'}\` })),
+    [rows]
+  );
 
   return (
     <Stack spacing={1}>
-      <Box>
-        <Typography variant="subtitle1">${escapeDoubleQuote(detailGrid.label)}</Typography>
-        <Typography variant="caption" color="text.secondary">
-          ${escapeDoubleQuote(detailGrid.evidence)}
-        </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2 }}>
+        <Box>
+          <Typography variant="subtitle1">${escapeDoubleQuote(detailGrid.label)}</Typography>
+          <Typography variant="caption" color="text.secondary">
+            ${escapeDoubleQuote(detailGrid.evidence)}
+          </Typography>
+        </Box>
+        <Chip size="small" label={\`${'${normalizedRows.length}'} registro(s)\`} />
       </Box>
-      {error && <Alert severity="warning">Nao foi possivel carregar os detalhes.</Alert>}
+      {error && <Alert severity="warning">{describeError(error)}</Alert>}
       <Box sx={{ height, minHeight: 280, width: '100%' }}>
         <DataGrid
           rows={normalizedRows}
           columns={columns}
           loading={isLoading}
-          getRowId={resolveRowId}
+          getRowId={(row) => row.__generatedRowId as GridRowId}
           disableRowSelectionOnClick
           density="compact"
           pageSizeOptions={[5, 10, 25, 50]}
           initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
           slots={{ toolbar: GridToolbar }}
-          slotProps={{ toolbar: { showQuickFilter: true } }}
+          slotProps={{
+            toolbar: { showQuickFilter: true },
+            noRowsOverlay: { children: 'Nenhum detalhe encontrado.' }
+          }}
           sx={{ '& .MuiDataGrid-cell': { alignItems: 'center' } }}
         />
       </Box>
