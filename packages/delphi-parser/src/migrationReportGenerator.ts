@@ -14,7 +14,12 @@ export interface MigrationReport {
 export function generateMigrationReport(resolved: ResolvedForm): MigrationReport {
   const inferredTables = unique(resolved.databaseQueries.flatMap((query) => query.tables.map((table) => table.alias ? `${table.name} (${table.alias})` : table.name)));
   const inferredJoins = resolved.databaseQueries.flatMap((query) => query.joins.map((join) => `${query.methodName}: ${join.type} join ${join.table.name}${join.condition ? ` on ${join.condition}` : ''}`));
-  const inferredRelationships = resolved.relationships.map((relationship) => `${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn}; confianca: ${relationship.confidence}; evidencia: ${relationship.evidence}`);
+  const inferredRelationships = resolved.relationships.map((relationship) => {
+    const direction = relationship.dependentTable && relationship.principalTable
+      ? `dependente ${relationship.dependentTable}.${relationship.dependentColumn} -> principal ${relationship.principalTable}.${relationship.principalColumn}`
+      : `${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn}`;
+    return `${direction}; cardinalidade: ${relationship.cardinality}; opcionalidade: ${relationship.optionality}; join: ${relationship.joinType}; autorreferencia: ${relationship.selfReference ? 'sim' : 'nao'}; confianca: ${relationship.confidence}; evidencia: ${relationship.evidence}`;
+  });
   const inferredLookups = resolved.lookups.map((lookup) => `${lookup.fieldName}; source: ${lookup.lookupSource ?? 'nao inferido'}; key: ${lookup.keyField ?? 'id'}; label: ${lookup.displayField ?? 'descricao'}; confianca: ${lookup.confidence}; evidencia: ${lookup.evidence}`);
   const inferredTabs = resolved.tabs.map((tab) => `${tab.label}; campos: ${tab.fieldNames.join(', ')}; confianca: ${tab.confidence}; evidencia: ${tab.evidence}`);
   const inferredDetailGrids = resolved.detailGrids.map((grid) => `${grid.name}; DataSource: ${grid.dataSource ?? 'nao inferido'}; campos: ${grid.fieldNames.join(', ')}; relacionamento: ${grid.relationship ?? 'nao inferido'}; confianca: ${grid.confidence}; evidencia: ${grid.evidence}`);
@@ -39,6 +44,9 @@ export function generateMigrationReport(resolved: ResolvedForm): MigrationReport
     ...resolved.queries.map((query) => `Revisar SQL em ${query.methodName}: ${query.text}`),
     ...resolved.databaseQueries.filter((query) => query.tables.length === 0).map((query) => `Consulta sem tabela inferida: ${query.methodName}`),
     ...resolved.relationships.filter((relationship) => relationship.confidence !== 'high').map((relationship) => `Confirmar relacionamento ${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn} (${relationship.confidence})`),
+    ...resolved.relationships.filter((relationship) => relationship.optionality === 'unknown').map((relationship) => `Confirmar opcionalidade do relacionamento ${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn}`),
+    ...resolved.relationships.filter((relationship) => relationship.cardinality === 'unknown').map((relationship) => `Confirmar cardinalidade do relacionamento ${relationship.sourceTable}.${relationship.sourceColumn} -> ${relationship.targetTable}.${relationship.targetColumn}`),
+    ...resolved.relationships.filter((relationship) => relationship.selfReference).map((relationship) => `Revisar autorrelacionamento em ${relationship.sourceTable}: ${relationship.sourceColumn} -> ${relationship.targetColumn}`),
     ...resolved.lookups.filter((lookup) => lookup.confidence !== 'high').map((lookup) => `Confirmar lookup ${lookup.fieldName} (${lookup.confidence})`),
     ...resolved.tabs.filter((tab) => tab.confidence !== 'high').map((tab) => `Confirmar aba/secao ${tab.label} (${tab.confidence})`),
     ...resolved.detailGrids.filter((grid) => grid.confidence !== 'high').map((grid) => `Confirmar grid detalhe ${grid.name} (${grid.confidence})`),
