@@ -12,6 +12,7 @@ export * from './frontendFilterGenerator';
 export * from './frontendGenerator';
 export * from './frontendLookupComponentGenerator';
 export * from './frontendLookupGenerator';
+export * from './frontendSchemaGenerator';
 export * from './frontendTabGenerator';
 export * from './frontendTabbedFormGenerator';
 export * from './gestorPasEnrichment';
