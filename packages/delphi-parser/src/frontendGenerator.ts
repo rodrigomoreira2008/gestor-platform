@@ -6,6 +6,7 @@ import { renderFrontendFilterComponent } from './frontendFilterComponentGenerato
 import { renderFrontendFilterDefinitions } from './frontendFilterGenerator';
 import { renderLookupAutocompleteComponent } from './frontendLookupComponentGenerator';
 import { renderFrontendLookupDefinitions, renderFrontendLookupHooks } from './frontendLookupGenerator';
+import { renderFrontendZodSchema } from './frontendSchemaGenerator';
 import { renderFrontendTabDefinitions } from './frontendTabGenerator';
 import { renderTabbedFormScaffold } from './frontendTabbedFormGenerator';
 import type { ResolvedField, ResolvedForm } from './resolvedForm';
@@ -27,7 +28,7 @@ export function generateFrontendFiles(resolved: ResolvedForm, options: FrontendG
     { path: `${outputRoot}/types/${entity}.ts`, content: generateTypes(entityPascal, resolved.fields) },
     { path: `${outputRoot}/api/index.ts`, content: generateApi(entityPascal, entity, plural) },
     { path: `${outputRoot}/hooks/index.ts`, content: generateHooks(entityPascal, entity, plural) },
-    { path: `${outputRoot}/schema/${entity}Schema.ts`, content: generateSchema(entityPascal, entity, resolved.fields) },
+    { path: `${outputRoot}/schema/${entity}Schema.ts`, content: renderFrontendZodSchema(entityPascal, entity, resolved.fields) },
     { path: `${outputRoot}/filters/${entity}Filters.ts`, content: renderFrontendFilterDefinitions(resolved.fields, `${entity}Filters`) },
     { path: `${outputRoot}/components/${entityPascal}Filters.tsx`, content: renderFrontendFilterComponent(entityPascal, entity, resolved.fields) },
     { path: `${outputRoot}/lookups/${entity}Lookups.ts`, content: renderFrontendLookupDefinitions(resolved.lookups, `${entity}Lookups`) },
@@ -56,10 +57,6 @@ function generateApi(entityPascal: string, entity: string, plural: string): stri
 
 function generateHooks(entityPascal: string, entity: string, plural: string): string {
   return `import { useCrudResource } from '../../../shared/crud/useCrudResource';\nimport { ${entity}ResourceApi } from '../api';\nimport type { ${entityPascal}, ${entityPascal}Input } from '../types/${entity}';\n\nfunction use${entityPascal}Resource() { return useCrudResource<${entityPascal}, ${entityPascal}Input>('${plural}', ${entity}ResourceApi); }\n\nexport function use${entityPascal}s() { return use${entityPascal}Resource().list; }\nexport function useCreate${entityPascal}() { return use${entityPascal}Resource().create; }\nexport function useUpdate${entityPascal}() { return use${entityPascal}Resource().update; }\nexport function useRemove${entityPascal}() { return use${entityPascal}Resource().remove; }\n`;
-}
-
-function generateSchema(entityPascal: string, entity: string, fields: ResolvedField[]): string {
-  return `import { z } from 'zod';\n\nexport const ${entity}Schema = z.object({\n${fields.map((field) => `  ${toCamelCase(field.name)}: ${zodExpression(field)}`).join(',\n')}\n});\n\nexport type ${entityPascal}FormData = z.infer<typeof ${entity}Schema>;\n`;
 }
 
 function generateForm(entityPascal: string, entity: string, fields: ResolvedField[]): string {
@@ -93,7 +90,6 @@ function generateInput(field: ResolvedField): string {
   return `      <TextField label="${label}" type="${mapping.role === 'date' ? 'date' : type}" value={form.${name} ?? ''} required={${field.required ? 'true' : 'false'}} InputLabelProps={${mapping.role === 'date' ? '{ shrink: true }' : 'undefined'}} helperText="Origem Delphi: ${escapeTsx(field.source?.componentClass ?? 'desconhecida')} -> ${mapping.frontendComponent}" onChange={(event) => setForm((current) => ({ ...current, ${name}: ${type === 'number' ? "event.target.value === '' ? undefined : Number(event.target.value)" : 'event.target.value'} }))} />`;
 }
 
-function zodExpression(field: ResolvedField): string { const base = mapTsType(field) === 'number' ? 'z.number()' : mapTsType(field) === 'boolean' ? 'z.boolean()' : 'z.string()'; if (!field.required) return `${base}.optional()`; if (mapTsType(field) !== 'string') return base; const message = field.validationMessages[0] ?? `${field.label ?? field.name} é obrigatório.`; return `${base}.min(1, '${escapeSingleQuote(message)}')`; }
 function defaultValue(field: ResolvedField): string { const mapping = mapDelphiComponent(field.source?.componentClass); if (mapping.role === 'checkbox') return 'false as never'; return mapTsType(field) === 'number' ? 'undefined' : "''"; }
 function mapTsType(field: ResolvedField): string { const normalized = field.name.toLowerCase(); const mapping = mapDelphiComponent(field.source?.componentClass); if (mapping.role === 'checkbox') return 'boolean'; if (normalized.includes('valor') || normalized.includes('preco') || normalized.includes('total') || normalized.includes('quantidade') || normalized.includes('qtd') || normalized === 'id' || normalized.endsWith('id') || normalized.includes('codigo')) return 'number'; return 'string'; }
 function toPascalCase(value: string): string { return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]+/g, ' ').trim().split(/\s+/).filter(Boolean).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(''); }
