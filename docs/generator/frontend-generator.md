@@ -76,11 +76,31 @@ O gerador emite filters/<entidade>Filters.ts com filtros tipados por campo. A pa
 
 Quando o parser detecta combos ou componentes de lookup, o gerador emite:
 
-- lookups/<entidade>Lookups.ts com endpoint, valueField, labelField, confianca e evidencia;
+- lookups/<entidade>Lookups.ts com endpoint, lookupSource, valueField, labelField, confianca e evidencia;
 - lookups/<entidade>LookupHooks.ts com hooks React Query para carregar opcoes remotas;
 - components/<Entidade>LookupField.tsx com um campo reutilizavel baseado em Material UI Autocomplete.
 
-A inferencia de lookup tenta preencher valueField e labelField por relacionamentos, campos do mesmo DataSource e nomes comuns, como ID, CODIGO, CONTROLE, NOME e DESCRICAO.
+A inferencia agora preserva diretamente as propriedades Delphi `ListSource`, `KeyField` e `ListField`. Quando as tres propriedades estao presentes, o lookup recebe confianca alta. Na ausencia delas, o parser usa relacionamentos, datasets e nomes comuns como fallback.
+
+Os endpoints sao sugeridos a partir da tabela, do ListSource ou do nome do campo, removendo prefixos comuns como `Ds`, `Qry`, `Query`, `Cds`, `Fdq` e `Ado`.
+
+Os hooks gerados:
+
+- aceitam respostas em array direto ou envelopes `items`, `data`, `results` e `rows`;
+- cancelam a requisicao por AbortSignal;
+- aplicam cache de cinco minutos;
+- ordenam as opcoes pelo label em portugues;
+- ignoram registros sem chave;
+- incluem endpoint, valueField e labelField na query key.
+
+O Autocomplete gerado:
+
+- trata ids numericos e strings equivalentes;
+- possui textos de carregamento, vazio, abrir, fechar e limpar;
+- exibe progresso durante carregamento e refetch;
+- mostra erro de consulta;
+- permite desabilitar o carregamento;
+- exibe a evidencia quando a inferencia nao possui confianca alta.
 
 Lookups com confianca media ou baixa tambem aparecem no relatorio de migracao para revisao manual.
 
@@ -102,9 +122,10 @@ A inferencia de abas agora tambem:
 
 O ResolvedForm tambem recebe detailGrids inferidos a partir de componentes Grid Delphi. Cada grid detalhe tenta preservar:
 
-- nome do grid;
+- nome e titulo amigavel do grid;
 - DataSource associado;
-- campos vinculados;
+- campos vinculados sem duplicacoes;
+- campo mestre e campo detalhe do relacionamento;
 - relacionamento mestre/detalhe quando inferido;
 - nivel de confianca e evidencia.
 
@@ -113,6 +134,8 @@ O gerador frontend emite:
 - details/<entidade>DetailGrids.ts com metadados dos grids detalhe;
 - details/<entidade>DetailHooks.ts com hooks React Query para carregar detalhes por masterId;
 - details/<Entidade><Grid>DetailGrid.tsx com componente Material UI DataGrid para cada grid inferido.
+
+Os DataGrids detalhe gerados incluem pesquisa rapida, paginacao, densidade compacta, estado de erro, titulo, evidencia e identificacao automatica da linha por id, codigo ou controle.
 
 A pagina CRUD gerada conecta os detalhes de forma incremental: ao selecionar uma linha mestre, os hooks de detalhe recebem o id selecionado e a secao Detalhes renderiza os DataGrids inferidos.
 
