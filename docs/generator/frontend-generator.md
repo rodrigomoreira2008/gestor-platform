@@ -90,6 +90,14 @@ Quando o parser detecta sectionPath, PageControl ou agrupamentos equivalentes, o
 
 - tabs/<entidade>Tabs.ts com nome da aba, label, campos associados, confianca e evidencia.
 
+A inferencia de abas agora tambem:
+
+- preserva campos sem secao explicita em uma aba Dados gerais;
+- elimina campos duplicados dentro da mesma aba;
+- gera nomes unicos quando captions diferentes resultam no mesmo identificador;
+- mantem a ordem em que as secoes aparecem no formulario Delphi;
+- cria uma aba Dados quando nenhum agrupamento e encontrado.
+
 ## Grids detalhe
 
 O ResolvedForm tambem recebe detailGrids inferidos a partir de componentes Grid Delphi. Cada grid detalhe tenta preservar:
@@ -125,6 +133,15 @@ O TabbedForm tambem aplica componentes conforme o tipo inferido:
 - Date para campos/data pickers;
 - Number para campos numericos;
 - TextField para os demais campos.
+
+O formulario gerado agora possui:
+
+- paineis responsivos em uma coluna no mobile e duas no desktop;
+- associacao acessivel entre Tab e tabpanel por id e aria-controls;
+- reset do estado e retorno para a primeira aba quando initialValue muda;
+- preservacao automatica de campos que nao pertencem a uma aba valida;
+- tratamento de campo numerico vazio sem converter para zero;
+- indicador de envio no botao Salvar.
 
 Quando nenhuma aba e inferida, o gerador cria uma aba fallback chamada Dados com todos os campos resolvidos.
 
