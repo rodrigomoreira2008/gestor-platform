@@ -17,10 +17,33 @@ const missingFragments = requiredFragments.filter((fragment) => !files.some((fil
 const emptyFiles = files.filter((file) => file.content.trim().length === 0);
 const duplicatePaths = files.map((file) => file.path).filter((path, index, paths) => paths.indexOf(path) !== index);
 const missingFields = resolved.fields.length === 0;
+const schemaFile = files.find((file) => file.path.includes('/schema/') && file.path.endsWith('Schema.ts'));
+const schemaChecks = {
+  exists: Boolean(schemaFile),
+  exportsSchema: Boolean(schemaFile?.content.includes('Schema = z.object({')),
+  exportsFormData: Boolean(schemaFile?.content.includes('FormData = z.infer<typeof')),
+  preprocessesEmptyValues: Boolean(schemaFile?.content.includes('emptyStringToUndefined')),
+  excludesIdentityField: !Boolean(schemaFile?.content.match(/^\s+id:\s+/m))
+};
+const failedSchemaChecks = Object.entries(schemaChecks).filter(([, ok]) => !ok).map(([name]) => name);
 
-if (missingFragments.length > 0 || emptyFiles.length > 0 || duplicatePaths.length > 0 || missingFields) {
-  console.error(JSON.stringify({ missingFragments, emptyFiles: emptyFiles.map((file) => file.path), duplicatePaths, missingFields }, null, 2));
+if (missingFragments.length > 0 || emptyFiles.length > 0 || duplicatePaths.length > 0 || missingFields || failedSchemaChecks.length > 0) {
+  console.error(JSON.stringify({
+    missingFragments,
+    emptyFiles: emptyFiles.map((file) => file.path),
+    duplicatePaths,
+    missingFields,
+    failedSchemaChecks
+  }, null, 2));
   process.exit(1);
 }
 
-console.log(JSON.stringify({ entity, generatedFiles: files.length, fields: resolved.fields.length, detailGrids: resolved.detailGrids.length, lookups: resolved.lookups.length, tabs: resolved.tabs.length }, null, 2));
+console.log(JSON.stringify({
+  entity,
+  generatedFiles: files.length,
+  fields: resolved.fields.length,
+  detailGrids: resolved.detailGrids.length,
+  lookups: resolved.lookups.length,
+  tabs: resolved.tabs.length,
+  schemaChecks
+}, null, 2));
