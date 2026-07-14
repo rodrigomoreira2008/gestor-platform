@@ -75,6 +75,9 @@ jobs:
       - name: Validate generated TypeScript syntax
         run: pnpm --filter @gestor/delphi-parser validate:fixture-syntax
 
+      - name: Validate generated import graph
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-imports
+
       - name: Validate semantic fixture behavior
         run: pnpm --filter @gestor/delphi-parser validate:fixture-semantic
 
