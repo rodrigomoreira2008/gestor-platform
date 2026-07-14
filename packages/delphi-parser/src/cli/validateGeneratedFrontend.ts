@@ -39,6 +39,11 @@ const formChecks = {
   focusesFirstInvalidField: Boolean(tabbedFormFile?.content.includes('pendingFocusField') && tabbedFormFile?.content.includes('scrollIntoView')),
   exposesInvalidState: Boolean(tabbedFormFile?.content.includes("'aria-invalid': Boolean(errors.")),
   marksBusySubmit: Boolean(tabbedFormFile?.content.includes('aria-busy={isSubmitting}')),
+  tracksDirtyState: Boolean(tabbedFormFile?.content.includes('const isDirty = useMemo') && tabbedFormFile?.content.includes('onDirtyChange?.(isDirty)')),
+  protectsBrowserExit: Boolean(tabbedFormFile?.content.includes("window.addEventListener('beforeunload'")),
+  offersRestoreAction: Boolean(tabbedFormFile?.content.includes('onClick={resetForm}>Restaurar</Button>')),
+  communicatesPendingChanges: Boolean(tabbedFormFile?.content.includes('Existem alterações não salvas.')),
+  resetsBaselineAfterSubmit: Boolean(tabbedFormFile?.content.includes('baselineRef.current = serializeForm(normalized)')),
   excludesIdentityInput: !Boolean(tabbedFormFile?.content.match(/\bid\s*:\s*initialValue\?\.id/))
 };
 const lookupChecks = {
