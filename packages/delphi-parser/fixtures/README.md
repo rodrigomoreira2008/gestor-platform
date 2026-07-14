@@ -33,6 +33,16 @@ pnpm --filter @gestor/delphi-parser validate:fixture:grupo-parceiros
 pnpm --filter @gestor/delphi-parser validate:fixture:pedidos
 ```
 
+## Seguranca e integridade dos caminhos
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:fixture-paths
+pnpm --filter @gestor/delphi-parser validate:paths arquivo.dfm arquivo.pas Entidade TABELA
+pnpm --filter @gestor/delphi-parser validate:paths arquivo.dfm arquivo.pas Entidade TABELA -- --json
+```
+
+A auditoria de caminhos e executada antes de qualquer compilacao. Ela impede caminhos absolutos, `..`, barras invertidas, caracteres NUL, extensoes inesperadas, arquivos fora das raizes `apps/backend` e `apps/frontend`, caminhos nao normalizados e colisoes que apareceriam apenas em sistemas de arquivos sem diferenciacao entre maiusculas e minusculas.
+
 ## Sintaxe, imports e compilacao frontend
 
 ```bash
@@ -97,4 +107,4 @@ A etapa confirma campos, abas, lookup, validacoes, relacionamento mestre/detalhe
 
 ## Objetivo dos fixtures
 
-Os fixtures garantem regressao minima em parsing DFM/PAS, inferencias, geracao backend/frontend, sintaxe, imports, compilacao TypeScript, determinismo, contratos, persistencia, compilacao C#, rotas, semantica e cobertura funcional.
+Os fixtures garantem regressao minima em parsing DFM/PAS, inferencias, geracao backend/frontend, seguranca dos caminhos, sintaxe, imports, compilacao TypeScript, determinismo, contratos, persistencia, compilacao C#, rotas, semantica e cobertura funcional.
