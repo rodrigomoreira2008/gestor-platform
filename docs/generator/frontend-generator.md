@@ -180,6 +180,12 @@ O formulario gerado agora possui:
 - reset do estado e retorno para a primeira aba quando initialValue muda;
 - preservacao automatica de campos que nao pertencem a uma aba valida;
 - tratamento de campo numerico vazio sem converter para zero;
+- validacao Zod antes do envio;
+- contagem de erros por aba com badges visuais;
+- navegacao automatica para a aba do primeiro campo invalido;
+- foco e rolagem ate o primeiro campo invalido;
+- atributos `aria-invalid`, `aria-describedby`, `role=alert` e `aria-busy`;
+- mensagem geral informando a quantidade de campos invalidos;
 - indicador de envio no botao Salvar.
 
 Quando nenhuma aba e inferida, o gerador cria uma aba fallback chamada Dados com todos os campos resolvidos.
