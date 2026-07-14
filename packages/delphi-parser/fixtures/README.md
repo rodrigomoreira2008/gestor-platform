@@ -44,6 +44,19 @@ pnpm --filter @gestor/delphi-parser validate:fixture:grupo-parceiros
 pnpm --filter @gestor/delphi-parser validate:fixture:pedidos
 ```
 
+## Validacao semantica de pedidos
+
+A validacao estrutural confirma que os arquivos foram gerados. A validacao semantica confirma que o conteudo esperado realmente foi inferido e materializado:
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:fixture:pedidos-semantic
+pnpm --filter @gestor/delphi-parser validate:fixture:pedidos-semantic -- --json
+```
+
+Ela verifica campos, abas, lookup de cliente, metadados `KeyField`/`ListField`, grid de itens, relacionamento `PEDIDOS -> ITENSPEDIDO`, direcao da chave estrangeira, obrigatoriedade, regra de valor positivo, schema Zod, formulario validado, hook de lookup, DataGrid detalhe e configuracao EF Core.
+
+O comando `validate:fixture-artifacts` executa automaticamente essa validacao depois da geracao estrutural dos cinco fixtures.
+
 O fixture de pedidos concentra, em um unico caso, as principais inferencias que precisam permanecer integradas: abas, lookup remoto, tipos de campo, mensagens de validacao, relacionamento SQL e grid mestre/detalhe.
 
 ## Objetivo dos fixtures
@@ -60,4 +73,5 @@ Os fixtures foram criados para garantir regressao minima em:
 - inferencia de grids detalhe;
 - geracao backend;
 - geracao frontend;
-- validacao combinada de artefatos.
+- validacao combinada de artefatos;
+- preservacao semantica do cenario integrado de pedidos.
