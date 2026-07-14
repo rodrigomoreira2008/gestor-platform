@@ -81,6 +81,9 @@ jobs:
       - name: Validate deterministic generation
         run: pnpm --filter @gestor/delphi-parser validate:fixture-determinism
 
+      - name: Validate backend frontend contracts
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-contracts
+
       - name: Validate semantic fixture behavior
         run: pnpm --filter @gestor/delphi-parser validate:fixture-semantic
 
