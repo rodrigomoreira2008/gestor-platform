@@ -92,6 +92,21 @@ pnpm --filter @gestor/delphi-parser validate:contracts arquivo.dfm arquivo.pas E
 
 A validacao compara o DTO C# com a interface TypeScript gerada. Ela normaliza nomes PascalCase/camelCase, confirma a identidade numerica e verifica a compatibilidade das categorias `string`, `number`, `boolean` e `date`. O comando falha quando um campo existe apenas em uma camada ou quando os tipos gerados divergem.
 
+## Rotas backend e frontend
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:fixture-routes
+```
+
+Para validar um unico formulario:
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:routes arquivo.dfm arquivo.pas Entidade TABELA
+pnpm --filter @gestor/delphi-parser validate:routes arquivo.dfm arquivo.pas Entidade TABELA -- --json
+```
+
+A validacao compara o atributo `[Route]` do controller C# com o endpoint usado por `createCrudApi` no frontend. Ela tambem verifica se o snippet de rota da pagina corresponde ao item de menu, se o endpoint usa o prefixo `/api/`, se nao possui barras duplicadas e se a rota visual nao aponta acidentalmente para a API.
+
 ## Validacao semantica
 
 ```bash
@@ -124,5 +139,6 @@ Os fixtures foram criados para garantir regressao minima em:
 - determinismo dos modelos e artefatos gerados;
 - ausencia de mutacao do `ResolvedForm` pelos geradores;
 - compatibilidade entre DTO C# e tipos TypeScript;
+- consistencia entre endpoints CRUD, rotas de pagina e itens de menu;
 - validacao combinada de artefatos;
 - validacao semantica do cenario integrado de pedidos.
