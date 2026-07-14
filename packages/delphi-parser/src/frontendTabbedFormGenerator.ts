@@ -23,7 +23,9 @@ import type { ${input.entityPascal}Input } from '../types/${input.entity}';
 interface ${input.entityPascal}TabbedFormProps {
   initialValue?: Partial<${input.entityPascal}Input>;
   onSubmit: (input: ${input.entityPascal}Input) => void;
+  onDirtyChange?: (dirty: boolean) => void;
   isSubmitting?: boolean;
+  warnOnUnsavedChanges?: boolean;
 }
 
 type FormErrors = Partial<Record<keyof ${input.entityPascal}Input, string>>;
@@ -34,15 +36,22 @@ ${fields.map((field) => `    ${toCamelCase(field.name)}: initialValue?.${toCamel
   };
 }
 
-export function ${input.entityPascal}TabbedForm({ initialValue, onSubmit, isSubmitting }: ${input.entityPascal}TabbedFormProps) {
+function serializeForm(value: ${input.entityPascal}Input): string {
+  return JSON.stringify(value);
+}
+
+export function ${input.entityPascal}TabbedForm({ initialValue, onSubmit, onDirtyChange, isSubmitting, warnOnUnsavedChanges = true }: ${input.entityPascal}TabbedFormProps) {
   const [tab, setTab] = useState(0);
   const [form, setForm] = useState<${input.entityPascal}Input>(() => createInitialForm(initialValue));
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const pendingFocusField = useRef<string | null>(null);
+  const baselineRef = useRef(serializeForm(createInitialForm(initialValue)));
 
   useEffect(() => {
-    setForm(createInitialForm(initialValue));
+    const nextForm = createInitialForm(initialValue);
+    baselineRef.current = serializeForm(nextForm);
+    setForm(nextForm);
     setErrors({});
     setSubmitError(null);
     pendingFocusField.current = null;
@@ -51,6 +60,21 @@ export function ${input.entityPascal}TabbedForm({ initialValue, onSubmit, isSubm
 
   const panels = useMemo(() => ${JSON.stringify(tabs.map((tab) => ({ name: tab.name, label: tab.label, fieldNames: tab.fieldNames, confidence: tab.confidence, evidence: tab.evidence })), null, 2)}, []);
   const tabErrorCounts = useMemo(() => panels.map((panel) => panel.fieldNames.reduce((count, fieldName) => count + (errors[fieldName as keyof ${input.entityPascal}Input] ? 1 : 0), 0)), [errors, panels]);
+  const isDirty = useMemo(() => serializeForm(form) !== baselineRef.current, [form]);
+
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
+
+  useEffect(() => {
+    if (!warnOnUnsavedChanges || !isDirty) return;
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty, warnOnUnsavedChanges]);
 
   useEffect(() => {
     const fieldName = pendingFocusField.current;
@@ -69,13 +93,26 @@ export function ${input.entityPascal}TabbedForm({ initialValue, onSubmit, isSubm
     setSubmitError(null);
   }
 
+  function resetForm() {
+    const nextForm = createInitialForm(initialValue);
+    baselineRef.current = serializeForm(nextForm);
+    setForm(nextForm);
+    setErrors({});
+    setSubmitError(null);
+    pendingFocusField.current = null;
+    setTab(0);
+  }
+
   function handleSubmit() {
     const result = ${input.entity}Schema.safeParse(form);
     if (result.success) {
+      const normalized = result.data as ${input.entityPascal}Input;
+      baselineRef.current = serializeForm(normalized);
+      setForm(normalized);
       setErrors({});
       setSubmitError(null);
       pendingFocusField.current = null;
-      onSubmit(result.data as ${input.entityPascal}Input);
+      onSubmit(normalized);
       return;
     }
 
@@ -113,8 +150,14 @@ ${tabs.map((tab, index) => `        <Tab id="${input.entity}-tab-${index}" aria-
       </Tabs>
       {submitError && <Alert id="${input.entity}-form-error" severity="warning" role="alert">{submitError}</Alert>}
 ${tabPanels}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1 }}>
-        <Button type="submit" variant="contained" disabled={isSubmitting} aria-busy={isSubmitting}>{isSubmitting ? 'Salvando...' : 'Salvar'}</Button>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, pt: 1 }}>
+        <Typography variant="caption" color={isDirty ? 'warning.main' : 'text.secondary'} aria-live="polite">
+          {isDirty ? 'Existem alterações não salvas.' : 'Nenhuma alteração pendente.'}
+        </Typography>
+        <Stack direction="row" spacing={1}>
+          <Button type="button" variant="text" disabled={!isDirty || isSubmitting} onClick={resetForm}>Restaurar</Button>
+          <Button type="submit" variant="contained" disabled={isSubmitting} aria-busy={isSubmitting}>{isSubmitting ? 'Salvando...' : 'Salvar'}</Button>
+        </Stack>
       </Box>
     </Stack>
   );
