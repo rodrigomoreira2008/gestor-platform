@@ -45,7 +45,8 @@
     "validate:fixture-syntax": "pnpm validate:syntax fixtures/cadastro-produtos.dfm fixtures/cadastro-produtos.pas Produto PRODUTOS && pnpm validate:syntax fixtures/cadastro-parceiros.dfm fixtures/cadastro-parceiros.pas Parceiro PARCEIROS && pnpm validate:syntax fixtures/cadastro-grupo-produtos.dfm fixtures/cadastro-grupo-produtos.pas GrupoProduto GRUPOPRODUTOS && pnpm validate:syntax fixtures/cadastro-grupo-parceiros.dfm fixtures/cadastro-grupo-parceiros.pas GrupoParceiro GRUPOPARCEIROS && pnpm validate:syntax fixtures/cadastro-pedidos.dfm fixtures/cadastro-pedidos.pas Pedido PEDIDOS",
     "validate:fixture-artifacts": "pnpm validate:fixture:produtos && pnpm validate:fixture:parceiros && pnpm validate:fixture:grupo-produtos && pnpm validate:fixture:grupo-parceiros && pnpm validate:fixture:pedidos",
     "validate:fixture-semantic": "pnpm validate:fixture:pedidos-semantic",
-    "validate:all": "pnpm doctor && pnpm validate:package && pnpm build && pnpm validate:docs && pnpm validate:scripts && pnpm validate:workflow && pnpm validate:fixtures && pnpm validate:components && pnpm validate:fixture-components && pnpm validate:fixture-artifacts && pnpm validate:fixture-syntax && pnpm validate:fixture-semantic"
+    "validate:fixture-coverage": "tsx src/cli/validateFixtureCoverage.ts",
+    "validate:all": "pnpm doctor && pnpm validate:package && pnpm build && pnpm validate:docs && pnpm validate:scripts && pnpm validate:workflow && pnpm validate:fixtures && pnpm validate:components && pnpm validate:fixture-components && pnpm validate:fixture-artifacts && pnpm validate:fixture-syntax && pnpm validate:fixture-semantic && pnpm validate:fixture-coverage"
   },
   "dependencies": {
     "@gestor/dsl": "workspace:*"
