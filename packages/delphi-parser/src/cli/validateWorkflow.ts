@@ -12,11 +12,7 @@ const repositoryRoot = resolve(packageRoot, '../..');
 const workflowPath = resolve(repositoryRoot, '.github/workflows/delphi-fixtures.yml');
 const checks: WorkflowCheck[] = [];
 
-checks.push({
-  name: 'workflow existe',
-  ok: existsSync(workflowPath),
-  detail: workflowPath
-});
+checks.push({ name: 'workflow existe', ok: existsSync(workflowPath), detail: workflowPath });
 
 if (existsSync(workflowPath)) {
   const workflow = readFileSync(workflowPath, 'utf8');
@@ -50,15 +46,12 @@ if (existsSync(workflowPath)) {
     'validate:components',
     'validate:fixture-components',
     'validate:fixture-artifacts',
+    'validate:fixture-syntax',
     'validate:fixture-semantic'
   ];
 
   for (const fragment of requiredFragments) {
-    checks.push({
-      name: `workflow contem ${fragment}`,
-      ok: workflow.includes(fragment),
-      detail: workflowPath
-    });
+    checks.push({ name: `workflow contem ${fragment}`, ok: workflow.includes(fragment), detail: workflowPath });
   }
 
   checks.push({
@@ -66,7 +59,6 @@ if (existsSync(workflowPath)) {
     ok: !/(contents|pull-requests|issues|actions|checks|packages|statuses):\s*write/i.test(workflow),
     detail: workflowPath
   });
-
   checks.push({
     name: 'workflow sem continue-on-error',
     ok: !/continue-on-error:\s*true/i.test(workflow),
@@ -92,6 +84,7 @@ if (existsSync(workflowPath)) {
     'validate:components',
     'validate:fixture-components',
     'validate:fixture-artifacts',
+    'validate:fixture-syntax',
     'validate:fixture-semantic'
   ];
 
@@ -105,11 +98,17 @@ if (existsSync(workflowPath)) {
   }
 
   const artifactStep = workflow.indexOf('Validate generated fixture artifacts');
+  const syntaxStep = workflow.indexOf('Validate generated TypeScript syntax');
   const semanticStep = workflow.indexOf('Validate semantic fixture behavior');
   checks.push({
-    name: 'validacao semantica executada depois dos artefatos',
-    ok: artifactStep >= 0 && semanticStep > artifactStep,
-    detail: `artefatos=${artifactStep}, semantica=${semanticStep}`
+    name: 'validacao sintatica executada depois dos artefatos',
+    ok: artifactStep >= 0 && syntaxStep > artifactStep,
+    detail: `artefatos=${artifactStep}, sintaxe=${syntaxStep}`
+  });
+  checks.push({
+    name: 'validacao semantica executada depois da sintaxe',
+    ok: syntaxStep >= 0 && semanticStep > syntaxStep,
+    detail: `sintaxe=${syntaxStep}, semantica=${semanticStep}`
   });
 }
 
@@ -128,15 +127,9 @@ if (process.argv.includes('--json')) {
   console.log(JSON.stringify(output, null, 2));
 } else {
   console.log('Validacao do workflow do Delphi Parser');
-  for (const check of checks) {
-    console.log(`[${check.ok ? 'OK' : 'ERRO'}] ${check.name}: ${check.detail}`);
-  }
+  for (const check of checks) console.log(`[${check.ok ? 'OK' : 'ERRO'}] ${check.name}: ${check.detail}`);
   console.log(`Resumo: ${output.passed}/${output.total} verificacoes OK`);
-  if (failed.length > 0) {
-    console.error(`Falhas: ${output.failures.join(', ')}`);
-  }
+  if (failed.length > 0) console.error(`Falhas: ${output.failures.join(', ')}`);
 }
 
-if (failed.length > 0) {
-  process.exit(1);
-}
+if (failed.length > 0) process.exit(1);
