@@ -71,3 +71,6 @@ jobs:
 
       - name: Validate generated fixture artifacts
         run: pnpm --filter @gestor/delphi-parser validate:fixture-artifacts
+
+      - name: Validate semantic fixture behavior
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-semantic
