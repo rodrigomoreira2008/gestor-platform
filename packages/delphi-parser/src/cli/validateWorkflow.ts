@@ -47,7 +47,8 @@ if (existsSync(workflowPath)) {
     'validate:fixture-components',
     'validate:fixture-artifacts',
     'validate:fixture-syntax',
-    'validate:fixture-semantic'
+    'validate:fixture-semantic',
+    'validate:fixture-coverage'
   ];
 
   for (const fragment of requiredFragments) {
@@ -85,7 +86,8 @@ if (existsSync(workflowPath)) {
     'validate:fixture-components',
     'validate:fixture-artifacts',
     'validate:fixture-syntax',
-    'validate:fixture-semantic'
+    'validate:fixture-semantic',
+    'validate:fixture-coverage'
   ];
 
   for (const command of requiredCommands) {
@@ -100,15 +102,11 @@ if (existsSync(workflowPath)) {
   const artifactStep = workflow.indexOf('Validate generated fixture artifacts');
   const syntaxStep = workflow.indexOf('Validate generated TypeScript syntax');
   const semanticStep = workflow.indexOf('Validate semantic fixture behavior');
+  const coverageStep = workflow.indexOf('Validate fixture capability coverage');
   checks.push({
-    name: 'validacao sintatica executada depois dos artefatos',
-    ok: artifactStep >= 0 && syntaxStep > artifactStep,
-    detail: `artefatos=${artifactStep}, sintaxe=${syntaxStep}`
-  });
-  checks.push({
-    name: 'validacao semantica executada depois da sintaxe',
-    ok: syntaxStep >= 0 && semanticStep > syntaxStep,
-    detail: `sintaxe=${syntaxStep}, semantica=${semanticStep}`
+    name: 'etapas finais em ordem de profundidade',
+    ok: artifactStep >= 0 && syntaxStep > artifactStep && semanticStep > syntaxStep && coverageStep > semanticStep,
+    detail: `artefatos=${artifactStep}, sintaxe=${syntaxStep}, semantica=${semanticStep}, cobertura=${coverageStep}`
   });
 }
 
