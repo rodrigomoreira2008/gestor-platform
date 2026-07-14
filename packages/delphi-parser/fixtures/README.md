@@ -92,6 +92,21 @@ pnpm --filter @gestor/delphi-parser validate:contracts arquivo.dfm arquivo.pas E
 
 A validacao compara o DTO C# com a interface TypeScript gerada. Ela normaliza nomes PascalCase/camelCase, confirma a identidade numerica e verifica a compatibilidade das categorias `string`, `number`, `boolean` e `date`. O comando falha quando um campo existe apenas em uma camada ou quando os tipos gerados divergem.
 
+## Persistencia backend
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:fixture-repository
+```
+
+Para validar um unico formulario:
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:repository arquivo.dfm arquivo.pas Entidade TABELA
+pnpm --filter @gestor/delphi-parser validate:repository arquivo.dfm arquivo.pas Entidade TABELA -- --json
+```
+
+A auditoria verifica Entity, DTO, Validator, Service, Controller, EntityConfiguration e o snippet de registro do DbContext. Ela compara propriedades, tipos, mapeamentos do Service, colunas configuradas, `DbSet<TEntity>`, `ApplyConfiguration` e os contratos genericos utilizados pelas classes. O comando falha em campos ausentes, tipos divergentes, propriedades duplicadas ou referencias inconsistentes entre as camadas.
+
 ## Rotas backend e frontend
 
 ```bash
@@ -139,6 +154,7 @@ Os fixtures foram criados para garantir regressao minima em:
 - determinismo dos modelos e artefatos gerados;
 - ausencia de mutacao do `ResolvedForm` pelos geradores;
 - compatibilidade entre DTO C# e tipos TypeScript;
+- consistencia da camada Entity/DTO/Validator/Service/Controller/Configuration/DbContext;
 - consistencia entre endpoints CRUD, rotas de pagina e itens de menu;
 - validacao combinada de artefatos;
 - validacao semantica do cenario integrado de pedidos.
