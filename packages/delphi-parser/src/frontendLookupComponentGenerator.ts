@@ -15,6 +15,7 @@ interface ${entityPascal}LookupFieldProps {
   value?: string | number | null;
   required?: boolean;
   disabled?: boolean;
+  error?: boolean;
   helperText?: string;
   onChange: (value: string | number | null) => void;
 }
@@ -24,6 +25,7 @@ interface LookupAutocompleteProps {
   value: string | number | null;
   required?: boolean;
   disabled?: boolean;
+  error?: boolean;
   helperText?: string;
   onChange: (value: string | number | null) => void;
   query: UseQueryResult<LookupOption[], Error>;
@@ -34,7 +36,7 @@ function sameLookupValue(left: string | number | null | undefined, right: string
   return String(left) === String(right);
 }
 
-function LookupAutocomplete({ label, value, required, disabled, helperText, onChange, query }: LookupAutocompleteProps) {
+function LookupAutocomplete({ label, value, required, disabled, error, helperText, onChange, query }: LookupAutocompleteProps) {
   const options = query.data ?? [];
   const selected = options.find((option) => sameLookupValue(option.id, value)) ?? null;
 
@@ -61,6 +63,7 @@ function LookupAutocomplete({ label, value, required, disabled, helperText, onCh
           {...params}
           label={label}
           required={required}
+          error={error}
           helperText={helperText}
           InputProps={{
             ...params.InputProps,
@@ -79,9 +82,9 @@ function LookupAutocomplete({ label, value, required, disabled, helperText, onCh
 
 export function ${entityPascal}LookupField(props: ${entityPascal}LookupFieldProps) {
   switch (props.fieldName) {
-${cases || '    default:\n      return <TextField label={props.label} value={props.value ?? \'\'} required={props.required} disabled helperText="Lookup nao inferido." />;'}
+${cases || '    default:\n      return <TextField label={props.label} value={props.value ?? \'\'} required={props.required} error={props.error} disabled helperText={props.helperText ?? "Lookup nao inferido."} />;'}
     default:
-      return <TextField label={props.label} value={props.value ?? ''} required={props.required} disabled helperText="Lookup nao inferido." />;
+      return <TextField label={props.label} value={props.value ?? ''} required={props.required} error={props.error} disabled helperText={props.helperText ?? "Lookup nao inferido."} />;
   }
 }
 `;
@@ -91,7 +94,7 @@ function renderLookupCase(lookup: InferredLookup): string {
   const hookName = `use${toPascalCase(lookup.fieldName)}Lookup`;
   const helperText = lookup.confidence === 'high' ? undefined : `Inferência ${lookup.confidence}: ${lookup.evidence}`;
   return `    case '${escapeSingleQuote(lookup.fieldName)}':
-      return <LookupAutocomplete label={props.label} value={props.value ?? null} required={props.required} disabled={props.disabled} helperText={props.helperText ?? ${helperText ? `'${escapeSingleQuote(helperText)}'` : 'undefined'}} onChange={props.onChange} query={${hookName}(!props.disabled)} />;`;
+      return <LookupAutocomplete label={props.label} value={props.value ?? null} required={props.required} disabled={props.disabled} error={props.error} helperText={props.helperText ?? ${helperText ? `'${escapeSingleQuote(helperText)}'` : 'undefined'}} onChange={props.onChange} query={${hookName}(!props.disabled)} />;`;
 }
 
 function toPascalCase(value: string): string {
