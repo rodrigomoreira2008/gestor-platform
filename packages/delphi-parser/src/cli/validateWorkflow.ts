@@ -19,7 +19,7 @@ if (existsSync(workflowPath)) {
     'validate:package', 'validate:workflow', 'validate:scripts', 'validate:docs', 'validate:fixtures', 'validate:components',
     'validate:fixture-components', 'validate:fixture-artifacts', 'validate:fixture-syntax', 'validate:fixture-imports',
     'validate:fixture-determinism', 'validate:fixture-contracts', 'validate:fixture-repository', 'validate:fixture-backend-compile',
-    'validate:fixture-routes', 'validate:fixture-semantic', 'validate:fixture-coverage'
+    'validate:fixture-frontend-compile', 'validate:fixture-routes', 'validate:fixture-semantic', 'validate:fixture-coverage'
   ];
   for (const fragment of requiredFragments) checks.push({ name: `workflow contem ${fragment}`, ok: workflow.includes(fragment), detail: workflowPath });
 
@@ -34,7 +34,7 @@ if (existsSync(workflowPath)) {
     'doctor', 'validate:package', 'validate:workflow', 'validate:scripts', 'validate:docs', 'validate:fixtures', 'build',
     'validate:components', 'validate:fixture-components', 'validate:fixture-artifacts', 'validate:fixture-syntax',
     'validate:fixture-imports', 'validate:fixture-determinism', 'validate:fixture-contracts', 'validate:fixture-repository',
-    'validate:fixture-backend-compile', 'validate:fixture-routes', 'validate:fixture-semantic', 'validate:fixture-coverage'
+    'validate:fixture-backend-compile', 'validate:fixture-frontend-compile', 'validate:fixture-routes', 'validate:fixture-semantic', 'validate:fixture-coverage'
   ];
   for (const command of requiredCommands) {
     const occurrences = [...workflow.matchAll(new RegExp(`@gestor/delphi-parser ${command.replace(':', '\\:')}`, 'g'))].length;
@@ -47,14 +47,15 @@ if (existsSync(workflowPath)) {
   const determinismStep = workflow.indexOf('Validate deterministic generation');
   const contractsStep = workflow.indexOf('Validate backend frontend contracts');
   const repositoryStep = workflow.indexOf('Validate generated persistence layer');
-  const compileStep = workflow.indexOf('Compile generated backend');
+  const backendCompileStep = workflow.indexOf('Compile generated backend');
+  const frontendCompileStep = workflow.indexOf('Compile generated frontend');
   const routesStep = workflow.indexOf('Validate generated API routes');
   const semanticStep = workflow.indexOf('Validate semantic fixture behavior');
   const coverageStep = workflow.indexOf('Validate fixture capability coverage');
   checks.push({
     name: 'etapas finais em ordem de profundidade',
-    ok: artifactStep >= 0 && syntaxStep > artifactStep && importsStep > syntaxStep && determinismStep > importsStep && contractsStep > determinismStep && repositoryStep > contractsStep && compileStep > repositoryStep && routesStep > compileStep && semanticStep > routesStep && coverageStep > semanticStep,
-    detail: `artefatos=${artifactStep}, sintaxe=${syntaxStep}, imports=${importsStep}, determinismo=${determinismStep}, contratos=${contractsStep}, persistencia=${repositoryStep}, compilacao=${compileStep}, rotas=${routesStep}, semantica=${semanticStep}, cobertura=${coverageStep}`
+    ok: artifactStep >= 0 && syntaxStep > artifactStep && importsStep > syntaxStep && determinismStep > importsStep && contractsStep > determinismStep && repositoryStep > contractsStep && backendCompileStep > repositoryStep && frontendCompileStep > backendCompileStep && routesStep > frontendCompileStep && semanticStep > routesStep && coverageStep > semanticStep,
+    detail: `artefatos=${artifactStep}, sintaxe=${syntaxStep}, imports=${importsStep}, determinismo=${determinismStep}, contratos=${contractsStep}, persistencia=${repositoryStep}, backend=${backendCompileStep}, frontend=${frontendCompileStep}, rotas=${routesStep}, semantica=${semanticStep}, cobertura=${coverageStep}`
   });
 }
 
