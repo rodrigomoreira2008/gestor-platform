@@ -49,6 +49,7 @@ if (existsSync(workflowPath)) {
     'validate:fixture-syntax',
     'validate:fixture-imports',
     'validate:fixture-determinism',
+    'validate:fixture-contracts',
     'validate:fixture-semantic',
     'validate:fixture-coverage'
   ];
@@ -90,6 +91,7 @@ if (existsSync(workflowPath)) {
     'validate:fixture-syntax',
     'validate:fixture-imports',
     'validate:fixture-determinism',
+    'validate:fixture-contracts',
     'validate:fixture-semantic',
     'validate:fixture-coverage'
   ];
@@ -107,12 +109,13 @@ if (existsSync(workflowPath)) {
   const syntaxStep = workflow.indexOf('Validate generated TypeScript syntax');
   const importsStep = workflow.indexOf('Validate generated import graph');
   const determinismStep = workflow.indexOf('Validate deterministic generation');
+  const contractsStep = workflow.indexOf('Validate backend frontend contracts');
   const semanticStep = workflow.indexOf('Validate semantic fixture behavior');
   const coverageStep = workflow.indexOf('Validate fixture capability coverage');
   checks.push({
     name: 'etapas finais em ordem de profundidade',
-    ok: artifactStep >= 0 && syntaxStep > artifactStep && importsStep > syntaxStep && determinismStep > importsStep && semanticStep > determinismStep && coverageStep > semanticStep,
-    detail: `artefatos=${artifactStep}, sintaxe=${syntaxStep}, imports=${importsStep}, determinismo=${determinismStep}, semantica=${semanticStep}, cobertura=${coverageStep}`
+    ok: artifactStep >= 0 && syntaxStep > artifactStep && importsStep > syntaxStep && determinismStep > importsStep && contractsStep > determinismStep && semanticStep > contractsStep && coverageStep > semanticStep,
+    detail: `artefatos=${artifactStep}, sintaxe=${syntaxStep}, imports=${importsStep}, determinismo=${determinismStep}, contratos=${contractsStep}, semantica=${semanticStep}, cobertura=${coverageStep}`
   });
 }
 
