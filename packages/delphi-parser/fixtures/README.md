@@ -8,6 +8,7 @@ Esta pasta contem exemplos sinteticos de telas Delphi usados para validar o flux
 - `cadastro-parceiros.dfm` + `cadastro-parceiros.pas`: tela com abas, lookup, checkbox e grid detalhe.
 - `cadastro-grupo-produtos.dfm` + `cadastro-grupo-produtos.pas`: CRUD simples sem detalhe.
 - `cadastro-grupo-parceiros.dfm` + `cadastro-grupo-parceiros.pas`: CRUD simples sem detalhe.
+- `cadastro-pedidos.dfm` + `cadastro-pedidos.pas`: cenario integrado com PageControl, data, valor numerico, lookup de cliente, grid de itens, validacoes Pascal e relacionamento SQL mestre/detalhe.
 
 ## Validacao completa
 
@@ -25,7 +26,7 @@ Validar somente o catalogo de mapeamentos:
 pnpm --filter @gestor/delphi-parser validate:components
 ```
 
-Auditar os componentes usados pelos quatro DFM com modo estrito:
+Auditar os componentes usados pelos cinco DFM com modo estrito:
 
 ```bash
 pnpm --filter @gestor/delphi-parser validate:fixture-components
@@ -40,7 +41,10 @@ pnpm --filter @gestor/delphi-parser validate:fixture:produtos
 pnpm --filter @gestor/delphi-parser validate:fixture:parceiros
 pnpm --filter @gestor/delphi-parser validate:fixture:grupo-produtos
 pnpm --filter @gestor/delphi-parser validate:fixture:grupo-parceiros
+pnpm --filter @gestor/delphi-parser validate:fixture:pedidos
 ```
+
+O fixture de pedidos concentra, em um unico caso, as principais inferencias que precisam permanecer integradas: abas, lookup remoto, tipos de campo, mensagens de validacao, relacionamento SQL e grid mestre/detalhe.
 
 ## Objetivo dos fixtures
 
