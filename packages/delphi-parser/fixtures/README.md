@@ -77,6 +77,21 @@ pnpm --filter @gestor/delphi-parser validate:determinism arquivo.dfm arquivo.pas
 
 A validacao resolve e gera o mesmo formulario duas vezes. Ela compara a ordem, os paths e o conteudo de todos os artefatos backend e frontend, produz hashes SHA-256 resumidos e confirma que os geradores nao alteraram o `ResolvedForm` recebido. Isso evita diffs instaveis causados por ordem nao deterministica, estado global ou mutacao acidental.
 
+## Contratos backend e frontend
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:fixture-contracts
+```
+
+Para validar um unico formulario:
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:contracts arquivo.dfm arquivo.pas Entidade TABELA
+pnpm --filter @gestor/delphi-parser validate:contracts arquivo.dfm arquivo.pas Entidade TABELA -- --json
+```
+
+A validacao compara o DTO C# com a interface TypeScript gerada. Ela normaliza nomes PascalCase/camelCase, confirma a identidade numerica e verifica a compatibilidade das categorias `string`, `number`, `boolean` e `date`. O comando falha quando um campo existe apenas em uma camada ou quando os tipos gerados divergem.
+
 ## Validacao semantica
 
 ```bash
@@ -108,5 +123,6 @@ Os fixtures foram criados para garantir regressao minima em:
 - integridade do grafo de imports gerado;
 - determinismo dos modelos e artefatos gerados;
 - ausencia de mutacao do `ResolvedForm` pelos geradores;
+- compatibilidade entre DTO C# e tipos TypeScript;
 - validacao combinada de artefatos;
 - validacao semantica do cenario integrado de pedidos.
