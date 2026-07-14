@@ -36,8 +36,11 @@ const sections = [
       ['validate:backend <dfm> <pas> <entidade> [tabela]', 'Valida a geracao backend em memoria.'],
       ['validate:frontend <dfm> <pas> <entidade> [tabela]', 'Valida a geracao frontend em memoria.'],
       ['validate:generated <dfm> <pas> <entidade> [tabela]', 'Valida todos os artefatos gerados.'],
+      ['validate:syntax <dfm> <pas> <entidade> [tabela] [--json]', 'Compila em memoria a sintaxe TypeScript e TSX gerada.'],
       ['validate:fixture-components', 'Audita os DFM dos fixtures.'],
       ['validate:fixture-artifacts', 'Valida os artefatos dos fixtures.'],
+      ['validate:fixture-syntax', 'Valida a sintaxe TypeScript/TSX dos cinco fixtures.'],
+      ['validate:fixture-semantic', 'Valida o comportamento semantico do fixture integrado.'],
       ['validate:all', 'Executa doctor, metadados, build e toda a suite de validacao do pacote.']
     ]
   }
