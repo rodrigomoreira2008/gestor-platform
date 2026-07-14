@@ -23,7 +23,7 @@ env:
 jobs:
   validate-fixtures:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,6 +38,11 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
@@ -86,6 +91,9 @@ jobs:
 
       - name: Validate generated persistence layer
         run: pnpm --filter @gestor/delphi-parser validate:fixture-repository
+
+      - name: Compile generated backend
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-backend-compile
 
       - name: Validate generated API routes
         run: pnpm --filter @gestor/delphi-parser validate:fixture-routes
