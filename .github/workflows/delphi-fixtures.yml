@@ -84,6 +84,9 @@ jobs:
       - name: Validate backend frontend contracts
         run: pnpm --filter @gestor/delphi-parser validate:fixture-contracts
 
+      - name: Validate generated persistence layer
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-repository
+
       - name: Validate generated API routes
         run: pnpm --filter @gestor/delphi-parser validate:fixture-routes
 
