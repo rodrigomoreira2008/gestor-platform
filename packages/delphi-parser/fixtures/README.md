@@ -62,6 +62,21 @@ pnpm --filter @gestor/delphi-parser validate:imports arquivo.dfm arquivo.pas Ent
 pnpm --filter @gestor/delphi-parser validate:imports arquivo.dfm arquivo.pas Entidade TABELA -- --json
 ```
 
+## Determinismo da geracao
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:fixture-determinism
+```
+
+Para um unico formulario:
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:determinism arquivo.dfm arquivo.pas Entidade TABELA
+pnpm --filter @gestor/delphi-parser validate:determinism arquivo.dfm arquivo.pas Entidade TABELA -- --json
+```
+
+A validacao resolve e gera o mesmo formulario duas vezes. Ela compara a ordem, os paths e o conteudo de todos os artefatos backend e frontend, produz hashes SHA-256 resumidos e confirma que os geradores nao alteraram o `ResolvedForm` recebido. Isso evita diffs instaveis causados por ordem nao deterministica, estado global ou mutacao acidental.
+
 ## Validacao semantica
 
 ```bash
@@ -91,5 +106,7 @@ Os fixtures foram criados para garantir regressao minima em:
 - geracao frontend;
 - sintaxe TypeScript e TSX;
 - integridade do grafo de imports gerado;
+- determinismo dos modelos e artefatos gerados;
+- ausencia de mutacao do `ResolvedForm` pelos geradores;
 - validacao combinada de artefatos;
 - validacao semantica do cenario integrado de pedidos.
