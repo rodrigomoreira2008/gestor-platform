@@ -77,3 +77,6 @@ jobs:
 
       - name: Validate semantic fixture behavior
         run: pnpm --filter @gestor/delphi-parser validate:fixture-semantic
+
+      - name: Validate fixture capability coverage
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-coverage
