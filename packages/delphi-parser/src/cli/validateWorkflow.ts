@@ -49,7 +49,8 @@ if (existsSync(workflowPath)) {
     'validate:fixtures',
     'validate:components',
     'validate:fixture-components',
-    'validate:fixture-artifacts'
+    'validate:fixture-artifacts',
+    'validate:fixture-semantic'
   ];
 
   for (const fragment of requiredFragments) {
@@ -90,7 +91,8 @@ if (existsSync(workflowPath)) {
     'build',
     'validate:components',
     'validate:fixture-components',
-    'validate:fixture-artifacts'
+    'validate:fixture-artifacts',
+    'validate:fixture-semantic'
   ];
 
   for (const command of requiredCommands) {
@@ -101,6 +103,14 @@ if (existsSync(workflowPath)) {
       detail: `${occurrences} ocorrencia(s)`
     });
   }
+
+  const artifactStep = workflow.indexOf('Validate generated fixture artifacts');
+  const semanticStep = workflow.indexOf('Validate semantic fixture behavior');
+  checks.push({
+    name: 'validacao semantica executada depois dos artefatos',
+    ok: artifactStep >= 0 && semanticStep > artifactStep,
+    detail: `artefatos=${artifactStep}, semantica=${semanticStep}`
+  });
 }
 
 const failed = checks.filter((check) => !check.ok);
