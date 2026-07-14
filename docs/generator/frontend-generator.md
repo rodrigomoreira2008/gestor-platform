@@ -186,9 +186,15 @@ O formulario gerado agora possui:
 - foco e rolagem ate o primeiro campo invalido;
 - atributos `aria-invalid`, `aria-describedby`, `role=alert` e `aria-busy`;
 - mensagem geral informando a quantidade de campos invalidos;
+- deteccao de alteracoes pendentes por comparacao com o estado inicial;
+- callback opcional `onDirtyChange` para integracao com dialogos e rotas;
+- aviso do navegador ao sair com dados nao salvos;
+- texto de status acessivel indicando se existem alteracoes pendentes;
+- botao Restaurar para descartar as alteracoes locais;
+- redefinicao do estado-base apos um envio validado;
 - indicador de envio no botao Salvar.
 
-Quando nenhuma aba e inferida, o gerador cria uma aba fallback chamada Dados com todos os campos resolvidos.
+A protecao de saida pode ser desativada por formulario usando `warnOnUnsavedChanges={false}`. Quando nenhuma aba e inferida, o gerador cria uma aba fallback chamada Dados com todos os campos resolvidos.
 
 ## Pagina CRUD
 
