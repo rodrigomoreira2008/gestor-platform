@@ -12,7 +12,7 @@ Esta pasta contem exemplos sinteticos de telas Delphi usados para validar o flux
 
 ## Validacao completa
 
-Rodar catalogo, auditoria estrutural dos DFM e geracao de todos os fixtures:
+Rodar catalogo, auditoria estrutural dos DFM, geracao e validacao semantica:
 
 ```bash
 pnpm validate:delphi-fixtures
@@ -44,18 +44,18 @@ pnpm --filter @gestor/delphi-parser validate:fixture:grupo-parceiros
 pnpm --filter @gestor/delphi-parser validate:fixture:pedidos
 ```
 
-## Validacao semantica de pedidos
+Esses comandos verificam a geracao estrutural dos artefatos backend e frontend de cada fixture.
 
-A validacao estrutural confirma que os arquivos foram gerados. A validacao semantica confirma que o conteudo esperado realmente foi inferido e materializado:
+## Validacao semantica
 
 ```bash
-pnpm --filter @gestor/delphi-parser validate:fixture:pedidos-semantic
+pnpm --filter @gestor/delphi-parser validate:fixture-semantic
 pnpm --filter @gestor/delphi-parser validate:fixture:pedidos-semantic -- --json
 ```
 
-Ela verifica campos, abas, lookup de cliente, metadados `KeyField`/`ListField`, grid de itens, relacionamento `PEDIDOS -> ITENSPEDIDO`, direcao da chave estrangeira, obrigatoriedade, regra de valor positivo, schema Zod, formulario validado, hook de lookup, DataGrid detalhe e configuracao EF Core.
+A etapa semantica roda separadamente depois da geracao estrutural. Ela confirma que o fixture de pedidos preserva campos, abas, lookup, validacoes, relacionamento mestre/detalhe e trechos essenciais dos artefatos gerados.
 
-O comando `validate:fixture-artifacts` executa automaticamente essa validacao depois da geracao estrutural dos cinco fixtures.
+A separacao permite identificar no CI se a regressao ocorreu na estrutura geral dos arquivos ou no significado inferido a partir do Delphi.
 
 O fixture de pedidos concentra, em um unico caso, as principais inferencias que precisam permanecer integradas: abas, lookup remoto, tipos de campo, mensagens de validacao, relacionamento SQL e grid mestre/detalhe.
 
@@ -74,4 +74,4 @@ Os fixtures foram criados para garantir regressao minima em:
 - geracao backend;
 - geracao frontend;
 - validacao combinada de artefatos;
-- preservacao semantica do cenario integrado de pedidos.
+- validacao semantica do cenario integrado de pedidos.
