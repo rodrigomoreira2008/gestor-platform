@@ -78,6 +78,9 @@ jobs:
       - name: Validate generated import graph
         run: pnpm --filter @gestor/delphi-parser validate:fixture-imports
 
+      - name: Validate deterministic generation
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-determinism
+
       - name: Validate semantic fixture behavior
         run: pnpm --filter @gestor/delphi-parser validate:fixture-semantic
 
