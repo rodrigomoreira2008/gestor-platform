@@ -29,11 +29,16 @@ const schemaChecks = {
 };
 const formChecks = {
   exists: Boolean(tabbedFormFile),
-  importsSchema: Boolean(tabbedFormFile?.content.includes("../schema/")),
+  importsSchema: Boolean(tabbedFormFile?.content.includes('../schema/')),
   validatesWithSafeParse: Boolean(tabbedFormFile?.content.includes('.safeParse(form)')),
   mapsFieldErrors: Boolean(tabbedFormFile?.content.includes('result.error.issues')),
   navigatesToInvalidTab: Boolean(tabbedFormFile?.content.includes('setTab(invalidTab)')),
-  displaysSubmitError: Boolean(tabbedFormFile?.content.includes('Revise os campos destacados antes de salvar.')),
+  displaysSubmitError: Boolean(tabbedFormFile?.content.includes('campo(s) destacado(s) antes de salvar.')),
+  countsErrorsByTab: Boolean(tabbedFormFile?.content.includes('tabErrorCounts')),
+  displaysErrorBadges: Boolean(tabbedFormFile?.content.includes('<Badge color="error"')),
+  focusesFirstInvalidField: Boolean(tabbedFormFile?.content.includes('pendingFocusField') && tabbedFormFile?.content.includes('scrollIntoView')),
+  exposesInvalidState: Boolean(tabbedFormFile?.content.includes("'aria-invalid': Boolean(errors.")),
+  marksBusySubmit: Boolean(tabbedFormFile?.content.includes('aria-busy={isSubmitting}')),
   excludesIdentityInput: !Boolean(tabbedFormFile?.content.match(/\bid\s*:\s*initialValue\?\.id/))
 };
 const lookupChecks = {
