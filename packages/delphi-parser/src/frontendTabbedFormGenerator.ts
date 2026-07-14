@@ -14,8 +14,8 @@ export function renderTabbedFormScaffold(input: RenderTabbedFormInput): string {
   const tabs = normalizeTabs(input.tabs, fields);
   const tabPanels = tabs.map((tab, index) => renderTabPanel(tab, fields, index, input.entityPascal, input.entity)).join('\n');
 
-  return `import { Alert, Box, Button, Checkbox, FormControlLabel, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+  return `import { Alert, Badge, Box, Button, Checkbox, FormControlLabel, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ${input.entityPascal}LookupField } from './${input.entityPascal}LookupField';
 import { ${input.entity}Schema } from '../schema/${input.entity}Schema';
 import type { ${input.entityPascal}Input } from '../types/${input.entity}';
@@ -39,15 +39,29 @@ export function ${input.entityPascal}TabbedForm({ initialValue, onSubmit, isSubm
   const [form, setForm] = useState<${input.entityPascal}Input>(() => createInitialForm(initialValue));
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const pendingFocusField = useRef<string | null>(null);
 
   useEffect(() => {
     setForm(createInitialForm(initialValue));
     setErrors({});
     setSubmitError(null);
+    pendingFocusField.current = null;
     setTab(0);
   }, [initialValue]);
 
   const panels = useMemo(() => ${JSON.stringify(tabs.map((tab) => ({ name: tab.name, label: tab.label, fieldNames: tab.fieldNames, confidence: tab.confidence, evidence: tab.evidence })), null, 2)}, []);
+  const tabErrorCounts = useMemo(() => panels.map((panel) => panel.fieldNames.reduce((count, fieldName) => count + (errors[fieldName as keyof ${input.entityPascal}Input] ? 1 : 0), 0)), [errors, panels]);
+
+  useEffect(() => {
+    const fieldName = pendingFocusField.current;
+    if (!fieldName) return;
+    const element = document.querySelector<HTMLElement>(`[data-field-name="${'${fieldName}'}"] input, [data-field-name="${'${fieldName}'}"] button, [data-field-name="${'${fieldName}'}"] [tabindex="0"]`);
+    if (element) {
+      element.focus();
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      pendingFocusField.current = null;
+    }
+  }, [tab]);
 
   function updateField(name: keyof ${input.entityPascal}Input, value: unknown) {
     setForm((current) => ({ ...current, [name]: value }));
@@ -60,6 +74,7 @@ export function ${input.entityPascal}TabbedForm({ initialValue, onSubmit, isSubm
     if (result.success) {
       setErrors({});
       setSubmitError(null);
+      pendingFocusField.current = null;
       onSubmit(result.data as ${input.entityPascal}Input);
       return;
     }
@@ -70,15 +85,23 @@ export function ${input.entityPascal}TabbedForm({ initialValue, onSubmit, isSubm
       if (fieldName && !nextErrors[fieldName]) nextErrors[fieldName] = issue.message;
     }
     setErrors(nextErrors);
-    setSubmitError('Revise os campos destacados antes de salvar.');
+    setSubmitError(`Revise os ${'${Object.keys(nextErrors).length}'} campo(s) destacado(s) antes de salvar.`);
 
     const firstInvalidField = Object.keys(nextErrors)[0];
-    const invalidTab = panels.findIndex((panel) => panel.fieldNames.some((fieldName) => fieldName.toLocaleLowerCase('pt-BR') === firstInvalidField?.toLocaleLowerCase('pt-BR')));
-    if (invalidTab >= 0) setTab(invalidTab);
+    if (!firstInvalidField) return;
+    pendingFocusField.current = firstInvalidField;
+    const invalidTab = panels.findIndex((panel) => panel.fieldNames.some((fieldName) => fieldName.toLocaleLowerCase('pt-BR') === firstInvalidField.toLocaleLowerCase('pt-BR')));
+    if (invalidTab >= 0 && invalidTab !== tab) setTab(invalidTab);
+    else requestAnimationFrame(() => {
+      const element = document.querySelector<HTMLElement>(`[data-field-name="${'${firstInvalidField}'}"] input, [data-field-name="${'${firstInvalidField}'}"] button, [data-field-name="${'${firstInvalidField}'}"] [tabindex="0"]`);
+      element?.focus();
+      element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      pendingFocusField.current = null;
+    });
   }
 
   return (
-    <Stack spacing={2} component="form" noValidate onSubmit={(event) => { event.preventDefault(); handleSubmit(); }}>
+    <Stack spacing={2} component="form" noValidate aria-describedby={submitError ? '${input.entity}-form-error' : undefined} onSubmit={(event) => { event.preventDefault(); handleSubmit(); }}>
       <Tabs
         value={tab}
         onChange={(_, value: number) => setTab(value)}
@@ -86,12 +109,12 @@ export function ${input.entityPascal}TabbedForm({ initialValue, onSubmit, isSubm
         scrollButtons="auto"
         aria-label="Seções do cadastro de ${escapeDoubleQuote(input.entityPascal)}"
       >
-${tabs.map((tab, index) => `        <Tab id="${input.entity}-tab-${index}" aria-controls="${input.entity}-tabpanel-${index}" label="${escapeDoubleQuote(tab.label)}" />`).join('\n')}
+${tabs.map((tab, index) => `        <Tab id="${input.entity}-tab-${index}" aria-controls="${input.entity}-tabpanel-${index}" label={<Badge color="error" badgeContent={tabErrorCounts[${index}]} invisible={!tabErrorCounts[${index}]}><Box component="span" sx={{ pr: tabErrorCounts[${index}] ? 1 : 0 }}>${escapeDoubleQuote(tab.label)}</Box></Badge>} />`).join('\n')}
       </Tabs>
-      {submitError && <Alert severity="warning">{submitError}</Alert>}
+      {submitError && <Alert id="${input.entity}-form-error" severity="warning" role="alert">{submitError}</Alert>}
 ${tabPanels}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1 }}>
-        <Button type="submit" variant="contained" disabled={isSubmitting}>{isSubmitting ? 'Salvando...' : 'Salvar'}</Button>
+        <Button type="submit" variant="contained" disabled={isSubmitting} aria-busy={isSubmitting}>{isSubmitting ? 'Salvando...' : 'Salvar'}</Button>
       </Box>
     </Stack>
   );
@@ -138,7 +161,7 @@ function renderTabPanel(tab: InferredTab, fields: ResolvedField[], index: number
   const fieldControls = tab.fieldNames
     .map((fieldName) => fields.find((field) => field.name === fieldName))
     .filter((field): field is ResolvedField => Boolean(field))
-    .map((field) => `            <Box key="${escapeDoubleQuote(field.name)}" sx={{ minWidth: 0 }}>\n${renderInput(field, entityPascal)}\n            </Box>`)
+    .map((field) => `            <Box key="${escapeDoubleQuote(field.name)}" data-field-name="${escapeDoubleQuote(toCamelCase(field.name))}" sx={{ minWidth: 0 }}>\n${renderInput(field, entityPascal)}\n            </Box>`)
     .join('\n');
 
   return `      <Box
@@ -173,9 +196,9 @@ function renderCheckbox(field: ResolvedField): string {
   return `              <Stack spacing={0.5}>
                 <FormControlLabel
                   label="${label}"
-                  control={<Checkbox checked={Boolean(form.${name})} onChange={(event) => updateField('${name}', event.target.checked)} />}
+                  control={<Checkbox checked={Boolean(form.${name})} inputProps={{ 'aria-invalid': Boolean(errors.${name}), 'aria-describedby': errors.${name} ? '${name}-error' : undefined }} onChange={(event) => updateField('${name}', event.target.checked)} />}
                 />
-                {errors.${name} && <Typography variant="caption" color="error">{errors.${name}}</Typography>}
+                {errors.${name} && <Typography id="${name}-error" variant="caption" color="error" role="alert">{errors.${name}}</Typography>}
               </Stack>`;
 }
 
@@ -206,7 +229,7 @@ function renderTextField(field: ResolvedField, isDate: boolean): string {
                 required={${field.required ? 'true' : 'false'}}
                 error={Boolean(errors.${name})}
                 helperText={errors.${name}}
-                slotProps={${isDate ? "{ inputLabel: { shrink: true } }" : 'undefined'}}
+                slotProps={{ input: { 'aria-invalid': Boolean(errors.${name}), 'aria-describedby': errors.${name} ? '${name}-helper-text' : undefined }${isDate ? ", inputLabel: { shrink: true }" : ''} }}
                 onChange={(event) => updateField('${name}', ${changeExpression})}
               />`;
 }
