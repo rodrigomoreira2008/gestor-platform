@@ -46,6 +46,22 @@ pnpm --filter @gestor/delphi-parser validate:fixture:pedidos
 
 Esses comandos verificam a geracao estrutural dos artefatos backend e frontend de cada fixture.
 
+## Sintaxe e grafo de imports
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:fixture-syntax
+pnpm --filter @gestor/delphi-parser validate:fixture-imports
+```
+
+A validacao sintatica transpila todos os arquivos TypeScript e TSX gerados. A validacao de imports resolve cada import relativo contra o conjunto de arquivos emitidos e falha em imports ausentes, autorreferencias ou diferencas de maiusculas e minusculas. Imports para a infraestrutura compartilhada da aplicacao sao contabilizados separadamente como pontos de integracao.
+
+Para validar um unico formulario:
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:imports arquivo.dfm arquivo.pas Entidade TABELA
+pnpm --filter @gestor/delphi-parser validate:imports arquivo.dfm arquivo.pas Entidade TABELA -- --json
+```
+
 ## Validacao semantica
 
 ```bash
@@ -73,5 +89,7 @@ Os fixtures foram criados para garantir regressao minima em:
 - inferencia de grids detalhe;
 - geracao backend;
 - geracao frontend;
+- sintaxe TypeScript e TSX;
+- integridade do grafo de imports gerado;
 - validacao combinada de artefatos;
 - validacao semantica do cenario integrado de pedidos.
