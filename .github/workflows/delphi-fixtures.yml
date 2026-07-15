@@ -23,7 +23,7 @@ env:
 jobs:
   validate-fixtures:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -112,6 +112,9 @@ jobs:
 
       - name: Compile generated backend
         run: pnpm --filter @gestor/delphi-parser validate:fixture-backend-compile
+
+      - name: Execute generated backend runtime smoke tests
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-backend-runtime
 
       - name: Compile generated frontend
         run: pnpm --filter @gestor/delphi-parser validate:fixture-frontend-compile
