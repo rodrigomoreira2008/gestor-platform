@@ -22,7 +22,7 @@ if (existsSync(workflowPath)) {
     'validate:fixture-syntax', 'validate:fixture-imports', 'validate:fixture-determinism', 'validate:fixture-contracts',
     'validate:fixture-repository', 'validate:fixture-backend-compile', 'validate:fixture-backend-runtime', 'validate:fixture-backend-http',
     'validate:fixture-frontend-compile', 'validate:fixture-frontend-runtime', 'validate:fixture-frontend-api',
-    'validate:fixture-routes', 'validate:fixture-semantic', 'validate:fixture-coverage'
+    'validate:fixture-frontend-hooks', 'validate:fixture-routes', 'validate:fixture-semantic', 'validate:fixture-coverage'
   ];
   for (const fragment of requiredFragments) checks.push({ name: `workflow contem ${fragment}`, ok: workflow.includes(fragment), detail: workflowPath });
 
@@ -40,8 +40,8 @@ if (existsSync(workflowPath)) {
     'validate:fixture-boundaries', 'validate:fixture-syntax', 'validate:fixture-imports', 'validate:fixture-determinism',
     'validate:fixture-contracts', 'validate:fixture-repository', 'validate:fixture-backend-compile',
     'validate:fixture-backend-runtime', 'validate:fixture-backend-http', 'validate:fixture-frontend-compile',
-    'validate:fixture-frontend-runtime', 'validate:fixture-frontend-api', 'validate:fixture-routes',
-    'validate:fixture-semantic', 'validate:fixture-coverage'
+    'validate:fixture-frontend-runtime', 'validate:fixture-frontend-api', 'validate:fixture-frontend-hooks',
+    'validate:fixture-routes', 'validate:fixture-semantic', 'validate:fixture-coverage'
   ];
   for (const command of requiredCommands) {
     const occurrences = [...workflow.matchAll(new RegExp(`@gestor/delphi-parser ${command.replace(':', '\\:')}`, 'g'))].length;
@@ -66,13 +66,14 @@ if (existsSync(workflowPath)) {
   const frontendCompileStep = workflow.indexOf('Compile generated frontend');
   const frontendRuntimeStep = workflow.indexOf('Execute generated frontend runtime smoke tests');
   const frontendApiStep = workflow.indexOf('Execute generated frontend API contract tests');
+  const frontendHooksStep = workflow.indexOf('Execute generated frontend hooks contract tests');
   const routesStep = workflow.indexOf('Validate generated API routes');
   const semanticStep = workflow.indexOf('Validate semantic fixture behavior');
   const coverageStep = workflow.indexOf('Validate fixture capability coverage');
   checks.push({
     name: 'etapas finais em ordem de profundidade',
-    ok: artifactStep >= 0 && pathsStep > artifactStep && placeholdersStep > pathsStep && budgetsStep > placeholdersStep && textFormatStep > budgetsStep && namesStep > textFormatStep && boundariesStep > namesStep && syntaxStep > boundariesStep && importsStep > syntaxStep && determinismStep > importsStep && contractsStep > determinismStep && repositoryStep > contractsStep && backendCompileStep > repositoryStep && backendRuntimeStep > backendCompileStep && backendHttpStep > backendRuntimeStep && frontendCompileStep > backendHttpStep && frontendRuntimeStep > frontendCompileStep && frontendApiStep > frontendRuntimeStep && routesStep > frontendApiStep && semanticStep > routesStep && coverageStep > semanticStep,
-    detail: `artefatos=${artifactStep}, caminhos=${pathsStep}, placeholders=${placeholdersStep}, orcamentos=${budgetsStep}, formato=${textFormatStep}, nomes=${namesStep}, fronteiras=${boundariesStep}, sintaxe=${syntaxStep}, imports=${importsStep}, determinismo=${determinismStep}, contratos=${contractsStep}, persistencia=${repositoryStep}, backend=${backendCompileStep}, runtime=${backendRuntimeStep}, http=${backendHttpStep}, frontend=${frontendCompileStep}, frontendRuntime=${frontendRuntimeStep}, frontendApi=${frontendApiStep}, rotas=${routesStep}, semantica=${semanticStep}, cobertura=${coverageStep}`
+    ok: artifactStep >= 0 && pathsStep > artifactStep && placeholdersStep > pathsStep && budgetsStep > placeholdersStep && textFormatStep > budgetsStep && namesStep > textFormatStep && boundariesStep > namesStep && syntaxStep > boundariesStep && importsStep > syntaxStep && determinismStep > importsStep && contractsStep > determinismStep && repositoryStep > contractsStep && backendCompileStep > repositoryStep && backendRuntimeStep > backendCompileStep && backendHttpStep > backendRuntimeStep && frontendCompileStep > backendHttpStep && frontendRuntimeStep > frontendCompileStep && frontendApiStep > frontendRuntimeStep && frontendHooksStep > frontendApiStep && routesStep > frontendHooksStep && semanticStep > routesStep && coverageStep > semanticStep,
+    detail: `artefatos=${artifactStep}, caminhos=${pathsStep}, placeholders=${placeholdersStep}, orcamentos=${budgetsStep}, formato=${textFormatStep}, nomes=${namesStep}, fronteiras=${boundariesStep}, sintaxe=${syntaxStep}, imports=${importsStep}, determinismo=${determinismStep}, contratos=${contractsStep}, persistencia=${repositoryStep}, backend=${backendCompileStep}, runtime=${backendRuntimeStep}, http=${backendHttpStep}, frontend=${frontendCompileStep}, frontendRuntime=${frontendRuntimeStep}, frontendApi=${frontendApiStep}, frontendHooks=${frontendHooksStep}, rotas=${routesStep}, semantica=${semanticStep}, cobertura=${coverageStep}`
   });
 }
 
