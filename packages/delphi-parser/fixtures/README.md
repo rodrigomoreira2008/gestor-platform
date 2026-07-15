@@ -53,6 +53,16 @@ pnpm --filter @gestor/delphi-parser validate:budgets arquivo.dfm arquivo.pas Ent
 
 A auditoria de placeholders detecta conflitos Git, templates nao resolvidos, `undefined`, `[object Object]` e marcadores `FIXME`. A validacao de orcamentos impede crescimento acidental da saida: no maximo 100 arquivos por camada, 256 KiB e 5000 linhas por arquivo, 2 MiB e 30000 linhas no conjunto backend/frontend. A saida informa totais separados por camada e o arquivo exato que excedeu um limite.
 
+## Formato textual dos artefatos
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:fixture-text-format
+pnpm --filter @gestor/delphi-parser validate:text-format arquivo.dfm arquivo.pas Entidade TABELA
+pnpm --filter @gestor/delphi-parser validate:text-format arquivo.dfm arquivo.pas Entidade TABELA -- --json
+```
+
+A validacao garante arquivos sem BOM, somente com quebras de linha LF, sem espacos finais, sem caracteres de controle inesperados e com exatamente um newline ao final. Isso evita diffs artificiais entre Windows e Linux e mantem os artefatos prontos para formatadores e compiladores.
+
 ## Sintaxe, imports e compilacao frontend
 
 ```bash
@@ -117,4 +127,4 @@ A etapa confirma campos, abas, lookup, validacoes, relacionamento mestre/detalhe
 
 ## Objetivo dos fixtures
 
-Os fixtures garantem regressao minima em parsing DFM/PAS, inferencias, geracao backend/frontend, seguranca dos caminhos, placeholders, orcamentos de tamanho, sintaxe, imports, compilacao TypeScript, determinismo, contratos, persistencia, compilacao C#, rotas, semantica e cobertura funcional.
+Os fixtures garantem regressao minima em parsing DFM/PAS, inferencias, geracao backend/frontend, seguranca dos caminhos, placeholders, orcamentos de tamanho, formato textual, sintaxe, imports, compilacao TypeScript, determinismo, contratos, persistencia, compilacao C#, rotas, semantica e cobertura funcional.
