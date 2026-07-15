@@ -20,7 +20,7 @@ if (existsSync(workflowPath)) {
     'validate:fixture-components', 'validate:fixture-artifacts', 'validate:fixture-paths', 'validate:fixture-placeholders',
     'validate:fixture-budgets', 'validate:fixture-text-format', 'validate:fixture-names', 'validate:fixture-boundaries',
     'validate:fixture-syntax', 'validate:fixture-imports', 'validate:fixture-determinism', 'validate:fixture-contracts',
-    'validate:fixture-repository', 'validate:fixture-backend-compile', 'validate:fixture-frontend-compile',
+    'validate:fixture-repository', 'validate:fixture-backend-compile', 'validate:fixture-backend-runtime', 'validate:fixture-frontend-compile',
     'validate:fixture-routes', 'validate:fixture-semantic', 'validate:fixture-coverage'
   ];
   for (const fragment of requiredFragments) checks.push({ name: `workflow contem ${fragment}`, ok: workflow.includes(fragment), detail: workflowPath });
@@ -38,7 +38,7 @@ if (existsSync(workflowPath)) {
     'validate:fixture-placeholders', 'validate:fixture-budgets', 'validate:fixture-text-format', 'validate:fixture-names',
     'validate:fixture-boundaries', 'validate:fixture-syntax', 'validate:fixture-imports', 'validate:fixture-determinism',
     'validate:fixture-contracts', 'validate:fixture-repository', 'validate:fixture-backend-compile',
-    'validate:fixture-frontend-compile', 'validate:fixture-routes', 'validate:fixture-semantic', 'validate:fixture-coverage'
+    'validate:fixture-backend-runtime', 'validate:fixture-frontend-compile', 'validate:fixture-routes', 'validate:fixture-semantic', 'validate:fixture-coverage'
   ];
   for (const command of requiredCommands) {
     const occurrences = [...workflow.matchAll(new RegExp(`@gestor/delphi-parser ${command.replace(':', '\\:')}`, 'g'))].length;
@@ -58,14 +58,15 @@ if (existsSync(workflowPath)) {
   const contractsStep = workflow.indexOf('Validate backend frontend contracts');
   const repositoryStep = workflow.indexOf('Validate generated persistence layer');
   const backendCompileStep = workflow.indexOf('Compile generated backend');
+  const backendRuntimeStep = workflow.indexOf('Execute generated backend runtime smoke tests');
   const frontendCompileStep = workflow.indexOf('Compile generated frontend');
   const routesStep = workflow.indexOf('Validate generated API routes');
   const semanticStep = workflow.indexOf('Validate semantic fixture behavior');
   const coverageStep = workflow.indexOf('Validate fixture capability coverage');
   checks.push({
     name: 'etapas finais em ordem de profundidade',
-    ok: artifactStep >= 0 && pathsStep > artifactStep && placeholdersStep > pathsStep && budgetsStep > placeholdersStep && textFormatStep > budgetsStep && namesStep > textFormatStep && boundariesStep > namesStep && syntaxStep > boundariesStep && importsStep > syntaxStep && determinismStep > importsStep && contractsStep > determinismStep && repositoryStep > contractsStep && backendCompileStep > repositoryStep && frontendCompileStep > backendCompileStep && routesStep > frontendCompileStep && semanticStep > routesStep && coverageStep > semanticStep,
-    detail: `artefatos=${artifactStep}, caminhos=${pathsStep}, placeholders=${placeholdersStep}, orcamentos=${budgetsStep}, formato=${textFormatStep}, nomes=${namesStep}, fronteiras=${boundariesStep}, sintaxe=${syntaxStep}, imports=${importsStep}, determinismo=${determinismStep}, contratos=${contractsStep}, persistencia=${repositoryStep}, backend=${backendCompileStep}, frontend=${frontendCompileStep}, rotas=${routesStep}, semantica=${semanticStep}, cobertura=${coverageStep}`
+    ok: artifactStep >= 0 && pathsStep > artifactStep && placeholdersStep > pathsStep && budgetsStep > placeholdersStep && textFormatStep > budgetsStep && namesStep > textFormatStep && boundariesStep > namesStep && syntaxStep > boundariesStep && importsStep > syntaxStep && determinismStep > importsStep && contractsStep > determinismStep && repositoryStep > contractsStep && backendCompileStep > repositoryStep && backendRuntimeStep > backendCompileStep && frontendCompileStep > backendRuntimeStep && routesStep > frontendCompileStep && semanticStep > routesStep && coverageStep > semanticStep,
+    detail: `artefatos=${artifactStep}, caminhos=${pathsStep}, placeholders=${placeholdersStep}, orcamentos=${budgetsStep}, formato=${textFormatStep}, nomes=${namesStep}, fronteiras=${boundariesStep}, sintaxe=${syntaxStep}, imports=${importsStep}, determinismo=${determinismStep}, contratos=${contractsStep}, persistencia=${repositoryStep}, backend=${backendCompileStep}, runtime=${backendRuntimeStep}, frontend=${frontendCompileStep}, rotas=${routesStep}, semantica=${semanticStep}, cobertura=${coverageStep}`
   });
 }
 
