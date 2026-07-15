@@ -87,6 +87,20 @@ const frontendPrivacyRules: UnsafeRule[] = [
   { name: 'privacidade-frontend-dados-em-url', pattern: /[?&](?:password|senha|token|secret|cpf|cnpj|email|telefone)=/i }
 ];
 
+const backendResourceRules: UnsafeRule[] = [
+  { name: 'recurso-backend-loop-infinito', pattern: /\b(?:while\s*\(\s*true\s*\)|for\s*\(\s*;\s*;\s*\))/i },
+  { name: 'recurso-backend-bloqueio-thread', pattern: /\bThread\s*\.\s*Sleep\s*\(/ },
+  { name: 'recurso-backend-task-run-desnecessario', pattern: /\bTask\s*\.\s*Run\s*\(/ },
+  { name: 'recurso-backend-materializacao-sem-limite', pattern: /\b(?:ToList|ToArray)Async?\s*\(\s*\)/ }
+];
+
+const frontendResourceRules: UnsafeRule[] = [
+  { name: 'recurso-frontend-loop-infinito', pattern: /\b(?:while\s*\(\s*true\s*\)|for\s*\(\s*;\s*;\s*\))/i },
+  { name: 'recurso-frontend-intervalo-global', pattern: /\b(?:window\s*\.\s*)?setInterval\s*\(/ },
+  { name: 'recurso-frontend-animation-frame-global', pattern: /\brequestAnimationFrame\s*\(/ },
+  { name: 'recurso-frontend-worker', pattern: /\bnew\s+(?:Worker|SharedWorker)\s*\(/ }
+];
+
 for (const file of backend) {
   const lines = file.content.split('\n');
   lines.forEach((line, index) => {
@@ -99,6 +113,7 @@ for (const file of backend) {
     scanRules('backend', file.path, line, index + 1, backendUnsafeRules);
     scanRules('backend', file.path, line, index + 1, backendNetworkRules);
     scanRules('backend', file.path, line, index + 1, backendPrivacyRules);
+    scanRules('backend', file.path, line, index + 1, backendResourceRules);
     scanSensitiveLine('backend', file.path, line, index + 1);
     scanUnicodeLine('backend', file.path, line, index + 1);
   });
@@ -123,6 +138,7 @@ for (const file of frontend) {
     scanRules('frontend', file.path, line, index + 1, frontendUnsafeRules);
     scanRules('frontend', file.path, line, index + 1, frontendNetworkRules);
     scanRules('frontend', file.path, line, index + 1, frontendPrivacyRules);
+    scanRules('frontend', file.path, line, index + 1, frontendResourceRules);
     scanSensitiveLine('frontend', file.path, line, index + 1);
     scanUnicodeLine('frontend', file.path, line, index + 1);
   });
@@ -136,6 +152,7 @@ const dependencyCount = unique.filter((item) => item.rule.includes('dependencia-
 const accessibilityCount = unique.filter((item) => item.rule.startsWith('acessibilidade-')).length;
 const networkCount = unique.filter((item) => isRuleFrom(item.rule, backendNetworkRules, frontendNetworkRules)).length;
 const privacyCount = unique.filter((item) => item.rule.startsWith('privacidade-')).length;
+const resourceCount = unique.filter((item) => item.rule.startsWith('recurso-')).length;
 const unsafeCount = unique.filter((item) => (item.rule.startsWith('backend-') || item.rule.startsWith('frontend-')) && !item.rule.includes('dependencia-nao-permitida') && !isRuleFrom(item.rule, backendNetworkRules, frontendNetworkRules)).length;
 const output = {
   ok: unique.length === 0,
@@ -147,12 +164,14 @@ const output = {
   unsafeRules: [...backendUnsafeRules, ...frontendUnsafeRules].map((rule) => rule.name),
   networkRules: [...backendNetworkRules, ...frontendNetworkRules].map((rule) => rule.name),
   privacyRules: [...backendPrivacyRules, ...frontendPrivacyRules].map((rule) => rule.name),
+  resourceRules: [...backendResourceRules, ...frontendResourceRules].map((rule) => rule.name),
   unicodeRules: ['unicode-controle-bidirecional', 'unicode-zero-width', 'unicode-nao-caractere'],
   accessibilityRules: ['acessibilidade-icon-button-sem-nome', 'acessibilidade-imagem-sem-alt', 'acessibilidade-campo-sem-rotulo', 'acessibilidade-dialogo-sem-titulo', 'acessibilidade-formulario-sem-submit'],
   sensitiveCount,
   unsafeCount,
   networkCount,
   privacyCount,
+  resourceCount,
   unicodeCount,
   dependencyCount,
   accessibilityCount,
@@ -161,7 +180,7 @@ const output = {
 
 if (json) console.log(JSON.stringify(output, null, 2));
 else {
-  console.log('Validacao de fronteiras, seguranca, privacidade, rede, acessibilidade e dependencias dos artefatos gerados');
+  console.log('Validacao de fronteiras, seguranca, recursos, privacidade, rede, acessibilidade e dependencias dos artefatos gerados');
   console.log(`Backend: ${backend.length} arquivo(s); frontend: ${frontend.length} arquivo(s)`);
   for (const violation of unique) console.error(`[ERRO] ${violation.layer} ${violation.file}:${violation.line} ${violation.rule}: ${violation.value}`);
   console.log(dependencyCount === 0 ? 'Dependencias frontend pertencem a lista permitida.' : `${dependencyCount} dependencia(s) externa(s) nao permitida(s).`);
@@ -171,6 +190,7 @@ else {
   console.log(unsafeCount === 0 ? 'Nenhum padrao de execucao insegura detectado.' : `${unsafeCount} padrao(oes) inseguro(s) detectado(s).`);
   console.log(networkCount === 0 ? 'Nenhuma saida de rede externa literal detectada.' : `${networkCount} referencia(s) de rede externa detectada(s).`);
   console.log(privacyCount === 0 ? 'Nenhum uso inseguro de dados pessoais ou armazenamento local detectado.' : `${privacyCount} risco(s) de privacidade detectado(s).`);
+  console.log(resourceCount === 0 ? 'Nenhum consumo de recurso potencialmente ilimitado detectado.' : `${resourceCount} risco(s) de consumo de recursos detectado(s).`);
   console.log(unique.length === 0 ? 'Fronteiras de camada preservadas.' : `${unique.length} violacao(oes) encontrada(s).`);
 }
 
