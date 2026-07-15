@@ -119,6 +119,9 @@ jobs:
       - name: Compile generated frontend
         run: pnpm --filter @gestor/delphi-parser validate:fixture-frontend-compile
 
+      - name: Execute generated frontend runtime smoke tests
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-frontend-runtime
+
       - name: Validate generated API routes
         run: pnpm --filter @gestor/delphi-parser validate:fixture-routes
 
