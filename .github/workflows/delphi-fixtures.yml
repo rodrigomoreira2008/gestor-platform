@@ -83,6 +83,9 @@ jobs:
       - name: Validate generated placeholders
         run: pnpm --filter @gestor/delphi-parser validate:fixture-placeholders
 
+      - name: Validate generated artifact budgets
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-budgets
+
       - name: Validate generated TypeScript syntax
         run: pnpm --filter @gestor/delphi-parser validate:fixture-syntax
 
