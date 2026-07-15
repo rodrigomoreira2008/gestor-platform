@@ -120,15 +120,25 @@ pnpm --filter @gestor/delphi-parser validate:contracts arquivo.dfm arquivo.pas E
 
 A validacao compara o DTO C# com a interface TypeScript gerada, incluindo identidade, nomes e categorias de tipos.
 
-## Persistencia, compilacao e runtime backend
+## Persistencia, compilacao, runtime e HTTP backend
 
 ```bash
 pnpm --filter @gestor/delphi-parser validate:fixture-repository
 pnpm --filter @gestor/delphi-parser validate:fixture-backend-compile
 pnpm --filter @gestor/delphi-parser validate:fixture-backend-runtime
+pnpm --filter @gestor/delphi-parser validate:fixture-backend-http
 ```
 
 A auditoria verifica Entity, DTO, Validator, Service, Controller, Configuration e DbContext. A etapa de compilacao materializa os artefatos em um projeto .NET 8 temporario e executa `dotnet build` com warnings tratados como erros. O smoke test de runtime instancia Validator e Service, executa o round-trip DTO -> Entity -> DTO, compara as propriedades e exige o marcador `RUNTIME_OK`.
+
+A validacao HTTP inicia uma aplicacao ASP.NET Core temporaria somente em `127.0.0.1`, registra os artefatos gerados e executa um ciclo CRUD real. Ela exige `201` no POST, `200` nas consultas e atualizacao, `204` no DELETE e `404` apos a exclusao. A rota e extraida do controller gerado e o sucesso exige o marcador `HTTP_RUNTIME_OK`.
+
+Para um unico formulario:
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:backend-http arquivo.dfm arquivo.pas Entidade TABELA
+pnpm --filter @gestor/delphi-parser validate:backend-http arquivo.dfm arquivo.pas Entidade TABELA -- --json
+```
 
 ## Rotas backend e frontend
 
@@ -150,4 +160,4 @@ A etapa confirma campos, abas, lookup, validacoes, relacionamento mestre/detalhe
 
 ## Objetivo dos fixtures
 
-Os fixtures garantem regressao minima em parsing DFM/PAS, inferencias, geracao backend/frontend, seguranca dos caminhos, placeholders, orcamentos de tamanho, formato textual, convencoes de nomes, fronteiras de camada, segredos, Unicode perigoso, dependencias permitidas, acessibilidade, saida de rede, privacidade, consumo de recursos, padroes de execucao insegura, sintaxe, imports, compilacao TypeScript, runtime frontend, determinismo, contratos, persistencia, compilacao C#, runtime backend, rotas, semantica e cobertura funcional.
+Os fixtures garantem regressao minima em parsing DFM/PAS, inferencias, geracao backend/frontend, seguranca dos caminhos, placeholders, orcamentos de tamanho, formato textual, convencoes de nomes, fronteiras de camada, segredos, Unicode perigoso, dependencias permitidas, acessibilidade, saida de rede, privacidade, consumo de recursos, padroes de execucao insegura, sintaxe, imports, compilacao TypeScript, runtime frontend, determinismo, contratos, persistencia, compilacao C#, runtime backend, CRUD HTTP backend, rotas, semantica e cobertura funcional.
