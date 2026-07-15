@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import vm from 'node:vm';
+import { createContext, Script } from 'node:vm';
 import ts from 'typescript';
 import { generateFrontendFiles, resolveDelphiForm } from '../index';
 
@@ -50,8 +50,8 @@ for (const file of runtimeCandidates) {
     }
 
     const module = { exports: {} as Record<string, unknown> };
-    const context = vm.createContext({ module, exports: module.exports, console });
-    const script = new vm.Script(transpiled.outputText, { filename: file.path });
+    const context = createContext({ module, exports: module.exports, console });
+    const script = new Script(transpiled.outputText, { filename: file.path });
     script.runInContext(context, { timeout: 1000 });
 
     const exported = module.exports;
