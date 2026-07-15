@@ -89,6 +89,9 @@ jobs:
       - name: Validate generated text format
         run: pnpm --filter @gestor/delphi-parser validate:fixture-text-format
 
+      - name: Validate generated naming conventions
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-names
+
       - name: Validate generated TypeScript syntax
         run: pnpm --filter @gestor/delphi-parser validate:fixture-syntax
 
