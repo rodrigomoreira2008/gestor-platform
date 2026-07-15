@@ -26,6 +26,11 @@ const nodeBuiltins = new Set([
   'tls', 'tty', 'url', 'util', 'v8', 'vm', 'worker_threads', 'zlib'
 ]);
 
+const allowedFrontendPackages = new Set([
+  'react', 'react-dom', 'react-router-dom', 'zod', 'axios',
+  '@mui/material', '@mui/icons-material', '@mui/x-data-grid', '@tanstack/react-query'
+]);
+
 const sensitiveRules: SensitiveRule[] = [
   { name: 'segredo-chave-privada', pattern: /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/i },
   { name: 'segredo-token-bearer', pattern: /Bearer\s+[A-Za-z0-9._~+/=-]{20,}/i },
@@ -89,6 +94,12 @@ for (const file of frontend) {
       if (/apps[\\/]backend|\.cs\b|^Microsoft\.|^System\./i.test(source)) {
         violations.push({ layer: 'frontend', file: file.path, line: index + 1, rule: 'frontend-importa-dependencia-backend', value: source });
       }
+      if (!source.startsWith('.') && !source.startsWith('/') && !source.startsWith('node:')) {
+        const packageName = getPackageName(source);
+        if (!allowedFrontendPackages.has(packageName)) {
+          violations.push({ layer: 'frontend', file: file.path, line: index + 1, rule: 'frontend-dependencia-nao-permitida', value: packageName });
+        }
+      }
     }
     if (/apps[\\/]backend|\.cs\b|using\s+(Microsoft|System)\./i.test(line)) {
       violations.push({ layer: 'frontend', file: file.path, line: index + 1, rule: 'frontend-referencia-artefato-backend', value: line.trim() });
@@ -102,28 +113,32 @@ for (const file of frontend) {
 const unique = [...new Map(violations.map((item) => [`${item.layer}:${item.file}:${item.line}:${item.rule}:${item.value}`, item])).values()];
 const sensitiveCount = unique.filter((item) => item.rule.startsWith('segredo-') || item.rule === 'senha-literal').length;
 const unicodeCount = unique.filter((item) => item.rule.startsWith('unicode-')).length;
-const unsafeCount = unique.filter((item) => item.rule.startsWith('backend-') || item.rule.startsWith('frontend-')).length;
+const dependencyCount = unique.filter((item) => item.rule.includes('dependencia-nao-permitida')).length;
+const unsafeCount = unique.filter((item) => (item.rule.startsWith('backend-') || item.rule.startsWith('frontend-')) && !item.rule.includes('dependencia-nao-permitida')).length;
 const output = {
   ok: unique.length === 0,
   entity,
   table: table ?? null,
   files: { backend: backend.length, frontend: frontend.length },
+  allowedFrontendPackages: [...allowedFrontendPackages].sort(),
   sensitiveRules: sensitiveRules.map((rule) => rule.name),
   unsafeRules: [...backendUnsafeRules, ...frontendUnsafeRules].map((rule) => rule.name),
   unicodeRules: ['unicode-controle-bidirecional', 'unicode-zero-width', 'unicode-nao-caractere'],
   sensitiveCount,
   unsafeCount,
   unicodeCount,
+  dependencyCount,
   violations: unique
 };
 
 if (json) console.log(JSON.stringify(output, null, 2));
 else {
-  console.log('Validacao de fronteiras, seguranca e dados sensiveis dos artefatos gerados');
+  console.log('Validacao de fronteiras, seguranca e dependencias dos artefatos gerados');
   console.log(`Backend: ${backend.length} arquivo(s); frontend: ${frontend.length} arquivo(s)`);
   for (const violation of unique) {
     console.error(`[ERRO] ${violation.layer} ${violation.file}:${violation.line} ${violation.rule}: ${violation.value}`);
   }
+  console.log(dependencyCount === 0 ? 'Dependencias frontend pertencem a lista permitida.' : `${dependencyCount} dependencia(s) externa(s) nao permitida(s).`);
   console.log(sensitiveCount === 0 ? 'Nenhum segredo literal detectado.' : `${sensitiveCount} possivel(is) segredo(s) detectado(s).`);
   console.log(unicodeCount === 0 ? 'Nenhum caractere Unicode perigoso detectado.' : `${unicodeCount} ocorrencia(s) Unicode perigosa(s).`);
   console.log(unsafeCount === 0 ? 'Nenhum padrao de execucao insegura detectado.' : `${unsafeCount} padrao(oes) inseguro(s) detectado(s).`);
@@ -131,6 +146,11 @@ else {
 }
 
 if (unique.length > 0) process.exit(1);
+
+function getPackageName(source: string): string {
+  const parts = source.split('/');
+  return source.startsWith('@') ? parts.slice(0, 2).join('/') : parts[0];
+}
 
 function scanRules(layer: 'backend' | 'frontend', file: string, line: string, lineNumber: number, rules: UnsafeRule[]): void {
   for (const rule of rules) {
