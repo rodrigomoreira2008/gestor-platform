@@ -116,14 +116,24 @@ pnpm --filter @gestor/delphi-parser validate:contracts arquivo.dfm arquivo.pas E
 
 A validacao compara o DTO C# com a interface TypeScript gerada, incluindo identidade, nomes e categorias de tipos.
 
-## Persistencia e compilacao backend
+## Persistencia, compilacao e runtime backend
 
 ```bash
 pnpm --filter @gestor/delphi-parser validate:fixture-repository
 pnpm --filter @gestor/delphi-parser validate:fixture-backend-compile
+pnpm --filter @gestor/delphi-parser validate:fixture-backend-runtime
 ```
 
 A auditoria verifica Entity, DTO, Validator, Service, Controller, Configuration e DbContext. A etapa de compilacao materializa os artefatos em um projeto .NET 8 temporario e executa `dotnet build` com warnings tratados como erros.
+
+A validacao de runtime cria um executavel .NET 8 temporario para cada fixture, instancia Validator e Service, executa o mapeamento DTO -> Entity -> DTO e compara as propriedades do round-trip. Tambem executa as regras de validacao inferidas e exige o marcador `RUNTIME_OK` antes de considerar o teste aprovado.
+
+Para um unico formulario:
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:backend-runtime arquivo.dfm arquivo.pas Entidade TABELA
+pnpm --filter @gestor/delphi-parser validate:backend-runtime arquivo.dfm arquivo.pas Entidade TABELA -- --json
+```
 
 ## Rotas backend e frontend
 
@@ -145,4 +155,4 @@ A etapa confirma campos, abas, lookup, validacoes, relacionamento mestre/detalhe
 
 ## Objetivo dos fixtures
 
-Os fixtures garantem regressao minima em parsing DFM/PAS, inferencias, geracao backend/frontend, seguranca dos caminhos, placeholders, orcamentos de tamanho, formato textual, convencoes de nomes, fronteiras de camada, segredos, Unicode perigoso, dependencias permitidas, acessibilidade, saida de rede, privacidade, consumo de recursos, padroes de execucao insegura, sintaxe, imports, compilacao TypeScript, determinismo, contratos, persistencia, compilacao C#, rotas, semantica e cobertura funcional.
+Os fixtures garantem regressao minima em parsing DFM/PAS, inferencias, geracao backend/frontend, seguranca dos caminhos, placeholders, orcamentos de tamanho, formato textual, convencoes de nomes, fronteiras de camada, segredos, Unicode perigoso, dependencias permitidas, acessibilidade, saida de rede, privacidade, consumo de recursos, padroes de execucao insegura, sintaxe, imports, compilacao TypeScript, determinismo, contratos, persistencia, compilacao C#, execucao dinamica do backend, rotas, semantica e cobertura funcional.
