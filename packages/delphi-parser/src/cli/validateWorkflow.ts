@@ -17,8 +17,9 @@ if (existsSync(workflowPath)) {
     'runs-on: ubuntu-latest', 'timeout-minutes:', 'actions/checkout@v4', 'pnpm/action-setup@v4', 'actions/setup-node@v4',
     'actions/setup-dotnet@v4', "dotnet-version: '8.0.x'", 'node-version: 20', 'cache: pnpm', 'pnpm install', 'doctor',
     'validate:package', 'validate:workflow', 'validate:scripts', 'validate:docs', 'validate:fixtures', 'validate:components',
-    'validate:fixture-components', 'validate:fixture-artifacts', 'validate:fixture-paths', 'validate:fixture-syntax', 'validate:fixture-imports',
-    'validate:fixture-determinism', 'validate:fixture-contracts', 'validate:fixture-repository', 'validate:fixture-backend-compile',
+    'validate:fixture-components', 'validate:fixture-artifacts', 'validate:fixture-paths', 'validate:fixture-placeholders',
+    'validate:fixture-budgets', 'validate:fixture-syntax', 'validate:fixture-imports', 'validate:fixture-determinism',
+    'validate:fixture-contracts', 'validate:fixture-repository', 'validate:fixture-backend-compile',
     'validate:fixture-frontend-compile', 'validate:fixture-routes', 'validate:fixture-semantic', 'validate:fixture-coverage'
   ];
   for (const fragment of requiredFragments) checks.push({ name: `workflow contem ${fragment}`, ok: workflow.includes(fragment), detail: workflowPath });
@@ -32,9 +33,11 @@ if (existsSync(workflowPath)) {
 
   const requiredCommands = [
     'doctor', 'validate:package', 'validate:workflow', 'validate:scripts', 'validate:docs', 'validate:fixtures', 'build',
-    'validate:components', 'validate:fixture-components', 'validate:fixture-artifacts', 'validate:fixture-paths', 'validate:fixture-syntax',
-    'validate:fixture-imports', 'validate:fixture-determinism', 'validate:fixture-contracts', 'validate:fixture-repository',
-    'validate:fixture-backend-compile', 'validate:fixture-frontend-compile', 'validate:fixture-routes', 'validate:fixture-semantic', 'validate:fixture-coverage'
+    'validate:components', 'validate:fixture-components', 'validate:fixture-artifacts', 'validate:fixture-paths',
+    'validate:fixture-placeholders', 'validate:fixture-budgets', 'validate:fixture-syntax', 'validate:fixture-imports',
+    'validate:fixture-determinism', 'validate:fixture-contracts', 'validate:fixture-repository',
+    'validate:fixture-backend-compile', 'validate:fixture-frontend-compile', 'validate:fixture-routes',
+    'validate:fixture-semantic', 'validate:fixture-coverage'
   ];
   for (const command of requiredCommands) {
     const occurrences = [...workflow.matchAll(new RegExp(`@gestor/delphi-parser ${command.replace(':', '\\:')}`, 'g'))].length;
@@ -43,6 +46,8 @@ if (existsSync(workflowPath)) {
 
   const artifactStep = workflow.indexOf('Validate generated fixture artifacts');
   const pathsStep = workflow.indexOf('Validate generated artifact paths');
+  const placeholdersStep = workflow.indexOf('Validate generated placeholders');
+  const budgetsStep = workflow.indexOf('Validate generated artifact budgets');
   const syntaxStep = workflow.indexOf('Validate generated TypeScript syntax');
   const importsStep = workflow.indexOf('Validate generated import graph');
   const determinismStep = workflow.indexOf('Validate deterministic generation');
@@ -55,8 +60,8 @@ if (existsSync(workflowPath)) {
   const coverageStep = workflow.indexOf('Validate fixture capability coverage');
   checks.push({
     name: 'etapas finais em ordem de profundidade',
-    ok: artifactStep >= 0 && pathsStep > artifactStep && syntaxStep > pathsStep && importsStep > syntaxStep && determinismStep > importsStep && contractsStep > determinismStep && repositoryStep > contractsStep && backendCompileStep > repositoryStep && frontendCompileStep > backendCompileStep && routesStep > frontendCompileStep && semanticStep > routesStep && coverageStep > semanticStep,
-    detail: `artefatos=${artifactStep}, caminhos=${pathsStep}, sintaxe=${syntaxStep}, imports=${importsStep}, determinismo=${determinismStep}, contratos=${contractsStep}, persistencia=${repositoryStep}, backend=${backendCompileStep}, frontend=${frontendCompileStep}, rotas=${routesStep}, semantica=${semanticStep}, cobertura=${coverageStep}`
+    ok: artifactStep >= 0 && pathsStep > artifactStep && placeholdersStep > pathsStep && budgetsStep > placeholdersStep && syntaxStep > budgetsStep && importsStep > syntaxStep && determinismStep > importsStep && contractsStep > determinismStep && repositoryStep > contractsStep && backendCompileStep > repositoryStep && frontendCompileStep > backendCompileStep && routesStep > frontendCompileStep && semanticStep > routesStep && coverageStep > semanticStep,
+    detail: `artefatos=${artifactStep}, caminhos=${pathsStep}, placeholders=${placeholdersStep}, orcamentos=${budgetsStep}, sintaxe=${syntaxStep}, imports=${importsStep}, determinismo=${determinismStep}, contratos=${contractsStep}, persistencia=${repositoryStep}, backend=${backendCompileStep}, frontend=${frontendCompileStep}, rotas=${routesStep}, semantica=${semanticStep}, cobertura=${coverageStep}`
   });
 }
 
