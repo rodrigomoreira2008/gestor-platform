@@ -80,6 +80,9 @@ jobs:
       - name: Validate generated artifact paths
         run: pnpm --filter @gestor/delphi-parser validate:fixture-paths
 
+      - name: Validate generated placeholders
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-placeholders
+
       - name: Validate generated TypeScript syntax
         run: pnpm --filter @gestor/delphi-parser validate:fixture-syntax
 
