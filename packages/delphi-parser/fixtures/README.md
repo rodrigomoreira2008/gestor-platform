@@ -63,7 +63,7 @@ pnpm --filter @gestor/delphi-parser validate:text-format arquivo.dfm arquivo.pas
 
 A validacao garante arquivos sem BOM, somente com quebras de linha LF, sem espacos finais, sem caracteres de controle inesperados e com exatamente um newline ao final. Isso evita diffs artificiais entre Windows e Linux e mantem os artefatos prontos para formatadores e compiladores.
 
-## Convencoes, fronteiras, privacidade, rede e seguranca de execucao
+## Convencoes, fronteiras, recursos, privacidade, rede e seguranca
 
 ```bash
 pnpm --filter @gestor/delphi-parser validate:fixture-names
@@ -78,6 +78,8 @@ A mesma etapa detecta segredos literais, caracteres Unicode invisiveis, problema
 A auditoria de saida de rede bloqueia URLs externas literais, `WebRequest`, sockets diretos, WebSocket, EventSource e `navigator.sendBeacon`. Enderecos relativos e `localhost` permanecem permitidos para a API gerada e para desenvolvimento local. O relatorio JSON separa `networkRules` e `networkCount` das demais categorias de seguranca.
 
 A auditoria de privacidade impede persistencia direta em `localStorage`, `sessionStorage`, IndexedDB e cookies do navegador. Tambem detecta dados pessoais ou credenciais em logs, query strings e URLs, alem de cookies backend explicitamente configurados sem `HttpOnly` ou `Secure`. O relatorio JSON separa `privacyRules` e `privacyCount`.
+
+A auditoria de recursos detecta loops infinitos, bloqueio de threads, `Task.Run` introduzido pelo gerador, materializacao de consultas sem limite, intervalos globais, animation frames e Web Workers. O relatorio JSON apresenta `resourceRules` e `resourceCount`, mantendo esses riscos separados das demais categorias.
 
 ## Sintaxe, imports e compilacao frontend
 
@@ -143,4 +145,4 @@ A etapa confirma campos, abas, lookup, validacoes, relacionamento mestre/detalhe
 
 ## Objetivo dos fixtures
 
-Os fixtures garantem regressao minima em parsing DFM/PAS, inferencias, geracao backend/frontend, seguranca dos caminhos, placeholders, orcamentos de tamanho, formato textual, convencoes de nomes, fronteiras de camada, segredos, Unicode perigoso, dependencias permitidas, acessibilidade, saida de rede, privacidade, padroes de execucao insegura, sintaxe, imports, compilacao TypeScript, determinismo, contratos, persistencia, compilacao C#, rotas, semantica e cobertura funcional.
+Os fixtures garantem regressao minima em parsing DFM/PAS, inferencias, geracao backend/frontend, seguranca dos caminhos, placeholders, orcamentos de tamanho, formato textual, convencoes de nomes, fronteiras de camada, segredos, Unicode perigoso, dependencias permitidas, acessibilidade, saida de rede, privacidade, consumo de recursos, padroes de execucao insegura, sintaxe, imports, compilacao TypeScript, determinismo, contratos, persistencia, compilacao C#, rotas, semantica e cobertura funcional.
