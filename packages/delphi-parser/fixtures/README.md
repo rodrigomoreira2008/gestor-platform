@@ -43,6 +43,16 @@ pnpm --filter @gestor/delphi-parser validate:paths arquivo.dfm arquivo.pas Entid
 
 A auditoria de caminhos e executada antes de qualquer compilacao. Ela impede caminhos absolutos, `..`, barras invertidas, caracteres NUL, extensoes inesperadas, arquivos fora das raizes `apps/backend` e `apps/frontend`, caminhos nao normalizados e colisoes que apareceriam apenas em sistemas de arquivos sem diferenciacao entre maiusculas e minusculas.
 
+## Placeholders e orcamentos de geracao
+
+```bash
+pnpm --filter @gestor/delphi-parser validate:fixture-placeholders
+pnpm --filter @gestor/delphi-parser validate:fixture-budgets
+pnpm --filter @gestor/delphi-parser validate:budgets arquivo.dfm arquivo.pas Entidade TABELA -- --json
+```
+
+A auditoria de placeholders detecta conflitos Git, templates nao resolvidos, `undefined`, `[object Object]` e marcadores `FIXME`. A validacao de orcamentos impede crescimento acidental da saida: no maximo 100 arquivos por camada, 256 KiB e 5000 linhas por arquivo, 2 MiB e 30000 linhas no conjunto backend/frontend. A saida informa totais separados por camada e o arquivo exato que excedeu um limite.
+
 ## Sintaxe, imports e compilacao frontend
 
 ```bash
@@ -107,4 +117,4 @@ A etapa confirma campos, abas, lookup, validacoes, relacionamento mestre/detalhe
 
 ## Objetivo dos fixtures
 
-Os fixtures garantem regressao minima em parsing DFM/PAS, inferencias, geracao backend/frontend, seguranca dos caminhos, sintaxe, imports, compilacao TypeScript, determinismo, contratos, persistencia, compilacao C#, rotas, semantica e cobertura funcional.
+Os fixtures garantem regressao minima em parsing DFM/PAS, inferencias, geracao backend/frontend, seguranca dos caminhos, placeholders, orcamentos de tamanho, sintaxe, imports, compilacao TypeScript, determinismo, contratos, persistencia, compilacao C#, rotas, semantica e cobertura funcional.
