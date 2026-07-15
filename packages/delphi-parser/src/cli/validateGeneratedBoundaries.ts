@@ -67,13 +67,9 @@ for (const file of backend) {
     const usingMatch = line.match(/^\s*using\s+([^;]+);/);
     if (usingMatch) {
       const namespace = usingMatch[1].trim();
-      if (/^(react|@|zod|axios|vite|apps\.frontend|frontend\b)/i.test(namespace)) {
-        violations.push({ layer: 'backend', file: file.path, line: index + 1, rule: 'backend-importa-dependencia-frontend', value: namespace });
-      }
+      if (/^(react|@|zod|axios|vite|apps\.frontend|frontend\b)/i.test(namespace)) violations.push({ layer: 'backend', file: file.path, line: index + 1, rule: 'backend-importa-dependencia-frontend', value: namespace });
     }
-    if (/apps[\\/]frontend|\.tsx?\b|node_modules/i.test(line)) {
-      violations.push({ layer: 'backend', file: file.path, line: index + 1, rule: 'backend-referencia-artefato-frontend', value: line.trim() });
-    }
+    if (/apps[\\/]frontend|\.tsx?\b|node_modules/i.test(line)) violations.push({ layer: 'backend', file: file.path, line: index + 1, rule: 'backend-referencia-artefato-frontend', value: line.trim() });
     scanRules('backend', file.path, line, index + 1, backendUnsafeRules);
     scanSensitiveLine('backend', file.path, line, index + 1);
     scanUnicodeLine('backend', file.path, line, index + 1);
@@ -88,32 +84,26 @@ for (const file of frontend) {
       const source = sourceMatch[1];
       const normalized = source.startsWith('node:') ? source.slice(5) : source;
       const rootPackage = normalized.split('/')[0];
-      if (source.startsWith('node:') || nodeBuiltins.has(rootPackage)) {
-        violations.push({ layer: 'frontend', file: file.path, line: index + 1, rule: 'frontend-importa-api-node', value: source });
-      }
-      if (/apps[\\/]backend|\.cs\b|^Microsoft\.|^System\./i.test(source)) {
-        violations.push({ layer: 'frontend', file: file.path, line: index + 1, rule: 'frontend-importa-dependencia-backend', value: source });
-      }
+      if (source.startsWith('node:') || nodeBuiltins.has(rootPackage)) violations.push({ layer: 'frontend', file: file.path, line: index + 1, rule: 'frontend-importa-api-node', value: source });
+      if (/apps[\\/]backend|\.cs\b|^Microsoft\.|^System\./i.test(source)) violations.push({ layer: 'frontend', file: file.path, line: index + 1, rule: 'frontend-importa-dependencia-backend', value: source });
       if (!source.startsWith('.') && !source.startsWith('/') && !source.startsWith('node:')) {
         const packageName = getPackageName(source);
-        if (!allowedFrontendPackages.has(packageName)) {
-          violations.push({ layer: 'frontend', file: file.path, line: index + 1, rule: 'frontend-dependencia-nao-permitida', value: packageName });
-        }
+        if (!allowedFrontendPackages.has(packageName)) violations.push({ layer: 'frontend', file: file.path, line: index + 1, rule: 'frontend-dependencia-nao-permitida', value: packageName });
       }
     }
-    if (/apps[\\/]backend|\.cs\b|using\s+(Microsoft|System)\./i.test(line)) {
-      violations.push({ layer: 'frontend', file: file.path, line: index + 1, rule: 'frontend-referencia-artefato-backend', value: line.trim() });
-    }
+    if (/apps[\\/]backend|\.cs\b|using\s+(Microsoft|System)\./i.test(line)) violations.push({ layer: 'frontend', file: file.path, line: index + 1, rule: 'frontend-referencia-artefato-backend', value: line.trim() });
     scanRules('frontend', file.path, line, index + 1, frontendUnsafeRules);
     scanSensitiveLine('frontend', file.path, line, index + 1);
     scanUnicodeLine('frontend', file.path, line, index + 1);
   });
+  if (file.path.endsWith('.tsx')) scanAccessibility(file);
 }
 
 const unique = [...new Map(violations.map((item) => [`${item.layer}:${item.file}:${item.line}:${item.rule}:${item.value}`, item])).values()];
 const sensitiveCount = unique.filter((item) => item.rule.startsWith('segredo-') || item.rule === 'senha-literal').length;
 const unicodeCount = unique.filter((item) => item.rule.startsWith('unicode-')).length;
 const dependencyCount = unique.filter((item) => item.rule.includes('dependencia-nao-permitida')).length;
+const accessibilityCount = unique.filter((item) => item.rule.startsWith('acessibilidade-')).length;
 const unsafeCount = unique.filter((item) => (item.rule.startsWith('backend-') || item.rule.startsWith('frontend-')) && !item.rule.includes('dependencia-nao-permitida')).length;
 const output = {
   ok: unique.length === 0,
@@ -124,21 +114,22 @@ const output = {
   sensitiveRules: sensitiveRules.map((rule) => rule.name),
   unsafeRules: [...backendUnsafeRules, ...frontendUnsafeRules].map((rule) => rule.name),
   unicodeRules: ['unicode-controle-bidirecional', 'unicode-zero-width', 'unicode-nao-caractere'],
+  accessibilityRules: ['acessibilidade-icon-button-sem-nome', 'acessibilidade-imagem-sem-alt', 'acessibilidade-campo-sem-rotulo', 'acessibilidade-dialogo-sem-titulo', 'acessibilidade-formulario-sem-submit'],
   sensitiveCount,
   unsafeCount,
   unicodeCount,
   dependencyCount,
+  accessibilityCount,
   violations: unique
 };
 
 if (json) console.log(JSON.stringify(output, null, 2));
 else {
-  console.log('Validacao de fronteiras, seguranca e dependencias dos artefatos gerados');
+  console.log('Validacao de fronteiras, seguranca, acessibilidade e dependencias dos artefatos gerados');
   console.log(`Backend: ${backend.length} arquivo(s); frontend: ${frontend.length} arquivo(s)`);
-  for (const violation of unique) {
-    console.error(`[ERRO] ${violation.layer} ${violation.file}:${violation.line} ${violation.rule}: ${violation.value}`);
-  }
+  for (const violation of unique) console.error(`[ERRO] ${violation.layer} ${violation.file}:${violation.line} ${violation.rule}: ${violation.value}`);
   console.log(dependencyCount === 0 ? 'Dependencias frontend pertencem a lista permitida.' : `${dependencyCount} dependencia(s) externa(s) nao permitida(s).`);
+  console.log(accessibilityCount === 0 ? 'Requisitos basicos de acessibilidade preservados.' : `${accessibilityCount} problema(s) de acessibilidade detectado(s).`);
   console.log(sensitiveCount === 0 ? 'Nenhum segredo literal detectado.' : `${sensitiveCount} possivel(is) segredo(s) detectado(s).`);
   console.log(unicodeCount === 0 ? 'Nenhum caractere Unicode perigoso detectado.' : `${unicodeCount} ocorrencia(s) Unicode perigosa(s).`);
   console.log(unsafeCount === 0 ? 'Nenhum padrao de execucao insegura detectado.' : `${unsafeCount} padrao(oes) inseguro(s) detectado(s).`);
@@ -147,42 +138,24 @@ else {
 
 if (unique.length > 0) process.exit(1);
 
-function getPackageName(source: string): string {
-  const parts = source.split('/');
-  return source.startsWith('@') ? parts.slice(0, 2).join('/') : parts[0];
-}
-
-function scanRules(layer: 'backend' | 'frontend', file: string, line: string, lineNumber: number, rules: UnsafeRule[]): void {
-  for (const rule of rules) {
-    rule.pattern.lastIndex = 0;
-    if (!rule.pattern.test(line)) continue;
-    violations.push({ layer, file, line: lineNumber, rule: rule.name, value: line.trim() });
-  }
-}
-
-function scanSensitiveLine(layer: 'backend' | 'frontend', file: string, line: string, lineNumber: number): void {
-  for (const rule of sensitiveRules) {
-    rule.pattern.lastIndex = 0;
-    if (!rule.pattern.test(line)) continue;
-    violations.push({ layer, file, line: lineNumber, rule: rule.name, value: redact(line.trim()) });
-  }
-}
-
+function getPackageName(source: string): string { const parts = source.split('/'); return source.startsWith('@') ? parts.slice(0, 2).join('/') : parts[0]; }
+function scanRules(layer: 'backend' | 'frontend', file: string, line: string, lineNumber: number, rules: UnsafeRule[]): void { for (const rule of rules) { rule.pattern.lastIndex = 0; if (rule.pattern.test(line)) violations.push({ layer, file, line: lineNumber, rule: rule.name, value: line.trim() }); } }
+function scanSensitiveLine(layer: 'backend' | 'frontend', file: string, line: string, lineNumber: number): void { for (const rule of sensitiveRules) { rule.pattern.lastIndex = 0; if (rule.pattern.test(line)) violations.push({ layer, file, line: lineNumber, rule: rule.name, value: redact(line.trim()) }); } }
 function scanUnicodeLine(layer: 'backend' | 'frontend', file: string, line: string, lineNumber: number): void {
   const groups: Array<{ name: string; pattern: RegExp }> = [
     { name: 'unicode-controle-bidirecional', pattern: /[\u202A-\u202E\u2066-\u2069]/g },
     { name: 'unicode-zero-width', pattern: /[\u200B-\u200F\u2060\uFEFF]/g },
     { name: 'unicode-nao-caractere', pattern: /[\uFDD0-\uFDEF\uFFFE\uFFFF]/g }
   ];
-  for (const group of groups) {
-    const matches = line.match(group.pattern);
-    if (!matches) continue;
-    const points = [...new Set(matches.map((value) => `U+${value.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}`))];
-    violations.push({ layer, file, line: lineNumber, rule: group.name, value: points.join(', ') });
-  }
+  for (const group of groups) { const matches = line.match(group.pattern); if (!matches) continue; const points = [...new Set(matches.map((value) => `U+${value.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}`))]; violations.push({ layer, file, line: lineNumber, rule: group.name, value: points.join(', ') }); }
 }
-
-function redact(value: string): string {
-  if (value.length <= 24) return '[conteudo sensivel ocultado]';
-  return `${value.slice(0, 12)}...[ocultado]...${value.slice(-8)}`;
+function scanAccessibility(file: GeneratedFile): void {
+  scanTagRequirement(file, /<IconButton\b[^>]*>/g, 'acessibilidade-icon-button-sem-nome', (tag) => /\baria-label\s*=|\baria-labelledby\s*=|\btitle\s*=/.test(tag));
+  scanTagRequirement(file, /<img\b[^>]*>/gi, 'acessibilidade-imagem-sem-alt', (tag) => /\balt\s*=/.test(tag));
+  scanTagRequirement(file, /<TextField\b[^>]*>/g, 'acessibilidade-campo-sem-rotulo', (tag) => /\blabel\s*=|\baria-label\s*=|\baria-labelledby\s*=|\bplaceholder\s*=/.test(tag));
+  if (/<Dialog\b/.test(file.content) && !/<DialogTitle\b/.test(file.content)) addAccessibility(file, file.content.indexOf('<Dialog'), 'acessibilidade-dialogo-sem-titulo', '<Dialog>');
+  if (/component=["']form["']/.test(file.content) && !/<Button\b[^>]*type=["']submit["']/.test(file.content)) addAccessibility(file, file.content.indexOf('component="form"'), 'acessibilidade-formulario-sem-submit', 'component="form"');
 }
+function scanTagRequirement(file: GeneratedFile, pattern: RegExp, rule: string, valid: (tag: string) => boolean): void { for (const match of file.content.matchAll(pattern)) { if (!valid(match[0])) addAccessibility(file, match.index ?? 0, rule, match[0]); } }
+function addAccessibility(file: GeneratedFile, index: number, rule: string, value: string): void { const line = file.content.slice(0, Math.max(0, index)).split('\n').length; violations.push({ layer: 'frontend', file: file.path, line, rule, value: value.slice(0, 160) }); }
+function redact(value: string): string { if (value.length <= 24) return '[conteudo sensivel ocultado]'; return `${value.slice(0, 12)}...[ocultado]...${value.slice(-8)}`; }
