@@ -92,6 +92,9 @@ jobs:
       - name: Validate generated naming conventions
         run: pnpm --filter @gestor/delphi-parser validate:fixture-names
 
+      - name: Validate generated layer boundaries
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-boundaries
+
       - name: Validate generated TypeScript syntax
         run: pnpm --filter @gestor/delphi-parser validate:fixture-syntax
 
