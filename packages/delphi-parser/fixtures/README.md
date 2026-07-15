@@ -63,7 +63,7 @@ pnpm --filter @gestor/delphi-parser validate:text-format arquivo.dfm arquivo.pas
 
 A validacao garante arquivos sem BOM, somente com quebras de linha LF, sem espacos finais, sem caracteres de controle inesperados e com exatamente um newline ao final. Isso evita diffs artificiais entre Windows e Linux e mantem os artefatos prontos para formatadores e compiladores.
 
-## Convencoes, fronteiras, rede e seguranca de execucao
+## Convencoes, fronteiras, privacidade, rede e seguranca de execucao
 
 ```bash
 pnpm --filter @gestor/delphi-parser validate:fixture-names
@@ -76,6 +76,8 @@ A auditoria de fronteiras impede que o backend gere referencias para React, Type
 A mesma etapa detecta segredos literais, caracteres Unicode invisiveis, problemas basicos de acessibilidade e padroes de execucao perigosos. No backend, bloqueia inicializacao de processos e shells, bibliotecas nativas, desserializadores inseguros e SQL bruto interpolado ou concatenado. No frontend, bloqueia `eval`, `new Function`, `dangerouslySetInnerHTML`, `document.write`, atribuicoes a `innerHTML` e URLs `javascript:`. Cada violacao informa camada, arquivo, linha, regra e referencia detectada; valores sensiveis sao parcialmente ocultados.
 
 A auditoria de saida de rede bloqueia URLs externas literais, `WebRequest`, sockets diretos, WebSocket, EventSource e `navigator.sendBeacon`. Enderecos relativos e `localhost` permanecem permitidos para a API gerada e para desenvolvimento local. O relatorio JSON separa `networkRules` e `networkCount` das demais categorias de seguranca.
+
+A auditoria de privacidade impede persistencia direta em `localStorage`, `sessionStorage`, IndexedDB e cookies do navegador. Tambem detecta dados pessoais ou credenciais em logs, query strings e URLs, alem de cookies backend explicitamente configurados sem `HttpOnly` ou `Secure`. O relatorio JSON separa `privacyRules` e `privacyCount`.
 
 ## Sintaxe, imports e compilacao frontend
 
@@ -141,4 +143,4 @@ A etapa confirma campos, abas, lookup, validacoes, relacionamento mestre/detalhe
 
 ## Objetivo dos fixtures
 
-Os fixtures garantem regressao minima em parsing DFM/PAS, inferencias, geracao backend/frontend, seguranca dos caminhos, placeholders, orcamentos de tamanho, formato textual, convencoes de nomes, fronteiras de camada, segredos, Unicode perigoso, dependencias permitidas, acessibilidade, saida de rede, padroes de execucao insegura, sintaxe, imports, compilacao TypeScript, determinismo, contratos, persistencia, compilacao C#, rotas, semantica e cobertura funcional.
+Os fixtures garantem regressao minima em parsing DFM/PAS, inferencias, geracao backend/frontend, seguranca dos caminhos, placeholders, orcamentos de tamanho, formato textual, convencoes de nomes, fronteiras de camada, segredos, Unicode perigoso, dependencias permitidas, acessibilidade, saida de rede, privacidade, padroes de execucao insegura, sintaxe, imports, compilacao TypeScript, determinismo, contratos, persistencia, compilacao C#, rotas, semantica e cobertura funcional.
