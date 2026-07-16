@@ -25,6 +25,7 @@ const fixtures: FixtureCase[] = [
 const validators: ValidatorCase[] = [
   { name: 'manifest', file: 'src/cli/validateGeneratedFrontendManifest.ts' },
   { name: 'wiring', file: 'src/cli/validateGeneratedFrontendWiring.ts' },
+  { name: 'complexity', file: 'src/cli/validateGeneratedFrontendComplexity.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
