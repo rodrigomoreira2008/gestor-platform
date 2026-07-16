@@ -26,6 +26,7 @@ const validators: ValidatorCase[] = [
   { name: 'tabbed-form', file: 'src/cli/validateGeneratedFrontendTabbedForm.ts' },
   { name: 'tabs', file: 'src/cli/validateGeneratedFrontendTabs.ts' },
   { name: 'filters', file: 'src/cli/validateGeneratedFrontendFilters.ts' },
+  { name: 'columns', file: 'src/cli/validateGeneratedFrontendColumns.ts' },
   { name: 'detail-grids', file: 'src/cli/validateGeneratedFrontendDetailGrids.ts' },
   { name: 'detail-hooks', file: 'src/cli/validateGeneratedFrontendDetailHooks.ts' },
   { name: 'lookup-hooks', file: 'src/cli/validateGeneratedFrontendLookupHooks.ts' }
