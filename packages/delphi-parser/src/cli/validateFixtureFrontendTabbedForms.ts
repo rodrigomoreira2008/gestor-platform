@@ -23,6 +23,7 @@ const fixtures: FixtureCase[] = [
 ];
 
 const validators: ValidatorCase[] = [
+  { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'tabbed-form', file: 'src/cli/validateGeneratedFrontendTabbedForm.ts' },
   { name: 'tabs', file: 'src/cli/validateGeneratedFrontendTabs.ts' },
   { name: 'filters', file: 'src/cli/validateGeneratedFrontendFilters.ts' },
