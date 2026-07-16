@@ -25,7 +25,8 @@ const fixtures: FixtureCase[] = [
 const validators: ValidatorCase[] = [
   { name: 'tabbed-form', file: 'src/cli/validateGeneratedFrontendTabbedForm.ts' },
   { name: 'filters', file: 'src/cli/validateGeneratedFrontendFilters.ts' },
-  { name: 'detail-grids', file: 'src/cli/validateGeneratedFrontendDetailGrids.ts' }
+  { name: 'detail-grids', file: 'src/cli/validateGeneratedFrontendDetailGrids.ts' },
+  { name: 'detail-hooks', file: 'src/cli/validateGeneratedFrontendDetailHooks.ts' }
 ];
 
 const packageRoot = process.cwd();
