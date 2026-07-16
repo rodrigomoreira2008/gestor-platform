@@ -131,6 +131,9 @@ jobs:
       - name: Execute generated frontend hooks contract tests
         run: pnpm --filter @gestor/delphi-parser validate:fixture-frontend-hooks
 
+      - name: Execute generated frontend schema contract tests
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-frontend-schema
+
       - name: Validate generated API routes
         run: pnpm --filter @gestor/delphi-parser validate:fixture-routes
 
