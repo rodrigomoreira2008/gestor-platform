@@ -1,0 +1,66 @@
+import { spawnSync } from 'node:child_process';
+import { resolve } from 'node:path';
+
+interface FixtureCase {
+  name: string;
+  dfm: string;
+  pas: string;
+  entity: string;
+  table: string;
+}
+
+const fixtures: FixtureCase[] = [
+  { name: 'produtos', dfm: 'fixtures/cadastro-produtos.dfm', pas: 'fixtures/cadastro-produtos.pas', entity: 'Produto', table: 'PRODUTOS' },
+  { name: 'parceiros', dfm: 'fixtures/cadastro-parceiros.dfm', pas: 'fixtures/cadastro-parceiros.pas', entity: 'Parceiro', table: 'PARCEIROS' },
+  { name: 'grupo-produtos', dfm: 'fixtures/cadastro-grupo-produtos.dfm', pas: 'fixtures/cadastro-grupo-produtos.pas', entity: 'GrupoProduto', table: 'GRUPOPRODUTOS' },
+  { name: 'grupo-parceiros', dfm: 'fixtures/cadastro-grupo-parceiros.dfm', pas: 'fixtures/cadastro-grupo-parceiros.pas', entity: 'GrupoParceiro', table: 'GRUPOPARCEIROS' },
+  { name: 'pedidos', dfm: 'fixtures/cadastro-pedidos.dfm', pas: 'fixtures/cadastro-pedidos.pas', entity: 'Pedido', table: 'PEDIDOS' }
+];
+
+const packageRoot = process.cwd();
+const validatorPath = resolve(packageRoot, 'src/cli/validateGeneratedFrontendTabbedForm.ts');
+const json = process.argv.includes('--json');
+const results: Array<{ fixture: string; ok: boolean; exitCode: number | null; output: string }> = [];
+
+for (const fixture of fixtures) {
+  const args = [
+    'exec',
+    'tsx',
+    validatorPath,
+    resolve(packageRoot, fixture.dfm),
+    resolve(packageRoot, fixture.pas),
+    fixture.entity,
+    fixture.table
+  ];
+  if (json) args.push('--json');
+
+  const execution = spawnSync('pnpm', args, {
+    cwd: packageRoot,
+    encoding: 'utf8',
+    timeout: 15_000,
+    shell: process.platform === 'win32'
+  });
+
+  const output = `${execution.stdout ?? ''}${execution.stderr ?? ''}`.trim();
+  const ok = execution.status === 0;
+  results.push({ fixture: fixture.name, ok, exitCode: execution.status, output });
+
+  if (!json) {
+    console.log(`\n[${ok ? 'OK' : 'ERRO'}] ${fixture.name}`);
+    if (output) console.log(output);
+  }
+}
+
+const failed = results.filter((result) => !result.ok);
+const report = {
+  ok: failed.length === 0,
+  total: results.length,
+  passed: results.length - failed.length,
+  failed: failed.length,
+  results
+};
+
+if (json) console.log(JSON.stringify(report, null, 2));
+else console.log(`\nResumo dos formularios com abas: ${report.passed}/${report.total} fixtures OK`);
+
+if (failed.length > 0) process.exit(1);
