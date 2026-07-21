@@ -26,6 +26,7 @@ const validators: ValidatorCase[] = [
   { name: 'manifest', file: 'src/cli/validateGeneratedFrontendManifest.ts' },
   { name: 'wiring', file: 'src/cli/validateGeneratedFrontendWiring.ts' },
   { name: 'security', file: 'src/cli/validateGeneratedFrontendSecurity.ts' },
+  { name: 'resilience', file: 'src/cli/validateGeneratedFrontendResilience.ts' },
   { name: 'complexity', file: 'src/cli/validateGeneratedFrontendComplexity.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
