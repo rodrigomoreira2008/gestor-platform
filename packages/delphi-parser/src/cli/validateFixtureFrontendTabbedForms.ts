@@ -33,6 +33,7 @@ const validators: ValidatorCase[] = [
   { name: 'performance', file: 'src/cli/validateGeneratedFrontendPerformance.ts' },
   { name: 'react-query', file: 'src/cli/validateGeneratedFrontendReactQuery.ts' },
   { name: 'state', file: 'src/cli/validateGeneratedFrontendState.ts' },
+  { name: 'mutations', file: 'src/cli/validateGeneratedFrontendMutations.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
