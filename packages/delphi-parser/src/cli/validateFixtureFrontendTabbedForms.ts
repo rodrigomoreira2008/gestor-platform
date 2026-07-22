@@ -85,6 +85,7 @@ const validators: ValidatorCase[] = [
   { name: 'offline-cache-warning-text-spacing', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningTextSpacing.ts' },
   { name: 'offline-cache-warning-text-hyphenation', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningTextHyphenation.ts' },
   { name: 'offline-cache-warning-language', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningLanguage.ts' },
+  { name: 'offline-cache-warning-direction', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningDirection.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
