@@ -50,6 +50,7 @@ const validators: ValidatorCase[] = [
   { name: 'result-count', file: 'src/cli/validateGeneratedFrontendResultCount.ts' },
   { name: 'last-updated', file: 'src/cli/validateGeneratedFrontendLastUpdated.ts' },
   { name: 'background-loading', file: 'src/cli/validateGeneratedFrontendBackgroundLoading.ts' },
+  { name: 'stale-data', file: 'src/cli/validateGeneratedFrontendStaleData.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
