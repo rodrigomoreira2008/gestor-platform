@@ -38,6 +38,7 @@ const validators: ValidatorCase[] = [
   { name: 'pagination', file: 'src/cli/validateGeneratedFrontendPagination.ts' },
   { name: 'sorting', file: 'src/cli/validateGeneratedFrontendSorting.ts' },
   { name: 'selection', file: 'src/cli/validateGeneratedFrontendSelection.ts' },
+  { name: 'search', file: 'src/cli/validateGeneratedFrontendSearch.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
