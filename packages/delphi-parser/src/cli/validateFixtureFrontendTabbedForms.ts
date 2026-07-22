@@ -48,6 +48,7 @@ const validators: ValidatorCase[] = [
   { name: 'error-recovery', file: 'src/cli/validateGeneratedFrontendErrorRecovery.ts' },
   { name: 'active-filter-count', file: 'src/cli/validateGeneratedFrontendActiveFilterCount.ts' },
   { name: 'result-count', file: 'src/cli/validateGeneratedFrontendResultCount.ts' },
+  { name: 'last-updated', file: 'src/cli/validateGeneratedFrontendLastUpdated.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
