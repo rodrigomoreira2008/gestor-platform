@@ -54,6 +54,7 @@ const validators: ValidatorCase[] = [
   { name: 'paused-query', file: 'src/cli/validateGeneratedFrontendPausedQuery.ts' },
   { name: 'retry-indicator', file: 'src/cli/validateGeneratedFrontendRetryIndicator.ts' },
   { name: 'offline-refresh', file: 'src/cli/validateGeneratedFrontendOfflineRefresh.ts' },
+  { name: 'query-status-announcement', file: 'src/cli/validateGeneratedFrontendQueryStatusAnnouncement.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
