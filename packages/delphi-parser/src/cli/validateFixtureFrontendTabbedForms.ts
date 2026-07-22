@@ -95,6 +95,7 @@ const validators: ValidatorCase[] = [
   { name: 'offline-cache-warning-logical-min-sizing', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningLogicalMinSizing.ts' },
   { name: 'offline-cache-warning-logical-text-align', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningLogicalTextAlign.ts' },
   { name: 'offline-cache-warning-word-break', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningWordBreak.ts' },
+  { name: 'offline-cache-warning-hanging-punctuation', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningHangingPunctuation.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
