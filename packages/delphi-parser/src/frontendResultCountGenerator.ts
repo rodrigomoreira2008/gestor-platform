@@ -27,8 +27,8 @@ function addResultCount(source: string): string {
   const withTotal = `${source.slice(0, rowsIndex)}  const totalRecords = (list.data ?? []).length;\n${source.slice(rowsIndex)}`;
 
   return withTotal.replace(
-    'Abas inferidas: {${entity}Tabs.length} · Registros exibidos: {rows.length}',
-    'Abas inferidas: {${entity}Tabs.length} · Registros exibidos: {rows.length} de {totalRecords}'
+    /Abas inferidas: \{[A-Za-z0-9_]+Tabs\.length\} · Registros exibidos: \{rows\.length\}/,
+    (summary) => `${summary} de {totalRecords}`
   );
 }
 
