@@ -63,6 +63,7 @@ const validators: ValidatorCase[] = [
   { name: 'offline-cache-warning-dismiss-focus', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningDismissFocus.ts' },
   { name: 'offline-cache-warning-escape-dismiss', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningEscapeDismiss.ts' },
   { name: 'offline-cache-warning-escape-shortcut', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningEscapeShortcut.ts' },
+  { name: 'offline-cache-warning-escape-description', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningEscapeDescription.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
