@@ -56,6 +56,7 @@ const validators: ValidatorCase[] = [
   { name: 'offline-refresh', file: 'src/cli/validateGeneratedFrontendOfflineRefresh.ts' },
   { name: 'query-status-announcement', file: 'src/cli/validateGeneratedFrontendQueryStatusAnnouncement.ts' },
   { name: 'offline-error-recovery', file: 'src/cli/validateGeneratedFrontendOfflineErrorRecovery.ts' },
+  { name: 'initial-offline-state', file: 'src/cli/validateGeneratedFrontendInitialOfflineState.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
