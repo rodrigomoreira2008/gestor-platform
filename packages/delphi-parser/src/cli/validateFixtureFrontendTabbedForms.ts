@@ -43,6 +43,7 @@ const validators: ValidatorCase[] = [
   { name: 'toolbar', file: 'src/cli/validateGeneratedFrontendToolbar.ts' },
   { name: 'empty-state', file: 'src/cli/validateGeneratedFrontendEmptyState.ts' },
   { name: 'csv-export', file: 'src/cli/validateGeneratedFrontendCsvExport.ts' },
+  { name: 'filter-reset', file: 'src/cli/validateGeneratedFrontendFilterReset.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
