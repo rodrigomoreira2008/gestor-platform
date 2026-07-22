@@ -28,7 +28,7 @@ const checks = [
   ['stale indicator suppressed while paused', source.includes("list.fetchStatus !== 'paused' && !list.isFetching")],
   ['stale label preserved', source.includes('label="Dados em cache"')],
   ['background loading preserved', source.includes('aria-label="Atualizando listagem"')],
-  ['manual refresh preserved', source.includes("list.isFetching ? 'Atualizando...' : 'Atualizar'"))
+  ['manual refresh preserved', source.includes("list.isFetching ? 'Atualizando...' : 'Atualizar'")]
 ] as const;
 
 const failed = checks.filter(([, ok]) => !ok);
