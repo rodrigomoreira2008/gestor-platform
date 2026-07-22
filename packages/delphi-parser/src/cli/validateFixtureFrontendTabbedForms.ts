@@ -81,6 +81,7 @@ const validators: ValidatorCase[] = [
   { name: 'offline-cache-warning-forced-colors', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningForcedColors.ts' },
   { name: 'offline-cache-warning-touch-target', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningTouchTarget.ts' },
   { name: 'offline-cache-warning-scroll-margin', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningScrollMargin.ts' },
+  { name: 'offline-cache-warning-text-reflow', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningTextReflow.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
