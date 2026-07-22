@@ -41,6 +41,7 @@ const validators: ValidatorCase[] = [
   { name: 'selection', file: 'src/cli/validateGeneratedFrontendSelection.ts' },
   { name: 'search', file: 'src/cli/validateGeneratedFrontendSearch.ts' },
   { name: 'toolbar', file: 'src/cli/validateGeneratedFrontendToolbar.ts' },
+  { name: 'empty-state', file: 'src/cli/validateGeneratedFrontendEmptyState.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
