@@ -26,8 +26,8 @@ const checks = [
   ['progress rendered', source.includes('<LinearProgress')],
   ['accessible label present', source.includes('aria-label="Atualizando listagem"')],
   ['error recovery preserved', source.includes('Tentar novamente')],
-  ['manual refresh preserved', source.includes("list.isFetching ? 'Atualizando...' : 'Atualizar'"))],
-  ['last updated preserved', source.includes('Última atualização: {lastUpdatedAt}'))
+  ['manual refresh preserved', source.includes("list.isFetching ? 'Atualizando...' : 'Atualizar'")],
+  ['last updated preserved', source.includes('Última atualização: {lastUpdatedAt}')]
 ] as const;
 
 const failed = checks.filter(([, ok]) => !ok);
