@@ -72,6 +72,7 @@ const validators: ValidatorCase[] = [
   { name: 'offline-cache-warning-state-description', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningStateDescription.ts' },
   { name: 'offline-cache-warning-button-role', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningButtonRole.ts' },
   { name: 'offline-cache-warning-keyboard-activation', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningKeyboardActivation.ts' },
+  { name: 'offline-cache-warning-keyboard-shortcuts', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningKeyboardShortcuts.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
