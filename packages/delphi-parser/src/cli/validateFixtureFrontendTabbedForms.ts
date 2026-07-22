@@ -90,6 +90,7 @@ const validators: ValidatorCase[] = [
   { name: 'offline-cache-warning-text-balance', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningTextBalance.ts' },
   { name: 'offline-cache-warning-no-truncation', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningNoTruncation.ts' },
   { name: 'offline-cache-warning-flex-reflow', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningFlexReflow.ts' },
+  { name: 'offline-cache-warning-box-sizing', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningBoxSizing.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
