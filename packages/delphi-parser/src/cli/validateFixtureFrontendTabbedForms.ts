@@ -49,6 +49,7 @@ const validators: ValidatorCase[] = [
   { name: 'active-filter-count', file: 'src/cli/validateGeneratedFrontendActiveFilterCount.ts' },
   { name: 'result-count', file: 'src/cli/validateGeneratedFrontendResultCount.ts' },
   { name: 'last-updated', file: 'src/cli/validateGeneratedFrontendLastUpdated.ts' },
+  { name: 'background-loading', file: 'src/cli/validateGeneratedFrontendBackgroundLoading.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
