@@ -52,6 +52,7 @@ const validators: ValidatorCase[] = [
   { name: 'background-loading', file: 'src/cli/validateGeneratedFrontendBackgroundLoading.ts' },
   { name: 'stale-data', file: 'src/cli/validateGeneratedFrontendStaleData.ts' },
   { name: 'paused-query', file: 'src/cli/validateGeneratedFrontendPausedQuery.ts' },
+  { name: 'retry-indicator', file: 'src/cli/validateGeneratedFrontendRetryIndicator.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
