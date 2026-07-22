@@ -101,6 +101,7 @@ const validators: ValidatorCase[] = [
   { name: 'offline-cache-warning-font-numeric', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningFontNumeric.ts' },
   { name: 'offline-cache-warning-font-caps', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningFontCaps.ts' },
   { name: 'offline-cache-warning-font-east-asian', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningFontEastAsian.ts' },
+  { name: 'offline-cache-warning-font-position', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningFontPosition.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
