@@ -1,18 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 
-interface FixtureCase {
-  name: string;
-  dfm: string;
-  pas: string;
-  entity: string;
-  table: string;
-}
-
-interface ValidatorCase {
-  name: string;
-  file: string;
-}
+interface FixtureCase { name: string; dfm: string; pas: string; entity: string; table: string; }
+interface ValidatorCase { name: string; file: string; }
 
 const fixtures: FixtureCase[] = [
   { name: 'produtos', dfm: 'fixtures/cadastro-produtos.dfm', pas: 'fixtures/cadastro-produtos.pas', entity: 'Produto', table: 'PRODUTOS' },
@@ -72,6 +62,7 @@ const validators: ValidatorCase[] = [
   { name: 'offline-cache-warning-restore-focus', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningRestoreFocus.ts' },
   { name: 'offline-cache-warning-dismiss-focus', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningDismissFocus.ts' },
   { name: 'offline-cache-warning-escape-dismiss', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningEscapeDismiss.ts' },
+  { name: 'offline-cache-warning-escape-shortcut', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningEscapeShortcut.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
@@ -87,50 +78,19 @@ const validators: ValidatorCase[] = [
 const packageRoot = process.cwd();
 const json = process.argv.includes('--json');
 const results: Array<{ fixture: string; contract: string; ok: boolean; exitCode: number | null; output: string }> = [];
-
 for (const fixture of fixtures) {
   for (const validator of validators) {
-    const args = [
-      'exec',
-      'tsx',
-      resolve(packageRoot, validator.file),
-      resolve(packageRoot, fixture.dfm),
-      resolve(packageRoot, fixture.pas),
-      fixture.entity,
-      fixture.table
-    ];
+    const args = ['exec', 'tsx', resolve(packageRoot, validator.file), resolve(packageRoot, fixture.dfm), resolve(packageRoot, fixture.pas), fixture.entity, fixture.table];
     if (json) args.push('--json');
-
-    const execution = spawnSync('pnpm', args, {
-      cwd: packageRoot,
-      encoding: 'utf8',
-      timeout: 15_000,
-      shell: process.platform === 'win32'
-    });
-
+    const execution = spawnSync('pnpm', args, { cwd: packageRoot, encoding: 'utf8', timeout: 15_000, shell: process.platform === 'win32' });
     const output = `${execution.stdout ?? ''}${execution.stderr ?? ''}`.trim();
     const ok = execution.status === 0;
     results.push({ fixture: fixture.name, contract: validator.name, ok, exitCode: execution.status, output });
-
-    if (!json) {
-      console.log(`\n[${ok ? 'OK' : 'ERRO'}] ${fixture.name} / ${validator.name}`);
-      if (output) console.log(output);
-    }
+    if (!json) { console.log(`\n[${ok ? 'OK' : 'ERRO'}] ${fixture.name} / ${validator.name}`); if (output) console.log(output); }
   }
 }
-
 const failed = results.filter((result) => !result.ok);
-const report = {
-  ok: failed.length === 0,
-  fixtures: fixtures.length,
-  contracts: validators.length,
-  total: results.length,
-  passed: results.length - failed.length,
-  failed: failed.length,
-  results
-};
-
+const report = { ok: failed.length === 0, fixtures: fixtures.length, contracts: validators.length, total: results.length, passed: results.length - failed.length, failed: failed.length, results };
 if (json) console.log(JSON.stringify(report, null, 2));
 else console.log(`\nResumo dos contratos frontend avancados: ${report.passed}/${report.total} execucoes OK`);
-
 if (failed.length > 0) process.exit(1);
