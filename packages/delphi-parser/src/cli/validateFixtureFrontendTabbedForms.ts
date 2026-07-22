@@ -68,6 +68,7 @@ const validators: ValidatorCase[] = [
   { name: 'offline-cache-warning-snapshot-rearm', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningSnapshotRearm.ts' },
   { name: 'offline-cache-warning-session-dismiss', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningSessionDismiss.ts' },
   { name: 'offline-cache-warning-restore', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningRestore.ts' },
+  { name: 'offline-cache-warning-restore-hint', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningRestoreHint.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
