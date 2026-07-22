@@ -37,6 +37,7 @@ const validators: ValidatorCase[] = [
   { name: 'dialogs', file: 'src/cli/validateGeneratedFrontendDialogs.ts' },
   { name: 'pagination', file: 'src/cli/validateGeneratedFrontendPagination.ts' },
   { name: 'sorting', file: 'src/cli/validateGeneratedFrontendSorting.ts' },
+  { name: 'selection', file: 'src/cli/validateGeneratedFrontendSelection.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
