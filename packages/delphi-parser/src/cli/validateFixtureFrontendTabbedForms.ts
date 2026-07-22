@@ -61,6 +61,7 @@ const validators: ValidatorCase[] = [
   { name: 'offline-cache-age', file: 'src/cli/validateGeneratedFrontendOfflineCacheAge.ts' },
   { name: 'offline-cache-threshold', file: 'src/cli/validateGeneratedFrontendOfflineCacheThreshold.ts' },
   { name: 'offline-cache-timestamp', file: 'src/cli/validateGeneratedFrontendOfflineCacheTimestamp.ts' },
+  { name: 'offline-cache-warning', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarning.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
