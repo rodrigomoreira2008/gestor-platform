@@ -23,7 +23,7 @@ function addOfflineCacheWarningHangingPunctuation(source: string): string {
   return source.replace(
     "        wordBreak: 'normal'",
     `        wordBreak: 'normal',
-         hangingPunctuation: 'none'`
+        hangingPunctuation: 'none'`
   );
 }
 
