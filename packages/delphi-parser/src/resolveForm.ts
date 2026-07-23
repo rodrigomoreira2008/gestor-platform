@@ -52,6 +52,7 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
     events: pascal.eventHints,
     dependencies: pascal.dependencyHints,
     rules: pascal.ruleHints,
+    methodFlows: pascal.methodFlows,
     warnings: [...parsedDfm.warnings, ...pascal.warnings]
   };
 
@@ -99,9 +100,5 @@ function sameName(left: string, right: string): boolean {
 }
 
 function normalizeName(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9]/g, '')
-    .toLowerCase();
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 }
