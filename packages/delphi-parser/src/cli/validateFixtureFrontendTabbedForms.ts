@@ -119,6 +119,7 @@ const validators: ValidatorCase[] = [
   { name: 'offline-cache-warning-letter-spacing', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningLetterSpacing.ts' },
   { name: 'offline-cache-warning-word-spacing', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningWordSpacing.ts' },
   { name: 'offline-cache-warning-text-indent', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningTextIndent.ts' },
+  { name: 'offline-cache-warning-text-transform', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningTextTransform.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
