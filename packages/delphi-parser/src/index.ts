@@ -9,7 +9,7 @@ export * from './frontendDetailGridGenerator';
 export * from './frontendDetailHookGenerator';
 export * from './frontendFilterComponentGenerator';
 export * from './frontendFilterGenerator';
-export * from './frontendOfflineCacheWarningTextDecorationGenerator';
+export * from './frontendOfflineCacheWarningTextShadowGenerator';
 export * from './frontendLookupComponentGenerator';
 export * from './frontendLookupGenerator';
 export * from './frontendSchemaGenerator';
