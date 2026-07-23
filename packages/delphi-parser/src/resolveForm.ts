@@ -1,3 +1,4 @@
+import { inferBusinessRules } from './businessRuleInference';
 import { inferDatabaseQueries } from './databaseInference';
 import { inferDetailGrids } from './detailGridInference';
 import { collectActionBindings, collectFieldBindings } from './dfmIntrospection';
@@ -30,6 +31,7 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
   const dfmActions = collectActionBindings(parsedDfm.root);
   const databaseQueries = inferDatabaseQueries(pascal.sqlSnippets);
   const relationships = inferRelationships(databaseQueries);
+  const businessRules = inferBusinessRules(pascal.methodFlows);
   const partialResolved = {
     form: enriched,
     fields: dfmFields.map((field) => resolveField(field, pascal.validationHints)),
@@ -53,6 +55,7 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
     dependencies: pascal.dependencyHints,
     rules: pascal.ruleHints,
     methodFlows: pascal.methodFlows,
+    businessRules,
     warnings: [...parsedDfm.warnings, ...pascal.warnings]
   };
 
