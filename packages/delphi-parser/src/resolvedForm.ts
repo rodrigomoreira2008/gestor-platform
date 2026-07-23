@@ -1,4 +1,5 @@
 import type { GestorForm } from '@gestor/dsl';
+import type { InferredBusinessRule } from './businessRuleInference';
 import type { InferredDetailGrid } from './detailGridInference';
 import type { InferredLookup } from './lookupInference';
 import type { InferredSqlQuery } from './databaseInference';
@@ -33,6 +34,7 @@ export interface ResolvedForm {
   dependencies?: PascalDependencyHint[];
   rules?: PascalRuleHint[];
   methodFlows?: PascalMethodFlow[];
+  businessRules?: InferredBusinessRule[];
   warnings: string[];
 }
 
