@@ -30,12 +30,26 @@ export interface PascalEventHint {
   handlerName: string;
 }
 
+export interface PascalDependencyHint {
+  name: string;
+  source: 'uses' | 'include';
+}
+
+export interface PascalRuleHint {
+  methodName: string;
+  kind: 'condition' | 'assignment' | 'call' | 'abort';
+  expression: string;
+  target?: string;
+}
+
 export interface PascalParseResult {
   methods: PascalMethod[];
   sqlSnippets: PascalSqlSnippet[];
   validationHints: PascalValidationHint[];
   datasetHints: PascalDatasetHint[];
   eventHints: PascalEventHint[];
+  dependencyHints: PascalDependencyHint[];
+  ruleHints: PascalRuleHint[];
   warnings: string[];
 }
 
@@ -48,6 +62,11 @@ const sqlAssignmentPattern = /(?:SQL\.Text|CommandText)\s*:=\s*((?:'[^']*(?:''[^
 const sqlAddPattern = /SQL\.Add\s*\(\s*'([^']*(?:''[^']*)*)'\s*\)/gi;
 const messagePattern = /(?:ShowMessage|MessageDlg|raise\s+Exception\.Create)\s*\(\s*'([^']*(?:''[^']*)*)'/gi;
 const requiredFieldPattern = /(?:FieldByName\s*\(\s*'([^']+)'\s*\)|\b(\w+)\s*)\.(?:IsNull|Text\s*=\s*'')/i;
+const usesPattern = /\buses\s+([\s\S]*?);/gi;
+const includePattern = /\{\$I(?:NCLUDE)?\s+([^}]+)\}/gi;
+const conditionPattern = /^\s*(?:else\s+)?if\s+(.+?)\s+then\b/i;
+const assignmentPattern = /^\s*([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)\s*:=\s*(.+?);?\s*$/i;
+const callPattern = /^\s*([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)\s*(?:\((.*)\))?\s*;\s*$/i;
 
 export function parsePascalUnit(input: string): PascalParseResult {
   const warnings: string[] = [];
@@ -56,6 +75,8 @@ export function parsePascalUnit(input: string): PascalParseResult {
   const validationHints = methods.flatMap((method) => collectValidationHints(method));
   const datasetHints = collectDatasetHints(input);
   const eventHints = collectEventHints(input, methods);
+  const dependencyHints = collectDependencyHints(input);
+  const ruleHints = methods.flatMap((method) => collectRuleHints(method));
 
   return {
     methods,
@@ -63,6 +84,8 @@ export function parsePascalUnit(input: string): PascalParseResult {
     validationHints,
     datasetHints,
     eventHints,
+    dependencyHints,
+    ruleHints,
     warnings
   };
 }
@@ -156,6 +179,70 @@ function collectEventHints(input: string, methods: PascalMethod[]): PascalEventH
   return [...hints.values()];
 }
 
+function collectDependencyHints(input: string): PascalDependencyHint[] {
+  const hints = new Map<string, PascalDependencyHint>();
+
+  for (const match of input.matchAll(usesPattern)) {
+    const block = stripPascalComments(match[1]);
+    for (const entry of block.split(',')) {
+      const name = entry.trim().split(/\s+in\s+/i)[0]?.trim();
+      if (!name || !/^[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*$/.test(name)) continue;
+      hints.set(`uses:${name.toLowerCase()}`, { name, source: 'uses' });
+    }
+  }
+
+  for (const match of input.matchAll(includePattern)) {
+    const name = match[1].trim().replace(/^['"]|['"]$/g, '');
+    if (!name) continue;
+    hints.set(`include:${name.toLowerCase()}`, { name, source: 'include' });
+  }
+
+  return [...hints.values()];
+}
+
+function collectRuleHints(method: PascalMethod): PascalRuleHint[] {
+  const hints: PascalRuleHint[] = [];
+
+  for (const rawLine of method.body.split(/\r?\n/)) {
+    const line = stripPascalComment(rawLine).trim();
+    if (!line || /^(begin|end;?|else)$/i.test(line)) continue;
+
+    const condition = line.match(conditionPattern);
+    if (condition) {
+      hints.push({ methodName: method.name, kind: 'condition', expression: condition[1].trim() });
+      continue;
+    }
+
+    if (/^Abort\s*;?$/i.test(line)) {
+      hints.push({ methodName: method.name, kind: 'abort', expression: 'Abort' });
+      continue;
+    }
+
+    const assignment = line.match(assignmentPattern);
+    if (assignment) {
+      hints.push({
+        methodName: method.name,
+        kind: 'assignment',
+        target: assignment[1],
+        expression: assignment[2].replace(/;$/, '').trim()
+      });
+      continue;
+    }
+
+    const call = line.match(callPattern);
+    if (call && !/^(if|for|while|case|with|repeat|until)$/i.test(call[1])) {
+      hints.push({
+        methodName: method.name,
+        kind: 'call',
+        target: call[1],
+        expression: call[2]?.trim() ?? ''
+      });
+    }
+  }
+
+  return hints;
+}
+
 function inferEventFromHandler(handlerName: string): { componentName: string; eventName: string } | null {
   const knownSuffixes: Array<[string, string]> = [
     ['Click', 'OnClick'],
@@ -235,7 +322,14 @@ function normalizePascalStringExpression(value: string): string {
 }
 
 function stripPascalComment(line: string): string {
-  return line.replace(/\/\/.*$/, '').replace(/\{.*?\}/g, '');
+  return line.replace(/\/\/.*$/, '').replace(/\{(?!\$I(?:NCLUDE)?\b).*?\}/gi, '');
+}
+
+function stripPascalComments(value: string): string {
+  return value
+    .replace(/\/\/.*$/gm, '')
+    .replace(/\{[\s\S]*?\}/g, '')
+    .replace(/\(\*[\s\S]*?\*\)/g, '');
 }
 
 function unescapePascalString(value: string): string {
