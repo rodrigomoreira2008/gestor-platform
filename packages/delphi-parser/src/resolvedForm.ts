@@ -5,7 +5,15 @@ import type { InferredSqlQuery } from './databaseInference';
 import type { InferredRelationship } from './relationshipInference';
 import type { InferredTab } from './tabInference';
 import type { DelphiActionBinding, DelphiFieldBinding } from './types';
-import type { PascalDatasetHint, PascalEventHint, PascalSqlSnippet, PascalValidationHint } from './pasParser';
+import type {
+  PascalDatasetHint,
+  PascalDependencyHint,
+  PascalEventHint,
+  PascalMethod,
+  PascalRuleHint,
+  PascalSqlSnippet,
+  PascalValidationHint
+} from './pasParser';
 
 export interface ResolvedForm {
   form: GestorForm;
@@ -19,6 +27,10 @@ export interface ResolvedForm {
   tabs: InferredTab[];
   detailGrids: InferredDetailGrid[];
   validations: PascalValidationHint[];
+  methods?: PascalMethod[];
+  events?: PascalEventHint[];
+  dependencies?: PascalDependencyHint[];
+  rules?: PascalRuleHint[];
   warnings: string[];
 }
 
