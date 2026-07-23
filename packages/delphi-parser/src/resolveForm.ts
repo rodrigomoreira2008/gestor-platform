@@ -48,6 +48,10 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
     databaseQueries,
     relationships,
     validations: pascal.validationHints,
+    methods: pascal.methods,
+    events: pascal.eventHints,
+    dependencies: pascal.dependencyHints,
+    rules: pascal.ruleHints,
     warnings: [...parsedDfm.warnings, ...pascal.warnings]
   };
 
