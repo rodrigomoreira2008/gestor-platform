@@ -127,6 +127,7 @@ const validators: ValidatorCase[] = [
   { name: 'offline-cache-warning-text-combine-upright', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningTextCombineUpright.ts' },
   { name: 'offline-cache-warning-text-underline-position', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningTextUnderlinePosition.ts' },
   { name: 'offline-cache-warning-text-underline-offset', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningTextUnderlineOffset.ts' },
+  { name: 'offline-cache-warning-text-decoration-skip-ink', file: 'src/cli/validateGeneratedFrontendOfflineCacheWarningTextDecorationSkipInk.ts' },
   { name: 'accessibility', file: 'src/cli/validateGeneratedFrontendAccessibility.ts' },
   { name: 'types', file: 'src/cli/validateGeneratedFrontendTypes.ts' },
   { name: 'navigation', file: 'src/cli/validateGeneratedFrontendNavigation.ts' },
