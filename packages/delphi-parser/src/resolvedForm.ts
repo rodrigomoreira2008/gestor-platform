@@ -10,6 +10,7 @@ import type {
   PascalDependencyHint,
   PascalEventHint,
   PascalMethod,
+  PascalMethodFlow,
   PascalRuleHint,
   PascalSqlSnippet,
   PascalValidationHint
@@ -31,6 +32,7 @@ export interface ResolvedForm {
   events?: PascalEventHint[];
   dependencies?: PascalDependencyHint[];
   rules?: PascalRuleHint[];
+  methodFlows?: PascalMethodFlow[];
   warnings: string[];
 }
 
