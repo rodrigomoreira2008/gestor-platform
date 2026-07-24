@@ -1,5 +1,5 @@
-import { inferBusinessRules } from './businessRuleInference';
 import { enrichFieldsWithBusinessRules } from './businessRuleFieldEnrichment';
+import { inferBusinessRules } from './businessRuleInference';
 import { inferDatabaseQueries } from './databaseInference';
 import { inferDetailGrids } from './detailGridInference';
 import { collectActionBindings, collectFieldBindings } from './dfmIntrospection';
@@ -35,7 +35,7 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
   const businessRules = inferBusinessRules(pascal.methodFlows);
   const baseResolvedFields = dfmFields.map((field) => resolveField(field, pascal.validationHints));
   const fieldEnrichment = enrichFieldsWithBusinessRules(baseResolvedFields, businessRules);
-  const ruleWarnings = fieldEnrichment.unmatchedRules.map((rule) => `Regra obrigatória sem campo DFM correspondente em ${rule.methodName}: ${rule.field}`);
+  const ruleWarnings = fieldEnrichment.unmatchedRules.map((rule) => `Regra de campo sem componente DFM correspondente em ${rule.methodName}: ${rule.kind}(${rule.field})`);
 
   const partialResolved = {
     form: enriched,
