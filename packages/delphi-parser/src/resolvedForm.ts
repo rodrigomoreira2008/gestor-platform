@@ -3,6 +3,7 @@ import type { InferredBusinessRule } from './businessRuleInference';
 import type { InferredDetailGrid } from './detailGridInference';
 import type { InferredLookup } from './lookupInference';
 import type { InferredSqlQuery } from './databaseInference';
+import type { MethodActionPlan } from './methodActionPlanning';
 import type { InferredRelationship } from './relationshipInference';
 import type { InferredTab } from './tabInference';
 import type { DelphiActionBinding, DelphiFieldBinding } from './types';
@@ -35,6 +36,7 @@ export interface ResolvedForm {
   rules?: PascalRuleHint[];
   methodFlows?: PascalMethodFlow[];
   businessRules?: InferredBusinessRule[];
+  methodActionPlans?: MethodActionPlan[];
   warnings: string[];
 }
 
