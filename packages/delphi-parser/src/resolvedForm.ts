@@ -38,6 +38,13 @@ export interface ResolvedForm {
   warnings: string[];
 }
 
+export interface ResolvedNumericConstraint {
+  value: number;
+  exclusive: boolean;
+  message?: string;
+  sourceNodeId: string;
+}
+
 export interface ResolvedField {
   name: string;
   label?: string;
@@ -46,6 +53,8 @@ export interface ResolvedField {
   section?: string;
   required: boolean;
   validationMessages: string[];
+  numericMinimum?: ResolvedNumericConstraint;
+  numericMaximum?: ResolvedNumericConstraint;
   source?: DelphiFieldBinding;
 }
 
