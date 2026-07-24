@@ -20,6 +20,7 @@ export * from './frontendTabbedFormGenerator';
 export * from './gestorPasEnrichment';
 export * from './lookupInference';
 export * from './migrationReportGenerator';
+export * from './numericConstraintRendering';
 export * from './pasParser';
 export * from './relationshipInference';
 export * from './resolvedForm';
