@@ -1,4 +1,5 @@
 import type { InferredRelationship } from './relationshipInference';
+import { renderCSharpNumericConstraints } from './numericConstraintRendering';
 import type { ResolvedField, ResolvedForm } from './resolvedForm';
 
 export interface BackendGeneratedFile {
@@ -122,17 +123,23 @@ function generateFieldValidationRules(field: ResolvedField): string[] {
   }
 
   if (type === 'decimal?' || type === 'int?') {
-    if (messages.some((message) => /maior que zero|positivo|superior a zero/i.test(message))) {
-      const message = messages.find((item) => /maior que zero|positivo|superior a zero/i.test(item)) ?? `${label} deve ser maior que zero.`;
-      rules.push(`        if (input.${propertyName} is not null && input.${propertyName} <= 0) errors.Add("${escapeCSharpString(message)}");`);
-    } else if (messages.some((message) => /não pode ser negativo|nao pode ser negativo|maior ou igual a zero/i.test(message))) {
-      const message = messages.find((item) => /não pode ser negativo|nao pode ser negativo|maior ou igual a zero/i.test(item)) ?? `${label} não pode ser negativo.`;
-      rules.push(`        if (input.${propertyName} is not null && input.${propertyName} < 0) errors.Add("${escapeCSharpString(message)}");`);
+    const structuredRules = renderCSharpNumericConstraints(field, propertyName);
+    rules.push(...structuredRules);
+
+    if (structuredRules.length === 0) {
+      if (messages.some((message) => /maior que zero|positivo|superior a zero/i.test(message))) {
+        const message = messages.find((item) => /maior que zero|positivo|superior a zero/i.test(item)) ?? `${label} deve ser maior que zero.`;
+        rules.push(`        if (input.${propertyName} is not null && input.${propertyName} <= 0) errors.Add("${escapeCSharpString(message)}");`);
+      } else if (messages.some((message) => /não pode ser negativo|nao pode ser negativo|maior ou igual a zero/i.test(message))) {
+        const message = messages.find((item) => /não pode ser negativo|nao pode ser negativo|maior ou igual a zero/i.test(item)) ?? `${label} não pode ser negativo.`;
+        rules.push(`        if (input.${propertyName} is not null && input.${propertyName} < 0) errors.Add("${escapeCSharpString(message)}");`);
+      }
     }
   }
 
+  const structuredMessages = new Set([field.numericMinimum?.message, field.numericMaximum?.message].filter((message): message is string => Boolean(message)));
   for (const message of messages) {
-    if (message === requiredMessage) continue;
+    if (message === requiredMessage || structuredMessages.has(message)) continue;
     if (/maior que zero|positivo|superior a zero|não pode ser negativo|nao pode ser negativo|maior ou igual a zero|caracter|e-mail|email/i.test(message)) continue;
     rules.push(`        // Regra Pascal para revisão manual em ${propertyName}: ${escapeCSharpComment(message)}`);
   }
@@ -320,6 +327,7 @@ function isIdentityName(value: string): boolean {
 }
 
 function mapCSharpType(field: ResolvedField): string {
+  if (field.numericMinimum || field.numericMaximum) return 'decimal?';
   const normalized = normalizeName(field.name);
   if (normalized.includes('valor') || normalized.includes('preco') || normalized.includes('total')) return 'decimal?';
   if (normalized.includes('quantidade') || normalized.includes('qtd')) return 'decimal?';
