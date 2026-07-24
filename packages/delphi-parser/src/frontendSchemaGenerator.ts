@@ -1,4 +1,5 @@
 import { mapDelphiComponent } from './componentMapping';
+import { renderZodNumericConstraints } from './numericConstraintRendering';
 import type { ResolvedField } from './resolvedForm';
 
 export function renderFrontendZodSchema(entityPascal: string, entity: string, fields: ResolvedField[]): string {
@@ -31,7 +32,10 @@ function renderFieldSchema(field: ResolvedField): string {
 
   if (type === 'number') {
     let inner = `z.coerce.number({ invalid_type_error: '${escapeSingleQuote(`${label} deve ser numérico.`)}' }).optional()`;
-    if (messages.some((message) => /maior que zero|positivo|superior a zero/i.test(message))) {
+    const structuredConstraints = renderZodNumericConstraints(field);
+    if (structuredConstraints) {
+      inner += structuredConstraints;
+    } else if (messages.some((message) => /maior que zero|positivo|superior a zero/i.test(message))) {
       inner += `.refine((value) => value === undefined || value > 0, '${escapeSingleQuote(findMessage(messages, /maior que zero|positivo|superior a zero/i) ?? `${label} deve ser maior que zero.`)}')`;
     } else if (messages.some((message) => /não pode ser negativo|nao pode ser negativo|maior ou igual a zero/i.test(message))) {
       inner += `.refine((value) => value === undefined || value >= 0, '${escapeSingleQuote(findMessage(messages, /não pode ser negativo|nao pode ser negativo|maior ou igual a zero/i) ?? `${label} não pode ser negativo.`)}')`;
@@ -55,6 +59,7 @@ function inferType(field: ResolvedField): 'string' | 'number' | 'boolean' | 'dat
   const normalized = normalizeName(field.name);
   if (mapping.role === 'checkbox') return 'boolean';
   if (mapping.role === 'date' || normalized.includes('data')) return 'date';
+  if (field.numericMinimum || field.numericMaximum) return 'number';
   if (normalized.includes('valor') || normalized.includes('preco') || normalized.includes('total') || normalized.includes('quantidade') || normalized.includes('qtd') || normalized.endsWith('id') || normalized.includes('codigo')) return 'number';
   return 'string';
 }
