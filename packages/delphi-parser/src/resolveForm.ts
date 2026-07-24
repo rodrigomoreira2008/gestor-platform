@@ -6,6 +6,7 @@ import { collectActionBindings, collectFieldBindings } from './dfmIntrospection'
 import { dfmToGestorForm } from './dfmToGestorForm';
 import { enrichGestorFormWithPascal } from './gestorPasEnrichment';
 import { inferLookups } from './lookupInference';
+import { buildMethodActionPlans } from './methodActionPlanning';
 import { parseDfm } from './dfmParser';
 import { parsePascalUnit } from './pasParser';
 import { inferRelationships } from './relationshipInference';
@@ -33,6 +34,7 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
   const databaseQueries = inferDatabaseQueries(pascal.sqlSnippets);
   const relationships = inferRelationships(databaseQueries);
   const businessRules = inferBusinessRules(pascal.methodFlows);
+  const methodActionPlans = buildMethodActionPlans(businessRules);
   const baseResolvedFields = dfmFields.map((field) => resolveField(field, pascal.validationHints));
   const fieldEnrichment = enrichFieldsWithBusinessRules(baseResolvedFields, businessRules);
   const ruleWarnings = fieldEnrichment.unmatchedRules.map((rule) => `Regra de campo sem componente DFM correspondente em ${rule.methodName}: ${rule.kind}(${rule.field})`);
@@ -61,6 +63,7 @@ export function resolveDelphiForm(dfmInput: string, pasInput: string, options: R
     rules: pascal.ruleHints,
     methodFlows: pascal.methodFlows,
     businessRules,
+    methodActionPlans,
     warnings: [...parsedDfm.warnings, ...pascal.warnings, ...ruleWarnings]
   };
 
