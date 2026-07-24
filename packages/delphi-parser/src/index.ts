@@ -9,6 +9,7 @@ export * from './dfmParser';
 export * from './dfmToGestorForm';
 export * from './frontendDelphiActionControllerGenerator';
 export * from './frontendDelphiDialogControllerGenerator';
+export * from './frontendDelphiPageGenerator';
 export * from './frontendDelphiRuntimeGenerator';
 export * from './frontendDetailGridGenerator';
 export * from './frontendDetailHookGenerator';
