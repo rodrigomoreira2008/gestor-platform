@@ -11,6 +11,7 @@ export * from './frontendDetailGridGenerator';
 export * from './frontendDetailHookGenerator';
 export * from './frontendFilterComponentGenerator';
 export * from './frontendFilterGenerator';
+export * from './frontendMethodActionGenerator';
 export * from './frontendOfflineCacheWarningTextDecorationLineGenerator';
 export * from './frontendLookupComponentGenerator';
 export * from './frontendLookupGenerator';
