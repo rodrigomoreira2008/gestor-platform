@@ -1,4 +1,5 @@
 export * from './backendGenerator';
+export * from './businessRuleFieldEnrichment';
 export * from './businessRuleInference';
 export * from './componentMapping';
 export * from './databaseInference';
