@@ -19,6 +19,7 @@ export * from './frontendTabGenerator';
 export * from './frontendTabbedFormGenerator';
 export * from './gestorPasEnrichment';
 export * from './lookupInference';
+export * from './methodActionPlanning';
 export * from './migrationReportGenerator';
 export * from './numericConstraintRendering';
 export * from './pasParser';
