@@ -1,5 +1,6 @@
 import { renderFrontendDelphiActionController } from './frontendDelphiActionControllerGenerator';
 import { renderFrontendDelphiDialogController } from './frontendDelphiDialogControllerGenerator';
+import { renderFrontendDelphiPage } from './frontendDelphiPageGenerator';
 import { renderFrontendDelphiRuntime } from './frontendDelphiRuntimeGenerator';
 import { generateFrontendFiles, type FrontendGeneratedFile, type FrontendGeneratorOptions } from './frontendGenerator';
 import { renderFrontendMethodActionAdapters } from './frontendMethodActionGenerator';
@@ -33,6 +34,10 @@ export function generateFrontendFilesWithDelphiActions(
     {
       path: `${outputRoot}/delphi/${entityPascal}DelphiDialogController.tsx`,
       content: renderFrontendDelphiDialogController(resolved.actions, plans, { entityPascal, entity })
+    },
+    {
+      path: `${outputRoot}/pages/${entityPascal}DelphiPage.tsx`,
+      content: renderFrontendDelphiPage(resolved.actions, plans, { entityPascal, entity })
     }
   ];
 }
