@@ -21,7 +21,7 @@ export function renderFrontendDelphiActionController(
 ): string {
   const bindings = buildBindings(actions, plans);
   const imports = bindings.map((binding) => binding.executorName).filter((value, index, values) => values.indexOf(value) === index);
-  const handlerProperties = bindings.map((binding) => renderHandlerProperty(binding)).join('\n');
+  const handlerProperties = bindings.map((binding) => renderHandlerProperty(binding)).join(',\n');
   const metadataEntries = bindings.map((binding) => `  ${safeProperty(binding.componentName)}: { componentName: '${escapeSingleQuote(binding.componentName)}', handlerName: '${escapeSingleQuote(binding.handlerName)}', kind: '${escapeSingleQuote(binding.actionKind)}', label: ${binding.label ? `'${escapeSingleQuote(binding.label)}'` : 'undefined'} }`).join(',\n');
   const unmatched = actions.filter((action) => action.event?.handlerName && !bindings.some((binding) => sameName(binding.componentName, action.name)));
   const unmatchedComments = unmatched.map((action) => `// Evento sem plano executável: ${escapeComment(action.name)}.${escapeComment(action.event?.eventName ?? 'evento')} -> ${escapeComment(action.event?.handlerName ?? '')}`).join('\n');
