@@ -2,6 +2,8 @@ import type { PascalFlowNode, PascalMethodFlow } from './pasParser';
 
 export type InferredBusinessRuleKind =
   | 'requiredField'
+  | 'numericMinimum'
+  | 'numericMaximum'
   | 'ensureDatasetOpen'
   | 'saveDataset'
   | 'deleteRecord'
@@ -20,6 +22,8 @@ export interface InferredBusinessRule {
   field?: string;
   message?: string;
   expression?: string;
+  numericValue?: number;
+  exclusive?: boolean;
 }
 
 export function inferBusinessRules(flows: PascalMethodFlow[]): InferredBusinessRule[] {
@@ -37,20 +41,28 @@ function visitNodes(nodes: PascalFlowNode[], condition: string | undefined, meth
     const activeCondition = node.kind === 'if' ? node.expression : condition;
 
     if (node.kind === 'if') {
-      const requiredField = inferRequiredField(node.expression);
       const message = findMessage(node.children);
       const aborts = node.children.some((child) => child.kind === 'abort');
+      const requiredField = inferRequiredField(node.expression);
       if (requiredField && (message || aborts)) {
+        rules.push({ methodName, kind: 'requiredField', confidence: message && aborts ? 'high' : 'medium', sourceNodeId: node.id, condition: node.expression, field: requiredField, message });
+      }
+
+      const numericConstraint = inferNumericConstraint(node.expression);
+      if (numericConstraint && (message || aborts)) {
         rules.push({
           methodName,
-          kind: 'requiredField',
+          kind: numericConstraint.kind,
           confidence: message && aborts ? 'high' : 'medium',
           sourceNodeId: node.id,
           condition: node.expression,
-          field: requiredField,
-          message
+          field: numericConstraint.field,
+          message,
+          numericValue: numericConstraint.value,
+          exclusive: numericConstraint.exclusive
         });
       }
+
       visitNodes(node.children, activeCondition, methodName, rules);
       for (const alternate of node.alternate ?? []) visitNodes(alternate.children, `not (${node.expression ?? ''})`, methodName, rules);
       continue;
@@ -86,6 +98,19 @@ function inferRequiredField(expression?: string): string | undefined {
   if (fieldByName) return fieldByName[1];
   const control = expression.match(/\b([A-Za-z_]\w*)\.(?:Text|EditText)\s*=\s*''/i);
   return control?.[1];
+}
+
+function inferNumericConstraint(expression?: string): { kind: 'numericMinimum' | 'numericMaximum'; field: string; value: number; exclusive: boolean } | undefined {
+  if (!expression) return undefined;
+  const operand = String.raw`(?:FieldByName\s*\(\s*'([^']+)'\s*\)\.(?:AsInteger|AsFloat|AsCurrency)|([A-Za-z_]\w*)\.(?:Value|AsInteger|AsFloat|AsCurrency|Text))`;
+  const match = expression.match(new RegExp(`${operand}\\s*(<=|<|>=|>)\\s*(-?\\d+(?:[.,]\\d+)?)`, 'i'));
+  if (!match) return undefined;
+  const field = match[1] ?? match[2];
+  const operator = match[3];
+  const value = Number.parseFloat(match[4].replace(',', '.'));
+  if (!field || Number.isNaN(value)) return undefined;
+  if (operator === '<=' || operator === '<') return { kind: 'numericMinimum', field, value, exclusive: operator === '<=' };
+  return { kind: 'numericMaximum', field, value, exclusive: operator === '>=' };
 }
 
 function findMessage(nodes: PascalFlowNode[]): string | undefined {
