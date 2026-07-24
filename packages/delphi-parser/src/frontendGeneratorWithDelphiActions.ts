@@ -1,5 +1,6 @@
-import { generateFrontendFiles, type FrontendGeneratedFile, type FrontendGeneratorOptions } from './frontendGenerator';
+import { renderFrontendDelphiActionController } from './frontendDelphiActionControllerGenerator';
 import { renderFrontendDelphiRuntime } from './frontendDelphiRuntimeGenerator';
+import { generateFrontendFiles, type FrontendGeneratedFile, type FrontendGeneratorOptions } from './frontendGenerator';
 import { renderFrontendMethodActionAdapters } from './frontendMethodActionGenerator';
 import type { ResolvedForm } from './resolvedForm';
 
@@ -23,6 +24,10 @@ export function generateFrontendFilesWithDelphiActions(
     {
       path: `${outputRoot}/delphi/use${entityPascal}DelphiRuntime.ts`,
       content: renderFrontendDelphiRuntime({ entityPascal, entity })
+    },
+    {
+      path: `${outputRoot}/delphi/use${entityPascal}DelphiActionController.ts`,
+      content: renderFrontendDelphiActionController(resolved.actions, plans, { entityPascal, entity })
     }
   ];
 }
