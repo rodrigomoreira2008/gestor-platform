@@ -25,8 +25,8 @@ end.
 `;
 
 const fields: ResolvedField[] = [
-  { name: 'VALOR', label: 'Valor', required: false, validationMessages: [], source: { componentName: 'edtValor', componentClass: 'TEdit' } },
-  { name: 'DESCONTO', label: 'Desconto', required: false, validationMessages: [], source: { componentName: 'edtDesconto', componentClass: 'TEdit' } }
+  { name: 'VALOR', label: 'Valor', required: false, validationMessages: [] },
+  { name: 'DESCONTO', label: 'Desconto', required: false, validationMessages: [] }
 ];
 
 const parsed = parsePascalUnit(source);
