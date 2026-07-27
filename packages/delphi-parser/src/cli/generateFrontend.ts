@@ -4,12 +4,8 @@ import { generateFrontendFiles } from '../frontendGenerator';
 import { generateFrontendFilesWithDelphiActions } from '../frontendGeneratorWithDelphiActions';
 import { resolveDelphiForm } from '../resolveForm';
 
-const args = process.argv.slice(2);
-const positional = args.filter((arg) => !arg.startsWith('--'));
-const [dfmPath, pasPath, entity, table, outputRoot] = positional;
-const withDelphiActions = args.includes('--delphi-actions');
-const routePath = readOption(args, '--route-path');
-const routeExportAlias = readOption(args, '--route-export-alias');
+const cli = parseCliArgs(process.argv.slice(2));
+const [dfmPath, pasPath, entity, table, outputRoot] = cli.positional;
 
 if (!dfmPath || !pasPath || !entity) {
   console.error([
@@ -22,7 +18,7 @@ if (!dfmPath || !pasPath || !entity) {
   process.exit(1);
 }
 
-if (!withDelphiActions && (routePath || routeExportAlias)) {
+if (!cli.withDelphiActions && (cli.routePath || cli.routeExportAlias)) {
   console.error('As opcoes --route-path e --route-export-alias exigem --delphi-actions.');
   process.exit(1);
 }
@@ -39,11 +35,11 @@ if (resolvedForm.fields.length === 0) {
   process.exit(1);
 }
 
-const files = withDelphiActions
+const files = cli.withDelphiActions
   ? generateFrontendFilesWithDelphiActions(resolvedForm, {
       outputRoot,
-      routePath,
-      routeExportAlias
+      routePath: cli.routePath,
+      routeExportAlias: cli.routeExportAlias
     })
   : generateFrontendFiles(resolvedForm, outputRoot ? { outputRoot } : {});
 
@@ -54,13 +50,71 @@ for (const file of files) {
   console.log(`Gerado: ${target}`);
 }
 
-function readOption(values: string[], name: string): string | undefined {
-  const prefix = `${name}=`;
-  const inline = values.find((value) => value.startsWith(prefix));
-  if (inline) return inline.slice(prefix.length).trim() || undefined;
+interface ParsedCliArgs {
+  positional: string[];
+  withDelphiActions: boolean;
+  routePath?: string;
+  routeExportAlias?: string;
+}
 
-  const index = values.indexOf(name);
-  if (index < 0) return undefined;
-  const value = values[index + 1];
-  return value && !value.startsWith('--') ? value.trim() || undefined : undefined;
+export function parseCliArgs(values: string[]): ParsedCliArgs {
+  const positional: string[] = [];
+  let withDelphiActions = false;
+  let routePath: string | undefined;
+  let routeExportAlias: string | undefined;
+
+  for (let index = 0; index < values.length; index += 1) {
+    const value = values[index];
+
+    if (value === '--delphi-actions') {
+      withDelphiActions = true;
+      continue;
+    }
+
+    const routePathResult = readNamedOption(values, index, '--route-path');
+    if (routePathResult.matched) {
+      routePath = routePathResult.value;
+      index += routePathResult.consumedNext ? 1 : 0;
+      continue;
+    }
+
+    const aliasResult = readNamedOption(values, index, '--route-export-alias');
+    if (aliasResult.matched) {
+      routeExportAlias = aliasResult.value;
+      index += aliasResult.consumedNext ? 1 : 0;
+      continue;
+    }
+
+    if (value.startsWith('--')) {
+      throw new Error(`Opcao desconhecida: ${value}`);
+    }
+
+    positional.push(value);
+  }
+
+  return { positional, withDelphiActions, routePath, routeExportAlias };
+}
+
+interface NamedOptionResult {
+  matched: boolean;
+  consumedNext: boolean;
+  value?: string;
+}
+
+function readNamedOption(values: string[], index: number, name: string): NamedOptionResult {
+  const current = values[index];
+  const prefix = `${name}=`;
+
+  if (current.startsWith(prefix)) {
+    return { matched: true, consumedNext: false, value: current.slice(prefix.length).trim() || undefined };
+  }
+
+  if (current !== name) return { matched: false, consumedNext: false };
+
+  const next = values[index + 1];
+  if (!next || next.startsWith('--')) {
+    throw new Error(`A opcao ${name} exige um valor.`);
+  }
+
+  return { matched: true, consumedNext: true, value: next.trim() || undefined };
 }
