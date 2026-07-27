@@ -7,9 +7,14 @@ import { generateFrontendFiles, type FrontendGeneratedFile, type FrontendGenerat
 import { renderFrontendMethodActionAdapters } from './frontendMethodActionGenerator';
 import type { ResolvedForm } from './resolvedForm';
 
+export interface FrontendGeneratorWithDelphiActionsOptions extends FrontendGeneratorOptions {
+  routePath?: string;
+  routeExportAlias?: string;
+}
+
 export function generateFrontendFilesWithDelphiActions(
   resolved: ResolvedForm,
-  options: FrontendGeneratorOptions = {}
+  options: FrontendGeneratorWithDelphiActionsOptions = {}
 ): FrontendGeneratedFile[] {
   const files = generateFrontendFiles(resolved, options);
   const entity = toCamelCase(resolved.form.entity);
@@ -17,6 +22,12 @@ export function generateFrontendFilesWithDelphiActions(
   const plural = toKebabPlural(entity);
   const outputRoot = options.outputRoot ?? `apps/frontend/src/modules/${plural}`;
   const plans = resolved.methodActionPlans ?? [];
+  const routeOptions = {
+    entityPascal,
+    plural,
+    routePath: options.routePath,
+    exportAlias: options.routeExportAlias
+  };
 
   return [
     ...files,
@@ -42,11 +53,11 @@ export function generateFrontendFilesWithDelphiActions(
     },
     {
       path: `${outputRoot}/Generated/${entityPascal}DelphiRoute.tsx.txt`,
-      content: renderFrontendDelphiRouteSnippet({ entityPascal, plural })
+      content: renderFrontendDelphiRouteSnippet(routeOptions)
     },
     {
       path: `${outputRoot}/Generated/${entityPascal}PageSelection.tsx.txt`,
-      content: renderFrontendPageSelectionSnippet({ entityPascal, plural })
+      content: renderFrontendPageSelectionSnippet(routeOptions)
     }
   ];
 }
