@@ -1,10 +1,19 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { parseFrontendCliArgs } from '../frontendCliArgs';
 import { generateFrontendFiles } from '../frontendGenerator';
 import { generateFrontendFilesWithDelphiActions } from '../frontendGeneratorWithDelphiActions';
 import { resolveDelphiForm } from '../resolveForm';
 
-const cli = parseCliArgs(process.argv.slice(2));
+let cli;
+
+try {
+  cli = parseFrontendCliArgs(process.argv.slice(2));
+} catch (error) {
+  console.error(error instanceof Error ? error.message : String(error));
+  process.exit(1);
+}
+
 const [dfmPath, pasPath, entity, table, outputRoot] = cli.positional;
 
 if (!dfmPath || !pasPath || !entity) {
@@ -48,73 +57,4 @@ for (const file of files) {
   mkdirSync(dirname(target), { recursive: true });
   writeFileSync(target, file.content, 'utf8');
   console.log(`Gerado: ${target}`);
-}
-
-interface ParsedCliArgs {
-  positional: string[];
-  withDelphiActions: boolean;
-  routePath?: string;
-  routeExportAlias?: string;
-}
-
-export function parseCliArgs(values: string[]): ParsedCliArgs {
-  const positional: string[] = [];
-  let withDelphiActions = false;
-  let routePath: string | undefined;
-  let routeExportAlias: string | undefined;
-
-  for (let index = 0; index < values.length; index += 1) {
-    const value = values[index];
-
-    if (value === '--delphi-actions') {
-      withDelphiActions = true;
-      continue;
-    }
-
-    const routePathResult = readNamedOption(values, index, '--route-path');
-    if (routePathResult.matched) {
-      routePath = routePathResult.value;
-      index += routePathResult.consumedNext ? 1 : 0;
-      continue;
-    }
-
-    const aliasResult = readNamedOption(values, index, '--route-export-alias');
-    if (aliasResult.matched) {
-      routeExportAlias = aliasResult.value;
-      index += aliasResult.consumedNext ? 1 : 0;
-      continue;
-    }
-
-    if (value.startsWith('--')) {
-      throw new Error(`Opcao desconhecida: ${value}`);
-    }
-
-    positional.push(value);
-  }
-
-  return { positional, withDelphiActions, routePath, routeExportAlias };
-}
-
-interface NamedOptionResult {
-  matched: boolean;
-  consumedNext: boolean;
-  value?: string;
-}
-
-function readNamedOption(values: string[], index: number, name: string): NamedOptionResult {
-  const current = values[index];
-  const prefix = `${name}=`;
-
-  if (current.startsWith(prefix)) {
-    return { matched: true, consumedNext: false, value: current.slice(prefix.length).trim() || undefined };
-  }
-
-  if (current !== name) return { matched: false, consumedNext: false };
-
-  const next = values[index + 1];
-  if (!next || next.startsWith('--')) {
-    throw new Error(`A opcao ${name} exige um valor.`);
-  }
-
-  return { matched: true, consumedNext: true, value: next.trim() || undefined };
 }
