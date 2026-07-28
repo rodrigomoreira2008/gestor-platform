@@ -25,6 +25,15 @@ const separated = parseFrontendCliArgs([
 const longHelp = parseFrontendCliArgs(['--help']);
 const shortHelp = parseFrontendCliArgs(['-h']);
 
+function throwsWithMessage(values: string[], expectedMessage: string): boolean {
+  try {
+    parseFrontendCliArgs(values);
+    return false;
+  } catch (error) {
+    return error instanceof Error && error.message === expectedMessage;
+  }
+}
+
 const checks = [
   inline.positional.length === 5,
   inline.positional[0] === 'produto.dfm',
@@ -38,7 +47,9 @@ const checks = [
   separated.routePath === '/cadastros/produtos',
   separated.routeExportAlias === 'produtoRoute',
   longHelp.help && longHelp.positional.length === 0,
-  shortHelp.help && shortHelp.positional.length === 0
+  shortHelp.help && shortHelp.positional.length === 0,
+  throwsWithMessage(['--route-path', '   '], 'A opcao --route-path exige um valor.'),
+  throwsWithMessage(['--route-export-alias', '\t'], 'A opcao --route-export-alias exige um valor.')
 ];
 
 const passed = checks.filter(Boolean).length;
