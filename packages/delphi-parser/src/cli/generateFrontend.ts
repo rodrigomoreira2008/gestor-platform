@@ -1,23 +1,12 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { parseFrontendCliArgs } from '../frontendCliArgs';
+import { renderFrontendCliUsage } from '../frontendCliUsage';
 import { generateFrontendFiles } from '../frontendGenerator';
 import { generateFrontendFilesWithDelphiActions } from '../frontendGeneratorWithDelphiActions';
 import { resolveDelphiForm } from '../resolveForm';
 
-const usage = [
-  'Uso:',
-  'pnpm --filter @gestor/delphi-parser gen:frontend <arquivo.dfm> <arquivo.pas> <entidade> [tabela] [saida]',
-  '',
-  'Opcoes:',
-  '  --delphi-actions                  Gera runtime, controladores, pagina e rota orientados pelos eventos Delphi.',
-  '  --route-path=<caminho>            Define o caminho usado nos snippets de rota Delphi.',
-  '  --route-export-alias=<nome>       Define o nome exportado para o objeto de rota Delphi.',
-  '  -h, --help                        Mostra esta ajuda.',
-  '',
-  'Exemplo:',
-  'pnpm --filter @gestor/delphi-parser gen:frontend produto.dfm produto.pas Produto PRODUTOS apps/frontend/src/modules/produtos --delphi-actions --route-path=/cadastros/produtos --route-export-alias=produtoRoute'
-].join('\n');
+const usage = renderFrontendCliUsage();
 
 let cli;
 
