@@ -22,17 +22,23 @@ const separated = parseFrontendCliArgs([
   'produtoRoute'
 ]);
 
+const longHelp = parseFrontendCliArgs(['--help']);
+const shortHelp = parseFrontendCliArgs(['-h']);
+
 const checks = [
   inline.positional.length === 5,
   inline.positional[0] === 'produto.dfm',
   inline.positional[4] === 'apps/frontend/src/modules/produtos',
   inline.withDelphiActions,
+  !inline.help,
   inline.routePath === '/cadastros/produtos/',
   inline.routeExportAlias === 'produtoRoute',
   separated.positional.length === 3,
   separated.withDelphiActions,
   separated.routePath === '/cadastros/produtos',
-  separated.routeExportAlias === 'produtoRoute'
+  separated.routeExportAlias === 'produtoRoute',
+  longHelp.help && longHelp.positional.length === 0,
+  shortHelp.help && shortHelp.positional.length === 0
 ];
 
 const passed = checks.filter(Boolean).length;
