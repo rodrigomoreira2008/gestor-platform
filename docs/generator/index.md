@@ -22,6 +22,14 @@ Indice dos documentos adicionados para o fluxo de migracao Delphi DFM/PAS.
 - `backend-generator.md`: artefatos ASP.NET Core gerados.
 - `frontend-generator.md`: artefatos React/MUI gerados.
 
+## CLI de frontend
+
+- `frontend-cli-delphi-actions-runtime.md`: opcoes de geracao orientada pelos eventos Delphi.
+- `frontend-cli-help-runtime.md`: ajuda geral e ajuda direta de `gen:frontend`.
+- `frontend-cli-contracts-runtime.md`: contratos de argumentos, mensagem de uso e integracao da ajuda.
+- `frontend-generator-with-delphi-route-options-runtime.md`: propagacao das opcoes de rota ate os geradores.
+- `frontend-delphi-route-runtime.md`: renderizacao dos snippets de rota Delphi.
+
 ## Validacao recomendada
 
 ```bash
