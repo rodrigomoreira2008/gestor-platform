@@ -52,6 +52,8 @@ const checks = [
   helpShort.help && helpShort.positional.length === 0,
   throwsWithMessage(['--route-path'], 'A opcao --route-path exige um valor.'),
   throwsWithMessage(['--route-export-alias='], 'A opcao --route-export-alias exige um valor.'),
+  throwsWithMessage(['--route-path', '   '], 'A opcao --route-path exige um valor.'),
+  throwsWithMessage(['--route-export-alias', '\t'], 'A opcao --route-export-alias exige um valor.'),
   throwsWithMessage(['--desconhecida'], 'Opcao desconhecida: --desconhecida'),
   usage.includes('--delphi-actions'),
   usage.includes('--route-path=<caminho>'),
