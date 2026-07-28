@@ -8,6 +8,7 @@ export * from './dfmIntrospection';
 export * from './dfmParser';
 export * from './dfmToGestorForm';
 export * from './frontendCliArgs';
+export * from './frontendCliUsage';
 export * from './frontendDelphiActionControllerGenerator';
 export * from './frontendDelphiDialogControllerGenerator';
 export * from './frontendDelphiPageGenerator';
