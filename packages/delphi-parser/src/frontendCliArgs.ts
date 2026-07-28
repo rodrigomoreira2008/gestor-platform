@@ -40,7 +40,7 @@ export function parseFrontendCliArgs(values: string[]): ParsedFrontendCliArgs {
       continue;
     }
 
-    if (value.startsWith('--')) {
+    if (value.startsWith('-')) {
       throw new Error(`Opcao desconhecida: ${value}`);
     }
 
@@ -69,7 +69,7 @@ function readNamedOption(values: string[], index: number, name: string): NamedOp
   if (current !== name) return { matched: false, consumedNext: false };
 
   const next = values[index + 1];
-  if (!next || next.startsWith('--')) {
+  if (!next || next.startsWith('-')) {
     throw new Error(`A opcao ${name} exige um valor.`);
   }
 
