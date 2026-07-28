@@ -13,6 +13,7 @@ O fluxo cobre:
 - suporte a `--help` e `-h`;
 - rejeicao de opcoes desconhecidas;
 - rejeicao de opcoes nomeadas sem valor;
+- rejeicao de valores separados compostos apenas por espacos ou tabulacoes;
 - renderizacao compartilhada da mensagem de uso;
 - integracao entre `gen:frontend` e a ajuda geral do pacote.
 
@@ -49,14 +50,20 @@ O validador agregado verifica:
 
 - as duas sintaxes aceitas para opcoes nomeadas;
 - os dois aliases de ajuda;
-- mensagens exatas para valor ausente e opcao desconhecida;
+- mensagens exatas para valor ausente, valor em branco e opcao desconhecida;
 - a ajuda completa e a variante sem exemplo;
 - o consumo do renderer pelo gerador e pela ajuda geral.
 
 Saida esperada do contrato agregado:
 
 ```text
-FRONTEND_CLI_CONTRACTS_OK: checks=22: passed=22
+FRONTEND_CLI_CONTRACTS_OK: checks=24: passed=24
+```
+
+Saida esperada do contrato especifico do parser:
+
+```text
+FRONTEND_CLI_ARGS_OK: checks=15: passed=15
 ```
 
 ## Comando de geracao documentado
