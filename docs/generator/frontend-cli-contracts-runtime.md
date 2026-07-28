@@ -54,6 +54,8 @@ O validador agregado verifica:
 - a ajuda completa e a variante sem exemplo;
 - o consumo do renderer pelo gerador e pela ajuda geral.
 
+Os arquivos `generateFrontend.ts` e `showHelp.ts` sao localizados a partir de `import.meta.url`, e nao de `process.cwd()`. Assim, o contrato nao depende de o processo ser iniciado dentro de `packages/delphi-parser`.
+
 Saida esperada do contrato agregado:
 
 ```text
