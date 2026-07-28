@@ -1,18 +1,20 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { renderFrontendCliUsage } from '../frontendCliUsage';
 
 const source = readFileSync(resolve(process.cwd(), 'src/cli/showHelp.ts'), 'utf8');
+const usage = renderFrontendCliUsage();
 
 const checks = [
+  source.includes("import { renderFrontendCliUsage } from '../frontendCliUsage';"),
   source.includes('gen:frontend <dfm> <pas> <entidade> [tabela] [saida] [opcoes]'),
-  source.includes("title: 'Opcoes de gen:frontend'"),
-  source.includes("['--delphi-actions'"),
-  source.includes("['--route-path=<caminho>'"),
-  source.includes("['--route-export-alias=<nome>'"),
-  source.includes('Gera runtime, controladores, pagina e rota orientados pelos eventos Delphi.'),
-  source.includes('--delphi-actions --route-path=/cadastros/produtos'),
-  source.includes('--route-export-alias=produtoRoute'),
-  source.includes('apps/frontend/src/modules/produtos'),
+  source.includes("console.log('Detalhes de gen:frontend:');"),
+  source.includes('console.log(renderFrontendCliUsage());'),
+  !source.includes("title: 'Opcoes de gen:frontend'"),
+  usage.includes('--delphi-actions'),
+  usage.includes('--route-path=<caminho>'),
+  usage.includes('--route-export-alias=<nome>'),
+  usage.includes('apps/frontend/src/modules/produtos'),
   source.includes("console.log('Documentacao: docs/generator/index.md');")
 ];
 
