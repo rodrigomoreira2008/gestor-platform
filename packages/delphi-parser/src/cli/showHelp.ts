@@ -1,3 +1,5 @@
+import { renderFrontendCliUsage } from '../frontendCliUsage';
+
 const sections = [
   {
     title: 'Informacoes',
@@ -22,14 +24,6 @@ const sections = [
       ['gen:backend <dfm> <pas> <entidade> [tabela] [saida]', 'Gera artefatos ASP.NET Core.'],
       ['gen:frontend <dfm> <pas> <entidade> [tabela] [saida] [opcoes]', 'Gera artefatos React/MUI.'],
       ['gen:report <dfm> <pas> <entidade> [tabela] [saida]', 'Gera relatorio Markdown da migracao.']
-    ]
-  },
-  {
-    title: 'Opcoes de gen:frontend',
-    commands: [
-      ['--delphi-actions', 'Gera runtime, controladores, pagina e rota orientados pelos eventos Delphi.'],
-      ['--route-path=<caminho>', 'Define o caminho usado nos snippets de rota Delphi.'],
-      ['--route-export-alias=<nome>', 'Define o nome exportado para o objeto de rota Delphi.']
     ]
   },
   {
@@ -65,7 +59,7 @@ for (const section of sections) {
   console.log('');
 }
 
-console.log('Exemplo Delphi:');
-console.log('  pnpm --filter @gestor/delphi-parser gen:frontend produto.dfm produto.pas Produto PRODUTOS apps/frontend/src/modules/produtos --delphi-actions --route-path=/cadastros/produtos --route-export-alias=produtoRoute');
+console.log('Detalhes de gen:frontend:');
+console.log(renderFrontendCliUsage());
 console.log('');
 console.log('Documentacao: docs/generator/index.md');
