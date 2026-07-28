@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parseFrontendCliArgs } from '../frontendCliArgs';
 import { renderFrontendCliUsage } from '../frontendCliUsage';
 
@@ -28,8 +29,9 @@ const helpLong = parseFrontendCliArgs(['--help']);
 const helpShort = parseFrontendCliArgs(['-h']);
 const usage = renderFrontendCliUsage();
 const compactUsage = renderFrontendCliUsage({ includeExample: false });
-const generatorSource = readFileSync(resolve(process.cwd(), 'src/cli/generateFrontend.ts'), 'utf8');
-const helpSource = readFileSync(resolve(process.cwd(), 'src/cli/showHelp.ts'), 'utf8');
+const cliDirectory = dirname(fileURLToPath(import.meta.url));
+const generatorSource = readFileSync(resolve(cliDirectory, 'generateFrontend.ts'), 'utf8');
+const helpSource = readFileSync(resolve(cliDirectory, 'showHelp.ts'), 'utf8');
 
 function throwsWithMessage(values: string[], expectedMessage: string): boolean {
   try {
