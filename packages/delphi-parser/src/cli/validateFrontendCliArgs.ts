@@ -49,7 +49,10 @@ const checks = [
   longHelp.help && longHelp.positional.length === 0,
   shortHelp.help && shortHelp.positional.length === 0,
   throwsWithMessage(['--route-path', '   '], 'A opcao --route-path exige um valor.'),
-  throwsWithMessage(['--route-export-alias', '\t'], 'A opcao --route-export-alias exige um valor.')
+  throwsWithMessage(['--route-export-alias', '\t'], 'A opcao --route-export-alias exige um valor.'),
+  throwsWithMessage(['--route-path', '-h'], 'A opcao --route-path exige um valor.'),
+  throwsWithMessage(['--route-export-alias', '--delphi-actions'], 'A opcao --route-export-alias exige um valor.'),
+  throwsWithMessage(['-x'], 'Opcao desconhecida: -x')
 ];
 
 const passed = checks.filter(Boolean).length;
