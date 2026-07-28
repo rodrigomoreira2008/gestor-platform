@@ -73,5 +73,10 @@ function readNamedOption(values: string[], index: number, name: string): NamedOp
     throw new Error(`A opcao ${name} exige um valor.`);
   }
 
-  return { matched: true, consumedNext: true, value: next.trim() };
+  const value = next.trim();
+  if (!value) {
+    throw new Error(`A opcao ${name} exige um valor.`);
+  }
+
+  return { matched: true, consumedNext: true, value };
 }
