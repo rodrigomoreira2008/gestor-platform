@@ -1,6 +1,7 @@
 export interface ParsedFrontendCliArgs {
   positional: string[];
   withDelphiActions: boolean;
+  help: boolean;
   routePath?: string;
   routeExportAlias?: string;
 }
@@ -8,11 +9,17 @@ export interface ParsedFrontendCliArgs {
 export function parseFrontendCliArgs(values: string[]): ParsedFrontendCliArgs {
   const positional: string[] = [];
   let withDelphiActions = false;
+  let help = false;
   let routePath: string | undefined;
   let routeExportAlias: string | undefined;
 
   for (let index = 0; index < values.length; index += 1) {
     const value = values[index];
+
+    if (value === '--help' || value === '-h') {
+      help = true;
+      continue;
+    }
 
     if (value === '--delphi-actions') {
       withDelphiActions = true;
@@ -40,7 +47,7 @@ export function parseFrontendCliArgs(values: string[]): ParsedFrontendCliArgs {
     positional.push(value);
   }
 
-  return { positional, withDelphiActions, routePath, routeExportAlias };
+  return { positional, withDelphiActions, help, routePath, routeExportAlias };
 }
 
 interface NamedOptionResult {
