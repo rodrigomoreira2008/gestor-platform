@@ -8,9 +8,11 @@ O fluxo cobre:
 
 - leitura dos argumentos posicionais;
 - ativacao de `--delphi-actions`;
-- leitura de `--route-path`;
-- leitura de `--route-export-alias`;
+- leitura de `--route-path` nas formas `--route-path=<valor>` e `--route-path <valor>`;
+- leitura de `--route-export-alias` nas formas inline e separada;
 - suporte a `--help` e `-h`;
+- rejeicao de opcoes desconhecidas;
+- rejeicao de opcoes nomeadas sem valor;
 - renderizacao compartilhada da mensagem de uso;
 - integracao entre `gen:frontend` e a ajuda geral do pacote.
 
@@ -43,12 +45,18 @@ src/cli/validateFrontendCliHelp.ts
 src/cli/validateFrontendCliContracts.ts
 ```
 
-O validador agregado verifica o parser, o renderer e a integracao entre os comandos.
+O validador agregado verifica:
+
+- as duas sintaxes aceitas para opcoes nomeadas;
+- os dois aliases de ajuda;
+- mensagens exatas para valor ausente e opcao desconhecida;
+- a ajuda completa e a variante sem exemplo;
+- o consumo do renderer pelo gerador e pela ajuda geral.
 
 Saida esperada do contrato agregado:
 
 ```text
-FRONTEND_CLI_CONTRACTS_OK: checks=12: passed=12
+FRONTEND_CLI_CONTRACTS_OK: checks=22: passed=22
 ```
 
 ## Comando de geracao documentado
