@@ -60,6 +60,10 @@ const checks = [
   throwsWithMessage(
     ['--route-export-alias=produtoRoute', '--route-export-alias', 'cadastroProdutoRoute'],
     'A opcao --route-export-alias foi informada mais de uma vez.'
+  ),
+  throwsWithMessage(
+    ['--delphi-actions', '--delphi-actions'],
+    'A opcao --delphi-actions foi informada mais de uma vez.'
   )
 ];
 
