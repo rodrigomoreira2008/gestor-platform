@@ -86,6 +86,22 @@ Saida esperada do contrato especifico do parser:
 FRONTEND_CLI_ARGS_OK: checks=34: passed=34
 ```
 
+## Scripts do workspace
+
+O manifesto raiz expoe o contrato agregado com:
+
+```bash
+pnpm validate:frontend-cli
+```
+
+A validacao completa do conversor tambem executa esse contrato ao final:
+
+```bash
+pnpm validate:delphi-fixtures
+```
+
+Esse comando executa primeiro `validate:all` do pacote `@gestor/delphi-parser` e, em seguida, o contrato agregado do CLI.
+
 ## Comando de geracao documentado
 
 ```bash
