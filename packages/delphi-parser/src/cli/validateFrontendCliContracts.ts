@@ -19,6 +19,7 @@ const parsedSeparatedOptions = parseFrontendCliArgs([
   'produto.dfm',
   'produto.pas',
   'Produto',
+  '--delphi-actions',
   '--route-path',
   '/cadastros/produtos',
   '--route-export-alias',
@@ -27,6 +28,7 @@ const parsedSeparatedOptions = parseFrontendCliArgs([
 
 const helpLong = parseFrontendCliArgs(['--help']);
 const helpShort = parseFrontendCliArgs(['-h']);
+const helpWithRouteOption = parseFrontendCliArgs(['--help', '--route-path=/cadastros/produtos']);
 const usage = renderFrontendCliUsage();
 const compactUsage = renderFrontendCliUsage({ includeExample: false });
 const cliDirectory = dirname(fileURLToPath(import.meta.url));
@@ -52,6 +54,7 @@ const checks = [
   parsedSeparatedOptions.routeExportAlias === 'produtoRoute',
   helpLong.help && helpLong.positional.length === 0,
   helpShort.help && helpShort.positional.length === 0,
+  helpWithRouteOption.help && helpWithRouteOption.routePath === '/cadastros/produtos',
   throwsWithMessage(['--route-path'], 'A opcao --route-path exige um valor.'),
   throwsWithMessage(['--route-export-alias='], 'A opcao --route-export-alias exige um valor.'),
   throwsWithMessage(['--route-path', '   '], 'A opcao --route-path exige um valor.'),
@@ -72,6 +75,14 @@ const checks = [
     ['--delphi-actions', '--delphi-actions'],
     'A opcao --delphi-actions foi informada mais de uma vez.'
   ),
+  throwsWithMessage(
+    ['--route-path=/cadastros/produtos'],
+    'As opcoes --route-path e --route-export-alias exigem --delphi-actions.'
+  ),
+  throwsWithMessage(
+    ['--route-export-alias=produtoRoute'],
+    'As opcoes --route-path e --route-export-alias exigem --delphi-actions.'
+  ),
   usage.includes('--delphi-actions'),
   usage.includes('--route-path=<caminho>'),
   usage.includes('--route-export-alias=<nome>'),
@@ -80,6 +91,7 @@ const checks = [
   !compactUsage.includes('Exemplo:'),
   compactUsage.includes('--route-path=<caminho>'),
   generatorSource.includes('const usage = renderFrontendCliUsage();'),
+  !generatorSource.includes('if (!cli.withDelphiActions && (cli.routePath || cli.routeExportAlias))'),
   helpSource.includes('console.log(renderFrontendCliUsage());'),
   helpSource.includes('Detalhes de gen:frontend:')
 ];
