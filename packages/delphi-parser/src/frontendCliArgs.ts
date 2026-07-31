@@ -59,6 +59,10 @@ export function parseFrontendCliArgs(values: string[]): ParsedFrontendCliArgs {
     positional.push(value);
   }
 
+  if (!help && !withDelphiActions && (routePath !== undefined || routeExportAlias !== undefined)) {
+    throw new Error('As opcoes --route-path e --route-export-alias exigem --delphi-actions.');
+  }
+
   return { positional, withDelphiActions, help, routePath, routeExportAlias };
 }
 
