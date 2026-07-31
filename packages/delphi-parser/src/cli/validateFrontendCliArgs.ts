@@ -49,7 +49,7 @@ const checks = [
   inline.positional[4] === 'apps/frontend/src/modules/produtos',
   inline.withDelphiActions,
   !inline.help,
-  inline.routePath === '/cadastros/produtos/',
+  inline.routePath === '/cadastros/produtos',
   inline.routeExportAlias === 'produtoRoute',
   separated.positional.length === 3,
   separated.withDelphiActions,
