@@ -60,6 +60,14 @@ const checks = [
   throwsWithMessage(['--route-export-alias', '--delphi-actions'], 'A opcao --route-export-alias exige um valor.'),
   throwsWithMessage(['--desconhecida'], 'Opcao desconhecida: --desconhecida'),
   throwsWithMessage(['-x'], 'Opcao desconhecida: -x'),
+  throwsWithMessage(
+    ['--route-path=/produtos', '--route-path=/cadastros/produtos'],
+    'A opcao --route-path foi informada mais de uma vez.'
+  ),
+  throwsWithMessage(
+    ['--route-export-alias', 'produtoRoute', '--route-export-alias=cadastroProdutoRoute'],
+    'A opcao --route-export-alias foi informada mais de uma vez.'
+  ),
   usage.includes('--delphi-actions'),
   usage.includes('--route-path=<caminho>'),
   usage.includes('--route-export-alias=<nome>'),
