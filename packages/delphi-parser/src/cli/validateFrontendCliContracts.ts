@@ -46,6 +46,7 @@ function throwsWithMessage(values: string[], expectedMessage: string): boolean {
 
 const invalidRouteMessage = 'A opcao --route-path deve conter apenas um caminho de rota, sem espacos, query string ou fragmento.';
 const invalidAliasMessage = 'A opcao --route-export-alias deve ser um identificador TypeScript valido.';
+const reservedAliasMessage = 'A opcao --route-export-alias nao pode ser uma palavra reservada do TypeScript.';
 
 const checks = [
   parsedInlineOptions.positional.length === 5,
@@ -91,6 +92,9 @@ const checks = [
   throwsWithMessage(['--delphi-actions', '--route-path=/produtos#lista'], invalidRouteMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=produto-route'], invalidAliasMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=123ProdutoRoute'], invalidAliasMessage),
+  throwsWithMessage(['--delphi-actions', '--route-export-alias=default'], reservedAliasMessage),
+  throwsWithMessage(['--delphi-actions', '--route-export-alias=class'], reservedAliasMessage),
+  throwsWithMessage(['--delphi-actions', '--route-export-alias=await'], reservedAliasMessage),
   usage.includes('--delphi-actions'),
   usage.includes('--route-path=<caminho>'),
   usage.includes('--route-export-alias=<nome>'),
