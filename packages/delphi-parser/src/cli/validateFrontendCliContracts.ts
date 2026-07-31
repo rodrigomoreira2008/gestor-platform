@@ -26,6 +26,7 @@ const parsedSeparatedOptions = parseFrontendCliArgs([
   'produtoRoute'
 ]);
 
+const parsedRootRoute = parseFrontendCliArgs(['--delphi-actions', '--route-path=/']);
 const helpLong = parseFrontendCliArgs(['--help']);
 const helpShort = parseFrontendCliArgs(['-h']);
 const helpWithRouteOption = parseFrontendCliArgs(['--help', '--route-path=/cadastros/produtos']);
@@ -46,6 +47,8 @@ function throwsWithMessage(values: string[], expectedMessage: string): boolean {
 }
 
 const invalidRouteMessage = 'A opcao --route-path deve conter apenas um caminho de rota, sem espacos, query string ou fragmento.';
+const internalRouteMessage = 'A opcao --route-path deve ser um caminho interno iniciado por / e usar somente barras normais.';
+const navigationSegmentMessage = 'A opcao --route-path nao pode conter os segmentos "." ou "..".';
 const invalidAliasMessage = 'A opcao --route-export-alias deve ser um identificador TypeScript valido.';
 const reservedAliasMessage = 'A opcao --route-export-alias nao pode ser uma palavra reservada do TypeScript.';
 const excessPositionalsMessage = 'Foram informados 6 argumentos posicionais; o maximo permitido e 5.';
@@ -58,6 +61,7 @@ const checks = [
   parsedSeparatedOptions.positional.length === 3,
   parsedSeparatedOptions.routePath === '/cadastros/produtos',
   parsedSeparatedOptions.routeExportAlias === 'produtoRoute',
+  parsedRootRoute.routePath === '/',
   helpLong.help && helpLong.positional.length === 0,
   helpShort.help && helpShort.positional.length === 0,
   helpWithRouteOption.help && helpWithRouteOption.routePath === '/cadastros/produtos',
@@ -93,6 +97,11 @@ const checks = [
   throwsWithMessage(['--delphi-actions', '--route-path=/grupo produtos'], invalidRouteMessage),
   throwsWithMessage(['--delphi-actions', '--route-path=/produtos?status=ativo'], invalidRouteMessage),
   throwsWithMessage(['--delphi-actions', '--route-path=/produtos#lista'], invalidRouteMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=cadastros/produtos'], internalRouteMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=https://gestor.local/produtos'], internalRouteMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros\\produtos'], internalRouteMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros/./produtos'], navigationSegmentMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros/../produtos'], navigationSegmentMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=produto-route'], invalidAliasMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=123ProdutoRoute'], invalidAliasMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=default'], reservedAliasMessage),
