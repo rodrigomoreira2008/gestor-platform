@@ -22,6 +22,7 @@ const separated = parseFrontendCliArgs([
   'produtoRoute'
 ]);
 
+const rootRoute = parseFrontendCliArgs(['--delphi-actions', '--route-path=/']);
 const longHelp = parseFrontendCliArgs(['--help']);
 const shortHelp = parseFrontendCliArgs(['-h']);
 const helpWithRouteOption = parseFrontendCliArgs(['--help', '--route-path=/cadastros/produtos']);
@@ -38,6 +39,8 @@ function throwsWithMessage(values: string[], expectedMessage: string): boolean {
 
 const reservedAliasMessage = 'A opcao --route-export-alias nao pode ser uma palavra reservada do TypeScript.';
 const excessPositionalsMessage = 'Foram informados 6 argumentos posicionais; o maximo permitido e 5.';
+const internalRouteMessage = 'A opcao --route-path deve ser um caminho interno iniciado por / e usar somente barras normais.';
+const navigationSegmentMessage = 'A opcao --route-path nao pode conter os segmentos "." ou "..".';
 
 const checks = [
   inline.positional.length === 5,
@@ -51,6 +54,7 @@ const checks = [
   separated.withDelphiActions,
   separated.routePath === '/cadastros/produtos',
   separated.routeExportAlias === 'produtoRoute',
+  rootRoute.routePath === '/',
   longHelp.help && longHelp.positional.length === 0,
   shortHelp.help && shortHelp.positional.length === 0,
   helpWithRouteOption.help && helpWithRouteOption.routePath === '/cadastros/produtos',
@@ -92,6 +96,11 @@ const checks = [
     ['--delphi-actions', '--route-path=/produtos#lista'],
     'A opcao --route-path deve conter apenas um caminho de rota, sem espacos, query string ou fragmento.'
   ),
+  throwsWithMessage(['--delphi-actions', '--route-path=cadastros/produtos'], internalRouteMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=https://gestor.local/produtos'], internalRouteMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros\\produtos'], internalRouteMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros/./produtos'], navigationSegmentMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros/../produtos'], navigationSegmentMessage),
   throwsWithMessage(
     ['--delphi-actions', '--route-export-alias=produto-route'],
     'A opcao --route-export-alias deve ser um identificador TypeScript valido.'
