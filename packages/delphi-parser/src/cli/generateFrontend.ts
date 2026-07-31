@@ -30,11 +30,6 @@ if (!dfmPath || !pasPath || !entity) {
   process.exit(1);
 }
 
-if (!cli.withDelphiActions && (cli.routePath || cli.routeExportAlias)) {
-  console.error('As opcoes --route-path e --route-export-alias exigem --delphi-actions.');
-  process.exit(1);
-}
-
 const resolvedForm = resolveDelphiForm(readFileSync(dfmPath, 'utf8'), readFileSync(pasPath, 'utf8'), {
   entity,
   table,
