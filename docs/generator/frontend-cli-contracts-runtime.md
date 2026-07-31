@@ -15,6 +15,7 @@ O fluxo cobre:
 - rejeicao de opcoes nomeadas sem valor;
 - rejeicao de valores separados compostos apenas por espacos ou tabulacoes;
 - rejeicao de flags curtas ou longas usadas indevidamente como valor de outra opcao;
+- rejeicao de `--route-path` e `--route-export-alias` informadas mais de uma vez;
 - renderizacao compartilhada da mensagem de uso;
 - integracao entre `gen:frontend` e a ajuda geral do pacote.
 
@@ -51,9 +52,10 @@ O validador agregado verifica:
 
 - as duas sintaxes aceitas para opcoes nomeadas;
 - os dois aliases de ajuda;
-- mensagens exatas para valor ausente, valor em branco e opcao desconhecida;
+- mensagens exatas para valor ausente, valor em branco, opcao desconhecida e opcao duplicada;
 - rejeicao de `-h` e `--delphi-actions` quando aparecem na posicao de valor;
 - rejeicao de opcoes curtas desconhecidas, como `-x`;
+- rejeicao de combinacoes duplicadas nas formas inline e separada;
 - a ajuda completa e a variante sem exemplo;
 - o consumo do renderer pelo gerador e pela ajuda geral.
 
@@ -62,13 +64,13 @@ Os arquivos `generateFrontend.ts` e `showHelp.ts` sao localizados a partir de `i
 Saida esperada do contrato agregado:
 
 ```text
-FRONTEND_CLI_CONTRACTS_OK: checks=27: passed=27
+FRONTEND_CLI_CONTRACTS_OK: checks=29: passed=29
 ```
 
 Saida esperada do contrato especifico do parser:
 
 ```text
-FRONTEND_CLI_ARGS_OK: checks=18: passed=18
+FRONTEND_CLI_ARGS_OK: checks=20: passed=20
 ```
 
 ## Comando de geracao documentado
