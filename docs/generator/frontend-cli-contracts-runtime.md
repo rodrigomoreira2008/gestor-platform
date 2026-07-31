@@ -19,7 +19,7 @@ O fluxo cobre:
 - rejeicao de `--delphi-actions`, `--route-path` e `--route-export-alias` informadas mais de uma vez;
 - exigencia de `--delphi-actions` quando `--route-path` ou `--route-export-alias` sao usados;
 - validacao de `--route-path` como caminho interno iniciado por `/`, sem espacos, query string, fragmento, barra invertida, barras consecutivas ou segmentos `.` e `..`;
-- rejeicao de codificacao percentual invalida e de caracteres estruturais perigosos codificados;
+- rejeicao de codificacao percentual invalida, caracteres estruturais codificados e dupla codificacao estrutural;
 - canonicalizacao de `--route-path` pela remocao da barra final, preservando a rota raiz `/`;
 - validacao de `--route-export-alias` como identificador TypeScript nao reservado;
 - renderizacao compartilhada da mensagem de uso;
@@ -74,6 +74,7 @@ O validador agregado verifica:
 - rejeicao de codificacao percentual incompleta ou invalida;
 - rejeicao de barra, barra invertida, espaco, query string e fragmento codificados;
 - rejeicao de segmentos de navegacao com ponto codificado;
+- rejeicao de dupla codificacao estrutural, como `%252F` e `%252E%252E`;
 - aceitacao de caracteres Unicode percentualmente codificados, como `ma%C3%A7as`;
 - rejeicao de aliases com hifen ou iniciados por numero;
 - rejeicao de palavras reservadas do TypeScript, como `default`, `class` e `await`;
@@ -88,13 +89,13 @@ Os arquivos `generateFrontend.ts` e `showHelp.ts` sao localizados a partir de `i
 Saida esperada do contrato agregado:
 
 ```text
-FRONTEND_CLI_CONTRACTS_OK: checks=57: passed=57
+FRONTEND_CLI_CONTRACTS_OK: checks=59: passed=59
 ```
 
 Saida esperada do contrato especifico do parser:
 
 ```text
-FRONTEND_CLI_ARGS_OK: checks=47: passed=47
+FRONTEND_CLI_ARGS_OK: checks=49: passed=49
 ```
 
 ## Scripts do workspace
