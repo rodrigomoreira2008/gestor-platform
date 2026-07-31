@@ -29,6 +29,7 @@ const parsedSeparatedOptions = parseFrontendCliArgs([
 const helpLong = parseFrontendCliArgs(['--help']);
 const helpShort = parseFrontendCliArgs(['-h']);
 const helpWithRouteOption = parseFrontendCliArgs(['--help', '--route-path=/cadastros/produtos']);
+const helpWithExtraPositionals = parseFrontendCliArgs(['produto.dfm', 'produto.pas', 'Produto', 'TABELA', 'saida', 'extra', '--help']);
 const usage = renderFrontendCliUsage();
 const compactUsage = renderFrontendCliUsage({ includeExample: false });
 const cliDirectory = dirname(fileURLToPath(import.meta.url));
@@ -47,6 +48,7 @@ function throwsWithMessage(values: string[], expectedMessage: string): boolean {
 const invalidRouteMessage = 'A opcao --route-path deve conter apenas um caminho de rota, sem espacos, query string ou fragmento.';
 const invalidAliasMessage = 'A opcao --route-export-alias deve ser um identificador TypeScript valido.';
 const reservedAliasMessage = 'A opcao --route-export-alias nao pode ser uma palavra reservada do TypeScript.';
+const excessPositionalsMessage = 'Foram informados 6 argumentos posicionais; o maximo permitido e 5.';
 
 const checks = [
   parsedInlineOptions.positional.length === 5,
@@ -59,6 +61,7 @@ const checks = [
   helpLong.help && helpLong.positional.length === 0,
   helpShort.help && helpShort.positional.length === 0,
   helpWithRouteOption.help && helpWithRouteOption.routePath === '/cadastros/produtos',
+  helpWithExtraPositionals.help && helpWithExtraPositionals.positional.length === 6,
   throwsWithMessage(['--route-path'], 'A opcao --route-path exige um valor.'),
   throwsWithMessage(['--route-export-alias='], 'A opcao --route-export-alias exige um valor.'),
   throwsWithMessage(['--route-path', '   '], 'A opcao --route-path exige um valor.'),
@@ -95,6 +98,7 @@ const checks = [
   throwsWithMessage(['--delphi-actions', '--route-export-alias=default'], reservedAliasMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=class'], reservedAliasMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=await'], reservedAliasMessage),
+  throwsWithMessage(['produto.dfm', 'produto.pas', 'Produto', 'TABELA', 'saida', 'extra'], excessPositionalsMessage),
   usage.includes('--delphi-actions'),
   usage.includes('--route-path=<caminho>'),
   usage.includes('--route-export-alias=<nome>'),
