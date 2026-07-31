@@ -36,7 +36,7 @@ export function parseFrontendCliArgs(values: string[]): ParsedFrontendCliArgs {
         throw new Error('A opcao --route-path foi informada mais de uma vez.');
       }
 
-      routePath = routePathResult.value;
+      routePath = validateRoutePath(routePathResult.value!);
       index += routePathResult.consumedNext ? 1 : 0;
       continue;
     }
@@ -47,7 +47,7 @@ export function parseFrontendCliArgs(values: string[]): ParsedFrontendCliArgs {
         throw new Error('A opcao --route-export-alias foi informada mais de uma vez.');
       }
 
-      routeExportAlias = aliasResult.value;
+      routeExportAlias = validateExportAlias(aliasResult.value!);
       index += aliasResult.consumedNext ? 1 : 0;
       continue;
     }
@@ -95,4 +95,20 @@ function readNamedOption(values: string[], index: number, name: string): NamedOp
   }
 
   return { matched: true, consumedNext: true, value };
+}
+
+function validateRoutePath(value: string): string {
+  if (/\s/.test(value) || value.includes('?') || value.includes('#')) {
+    throw new Error('A opcao --route-path deve conter apenas um caminho de rota, sem espacos, query string ou fragmento.');
+  }
+
+  return value;
+}
+
+function validateExportAlias(value: string): string {
+  if (!/^[$A-Z_a-z][$\w]*$/.test(value)) {
+    throw new Error('A opcao --route-export-alias deve ser um identificador TypeScript valido.');
+  }
+
+  return value;
 }
