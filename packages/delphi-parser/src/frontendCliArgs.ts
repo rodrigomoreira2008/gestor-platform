@@ -161,6 +161,10 @@ function validateRoutePath(value: string): string {
     throw new Error('A opcao --route-path deve ser um caminho interno iniciado por / e usar somente barras normais.');
   }
 
+  if (value !== '/' && value.includes('//')) {
+    throw new Error('A opcao --route-path nao pode conter barras consecutivas.');
+  }
+
   const segments = value.split('/');
   if (segments.some((segment) => segment === '.' || segment === '..')) {
     throw new Error('A opcao --route-path nao pode conter os segmentos "." ou "..".');
