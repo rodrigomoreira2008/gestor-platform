@@ -157,6 +157,15 @@ function validateRoutePath(value: string): string {
     throw new Error('A opcao --route-path deve conter apenas um caminho de rota, sem espacos, query string ou fragmento.');
   }
 
+  if (!value.startsWith('/') || value.includes('\\') || value.includes('://')) {
+    throw new Error('A opcao --route-path deve ser um caminho interno iniciado por / e usar somente barras normais.');
+  }
+
+  const segments = value.split('/');
+  if (segments.some((segment) => segment === '.' || segment === '..')) {
+    throw new Error('A opcao --route-path nao pode conter segmentos . ou ...');
+  }
+
   return value;
 }
 
