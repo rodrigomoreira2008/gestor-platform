@@ -161,23 +161,7 @@ function validateRoutePath(value: string): string {
     throw new Error('A opcao --route-path deve ser um caminho interno iniciado por / e usar somente barras normais.');
   }
 
-  try {
-    decodeURIComponent(value);
-  } catch {
-    throw new Error('A opcao --route-path contem uma codificacao percentual invalida.');
-  }
-
-  if (/%(?:2f|5c|3f|23|20|09|0a|0d)/i.test(value)) {
-    throw new Error('A opcao --route-path nao pode ocultar separadores, espacos, query string ou fragmento por codificacao percentual.');
-  }
-
-  if (/%2e/i.test(value)) {
-    throw new Error('A opcao --route-path nao pode codificar segmentos de navegacao com ponto.');
-  }
-
-  if (/%25(?:2f|5c|3f|23|20|09|0a|0d|2e)/i.test(value)) {
-    throw new Error('A opcao --route-path nao pode usar dupla codificacao percentual para ocultar caracteres estruturais.');
-  }
+  validatePercentEncodedRoute(value);
 
   if (value !== '/' && value.includes('//')) {
     throw new Error('A opcao --route-path nao pode conter barras consecutivas.');
@@ -189,6 +173,51 @@ function validateRoutePath(value: string): string {
   }
 
   return value === '/' ? value : value.replace(/\/+$/, '');
+}
+
+function validatePercentEncodedRoute(value: string): void {
+  let encodedValue = value;
+  let decodingDepth = 0;
+
+  while (/%[\dA-Fa-f]{2}/.test(encodedValue)) {
+    if (/%(?:2f|5c|3f|23|20|09|0a|0d)/i.test(encodedValue)) {
+      if (decodingDepth === 0) {
+        throw new Error('A opcao --route-path nao pode ocultar separadores, espacos, query string ou fragmento por codificacao percentual.');
+      }
+
+      throw new Error('A opcao --route-path nao pode usar codificacao percentual aninhada para ocultar caracteres estruturais.');
+    }
+
+    if (/%2e/i.test(encodedValue)) {
+      if (decodingDepth === 0) {
+        throw new Error('A opcao --route-path nao pode codificar segmentos de navegacao com ponto.');
+      }
+
+      throw new Error('A opcao --route-path nao pode usar codificacao percentual aninhada para ocultar caracteres estruturais.');
+    }
+
+    let decodedValue: string;
+    try {
+      decodedValue = decodeURIComponent(encodedValue);
+    } catch {
+      throw new Error('A opcao --route-path contem uma codificacao percentual invalida.');
+    }
+
+    if (decodedValue === encodedValue || !/%[\dA-Fa-f]{2}/.test(decodedValue)) {
+      return;
+    }
+
+    encodedValue = decodedValue;
+    decodingDepth += 1;
+  }
+
+  if (encodedValue.includes('%')) {
+    try {
+      decodeURIComponent(encodedValue);
+    } catch {
+      throw new Error('A opcao --route-path contem uma codificacao percentual invalida.');
+    }
+  }
 }
 
 function validateExportAlias(value: string): string {
