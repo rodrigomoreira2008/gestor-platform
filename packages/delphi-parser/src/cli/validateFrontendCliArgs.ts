@@ -24,6 +24,7 @@ const separated = parseFrontendCliArgs([
 
 const longHelp = parseFrontendCliArgs(['--help']);
 const shortHelp = parseFrontendCliArgs(['-h']);
+const helpWithRouteOption = parseFrontendCliArgs(['--help', '--route-path=/cadastros/produtos']);
 
 function throwsWithMessage(values: string[], expectedMessage: string): boolean {
   try {
@@ -48,6 +49,7 @@ const checks = [
   separated.routeExportAlias === 'produtoRoute',
   longHelp.help && longHelp.positional.length === 0,
   shortHelp.help && shortHelp.positional.length === 0,
+  helpWithRouteOption.help && helpWithRouteOption.routePath === '/cadastros/produtos',
   throwsWithMessage(['--route-path', '   '], 'A opcao --route-path exige um valor.'),
   throwsWithMessage(['--route-export-alias', '\t'], 'A opcao --route-export-alias exige um valor.'),
   throwsWithMessage(['--route-path', '-h'], 'A opcao --route-path exige um valor.'),
@@ -64,6 +66,14 @@ const checks = [
   throwsWithMessage(
     ['--delphi-actions', '--delphi-actions'],
     'A opcao --delphi-actions foi informada mais de uma vez.'
+  ),
+  throwsWithMessage(
+    ['--route-path=/cadastros/produtos'],
+    'As opcoes --route-path e --route-export-alias exigem --delphi-actions.'
+  ),
+  throwsWithMessage(
+    ['--route-export-alias=produtoRoute'],
+    'As opcoes --route-path e --route-export-alias exigem --delphi-actions.'
   )
 ];
 
