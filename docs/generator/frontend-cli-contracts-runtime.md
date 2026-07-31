@@ -19,6 +19,7 @@ O fluxo cobre:
 - rejeicao de `--delphi-actions`, `--route-path` e `--route-export-alias` informadas mais de uma vez;
 - exigencia de `--delphi-actions` quando `--route-path` ou `--route-export-alias` sao usados;
 - validacao de `--route-path` como caminho interno iniciado por `/`, sem espacos, query string, fragmento, barra invertida, barras consecutivas ou segmentos `.` e `..`;
+- canonicalizacao de `--route-path` pela remocao da barra final, preservando a rota raiz `/`;
 - validacao de `--route-export-alias` como identificador TypeScript nao reservado;
 - renderizacao compartilhada da mensagem de uso;
 - integracao entre `gen:frontend` e a ajuda geral do pacote.
@@ -64,6 +65,7 @@ O validador agregado verifica:
 - rejeicao de opcoes de rota sem `--delphi-actions`;
 - preservacao do modo de ajuda mesmo quando uma opcao de rota acompanha `--help`;
 - aceitacao da rota raiz `/`;
+- canonicalizacao de `/cadastros/produtos/` para `/cadastros/produtos`;
 - rejeicao de caminhos relativos, URLs absolutas e barras invertidas;
 - rejeicao de barras consecutivas no inicio ou no meio do caminho;
 - rejeicao de caminhos com espacos, query string ou fragmento;
