@@ -161,18 +161,17 @@ function validateRoutePath(value: string): string {
     throw new Error('A opcao --route-path deve ser um caminho interno iniciado por / e usar somente barras normais.');
   }
 
-  let decodedValue: string;
   try {
-    decodedValue = decodeURIComponent(value);
+    decodeURIComponent(value);
   } catch {
     throw new Error('A opcao --route-path contem uma codificacao percentual invalida.');
   }
 
-  if (decodedValue !== value && /[\\/?#\s]/.test(decodedValue.replace(value, ''))) {
+  if (/%(?:2f|5c|3f|23|20|09|0a|0d)/i.test(value)) {
     throw new Error('A opcao --route-path nao pode ocultar separadores, espacos, query string ou fragmento por codificacao percentual.');
   }
 
-  if (/%(?:2e)/i.test(value)) {
+  if (/%2e/i.test(value)) {
     throw new Error('A opcao --route-path nao pode codificar segmentos de navegacao com ponto.');
   }
 
