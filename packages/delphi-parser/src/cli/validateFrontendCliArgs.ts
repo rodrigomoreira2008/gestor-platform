@@ -35,6 +35,8 @@ function throwsWithMessage(values: string[], expectedMessage: string): boolean {
   }
 }
 
+const reservedAliasMessage = 'A opcao --route-export-alias nao pode ser uma palavra reservada do TypeScript.';
+
 const checks = [
   inline.positional.length === 5,
   inline.positional[0] === 'produto.dfm',
@@ -94,7 +96,10 @@ const checks = [
   throwsWithMessage(
     ['--delphi-actions', '--route-export-alias=123ProdutoRoute'],
     'A opcao --route-export-alias deve ser um identificador TypeScript valido.'
-  )
+  ),
+  throwsWithMessage(['--delphi-actions', '--route-export-alias=default'], reservedAliasMessage),
+  throwsWithMessage(['--delphi-actions', '--route-export-alias=class'], reservedAliasMessage),
+  throwsWithMessage(['--delphi-actions', '--route-export-alias=await'], reservedAliasMessage)
 ];
 
 const passed = checks.filter(Boolean).length;
