@@ -22,6 +22,9 @@ export interface DelphiFieldBinding {
   componentClass: string;
   dataSource?: string;
   dataField?: string;
+  listSource?: string;
+  keyField?: string;
+  listField?: string;
   label?: string;
   section?: string;
   sectionPath?: string[];

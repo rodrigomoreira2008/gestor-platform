@@ -1,0 +1,156 @@
+name: Delphi Parser Fixtures
+
+on:
+  pull_request:
+    paths:
+      - 'packages/delphi-parser/**'
+      - 'docs/generator/**'
+      - '.github/workflows/delphi-fixtures.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: delphi-fixtures-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: true
+
+jobs:
+  validate-fixtures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Diagnose parser environment
+        run: pnpm --filter @gestor/delphi-parser doctor
+
+      - name: Validate package metadata
+        run: pnpm --filter @gestor/delphi-parser validate:package
+
+      - name: Validate package scripts
+        run: pnpm --filter @gestor/delphi-parser validate:scripts
+
+      - name: Validate parser documentation
+        run: pnpm --filter @gestor/delphi-parser validate:docs
+
+      - name: Validate CI workflow
+        run: pnpm --filter @gestor/delphi-parser validate:workflow
+
+      - name: Validate fixture structure
+        run: pnpm --filter @gestor/delphi-parser validate:fixtures
+
+      - name: Build parser
+        run: pnpm --filter @gestor/delphi-parser build
+
+      - name: Validate component catalog
+        run: pnpm --filter @gestor/delphi-parser validate:components
+
+      - name: Audit fixture DFM components
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-components
+
+      - name: Validate generated fixture artifacts
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-artifacts
+
+      - name: Validate generated artifact paths
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-paths
+
+      - name: Validate generated placeholders
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-placeholders
+
+      - name: Validate generated artifact budgets
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-budgets
+
+      - name: Validate generated text format
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-text-format
+
+      - name: Validate generated naming conventions
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-names
+
+      - name: Validate generated layer boundaries
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-boundaries
+
+      - name: Validate generated TypeScript syntax
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-syntax
+
+      - name: Validate generated import graph
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-imports
+
+      - name: Validate deterministic generation
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-determinism
+
+      - name: Validate backend frontend contracts
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-contracts
+
+      - name: Validate generated persistence layer
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-repository
+
+      - name: Compile generated backend
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-backend-compile
+
+      - name: Execute generated backend runtime smoke tests
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-backend-runtime
+
+      - name: Execute generated backend HTTP CRUD tests
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-backend-http
+
+      - name: Compile generated frontend
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-frontend-compile
+
+      - name: Execute generated frontend runtime smoke tests
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-frontend-runtime
+
+      - name: Execute generated frontend API contract tests
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-frontend-api
+
+      - name: Execute generated frontend hooks contract tests
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-frontend-hooks
+
+      - name: Execute generated frontend schema contract tests
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-frontend-schema
+
+      - name: Execute generated frontend page contract tests
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-frontend-page
+
+      - name: Execute generated frontend form contract tests
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-frontend-form
+
+      - name: Execute generated frontend tabbed form contract tests
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-frontend-tabbed-form
+
+      - name: Execute generated frontend lookup contract tests
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-frontend-lookup
+
+      - name: Validate generated API routes
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-routes
+
+      - name: Validate semantic fixture behavior
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-semantic
+
+      - name: Validate fixture capability coverage
+        run: pnpm --filter @gestor/delphi-parser validate:fixture-coverage

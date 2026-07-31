@@ -1,0 +1,115 @@
+import { enrichFieldsWithBusinessRules } from './businessRuleFieldEnrichment';
+import { inferBusinessRules } from './businessRuleInference';
+import { inferDatabaseQueries } from './databaseInference';
+import { inferDetailGrids } from './detailGridInference';
+import { collectActionBindings, collectFieldBindings } from './dfmIntrospection';
+import { dfmToGestorForm } from './dfmToGestorForm';
+import { enrichGestorFormWithPascal } from './gestorPasEnrichment';
+import { inferLookups } from './lookupInference';
+import { buildMethodActionPlans } from './methodActionPlanning';
+import { parseDfm } from './dfmParser';
+import { parsePascalUnit } from './pasParser';
+import { inferRelationships } from './relationshipInference';
+import { inferTabs } from './tabInference';
+import type { PascalValidationHint } from './pasParser';
+import type { ResolvedAction, ResolvedField, ResolvedForm } from './resolvedForm';
+
+export interface ResolveFormOptions {
+  entity: string;
+  title?: string;
+  dfmFile?: string;
+  pasFile?: string;
+  table?: string;
+}
+
+export function resolveDelphiForm(dfmInput: string, pasInput: string, options: ResolveFormOptions): ResolvedForm {
+  const parsedDfm = parseDfm(dfmInput);
+  if (!parsedDfm.root) throw new Error('DFM sem formulário raiz.');
+
+  const pascal = parsePascalUnit(pasInput);
+  const baseForm = dfmToGestorForm(dfmInput, options);
+  const enriched = enrichGestorFormWithPascal(baseForm, pascal).form;
+  const dfmFields = collectFieldBindings(parsedDfm.root);
+  const dfmActions = collectActionBindings(parsedDfm.root);
+  const databaseQueries = inferDatabaseQueries(pascal.sqlSnippets);
+  const relationships = inferRelationships(databaseQueries);
+  const businessRules = inferBusinessRules(pascal.methodFlows);
+  const methodActionPlans = buildMethodActionPlans(businessRules);
+  const baseResolvedFields = dfmFields.map((field) => resolveField(field, pascal.validationHints));
+  const fieldEnrichment = enrichFieldsWithBusinessRules(baseResolvedFields, businessRules);
+  const ruleWarnings = fieldEnrichment.unmatchedRules.map((rule) => `Regra de campo sem componente DFM correspondente em ${rule.methodName}: ${rule.kind}(${rule.field})`);
+
+  const partialResolved = {
+    form: enriched,
+    fields: fieldEnrichment.fields,
+    actions: dfmActions.map((action) => {
+      const event = pascal.eventHints.find((hint) => sameName(hint.componentName, action.componentName) || sameName(hint.handlerName, action.event ?? ''));
+      return {
+        name: action.componentName,
+        label: action.caption,
+        kind: inferActionKind(action.caption ?? action.componentName),
+        event,
+        source: action
+      } satisfies ResolvedAction;
+    }),
+    datasets: pascal.datasetHints,
+    queries: pascal.sqlSnippets,
+    databaseQueries,
+    relationships,
+    validations: pascal.validationHints,
+    methods: pascal.methods,
+    events: pascal.eventHints,
+    dependencies: pascal.dependencyHints,
+    rules: pascal.ruleHints,
+    methodFlows: pascal.methodFlows,
+    businessRules,
+    methodActionPlans,
+    warnings: [...parsedDfm.warnings, ...pascal.warnings, ...ruleWarnings]
+  };
+
+  const withLookups = {
+    ...partialResolved,
+    lookups: inferLookups({ ...partialResolved, lookups: [], tabs: [], detailGrids: [] })
+  };
+  const withTabs = {
+    ...withLookups,
+    tabs: inferTabs({ ...withLookups, tabs: [], detailGrids: [] })
+  };
+
+  return {
+    ...withTabs,
+    detailGrids: inferDetailGrids({ ...withTabs, detailGrids: [] })
+  };
+}
+
+function resolveField(field: ReturnType<typeof collectFieldBindings>[number], validations: PascalValidationHint[]): ResolvedField {
+  const matchingValidations = validations.filter((validation) => validation.field && [field.dataField, field.componentName].some((candidate) => candidate && sameName(candidate, validation.field!)));
+
+  return {
+    name: field.dataField ?? field.componentName,
+    label: field.label,
+    dataSource: field.dataSource,
+    dataField: field.dataField,
+    section: field.section,
+    required: matchingValidations.length > 0,
+    validationMessages: matchingValidations.map((validation) => validation.message),
+    source: field
+  };
+}
+
+function inferActionKind(label: string): string {
+  const normalized = normalizeName(label);
+  if (normalized.includes('novo')) return 'create';
+  if (normalized.includes('gravar') || normalized.includes('salvar') || normalized.includes('alterar')) return 'update';
+  if (normalized.includes('excluir')) return 'delete';
+  if (normalized.includes('imprimir')) return 'print';
+  return 'custom';
+}
+
+function sameName(left: string, right: string): boolean {
+  return normalizeName(left) === normalizeName(right);
+}
+
+function normalizeName(value: string): string {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+}

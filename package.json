@@ -8,7 +8,9 @@
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
     "format": "prettier --write .",
-    "check": "pnpm lint && pnpm test && pnpm build"
+    "check": "pnpm lint && pnpm test && pnpm build",
+    "validate:frontend-cli": "pnpm --filter @gestor/delphi-parser exec tsx src/cli/validateFrontendCliContracts.ts",
+    "validate:delphi-fixtures": "pnpm --filter @gestor/delphi-parser validate:all && pnpm validate:frontend-cli"
   },
   "devDependencies": {
     "@types/node": "latest",

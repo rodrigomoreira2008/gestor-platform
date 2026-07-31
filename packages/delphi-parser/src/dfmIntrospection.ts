@@ -1,9 +1,13 @@
 import type { DelphiActionBinding, DelphiBounds, DelphiFieldBinding, DelphiFormNode } from './types';
 
-const fieldClasses = new Set(['TDBEdit', 'TDBComboBox', 'TDBMemo', 'TDBGrid', 'TEdit', 'TComboBox', 'TMemo', 'TMaskEdit']);
+const fieldClasses = new Set([
+  'TDBEdit', 'TDBComboBox', 'TDBLookupComboBox', 'TDBLookupCombo', 'TDBMemo', 'TDBGrid', 'TDBGridEh',
+  'TDBCheckBox', 'TDBRadioGroup', 'TDBDateTimePicker', 'TDBNumberEdit',
+  'TEdit', 'TComboBox', 'TMemo', 'TMaskEdit', 'TCheckBox', 'TRadioGroup', 'TDateTimePicker', 'TSpinEdit', 'TStringGrid'
+]);
 const buttonClasses = new Set(['TBitBtn', 'TSpeedButton', 'TButton']);
 const labelClasses = new Set(['TLabel']);
-const sectionClasses = new Set(['TGroupBox', 'TTabSheet', 'TPanel']);
+const sectionClasses = new Set(['TGroupBox', 'TTabSheet', 'TcxTabSheet', 'TPanel']);
 
 export function collectFieldBindings(root: DelphiFormNode): DelphiFieldBinding[] {
   const result: DelphiFieldBinding[] = [];
@@ -17,6 +21,9 @@ export function collectFieldBindings(root: DelphiFormNode): DelphiFieldBinding[]
       componentClass: node.className,
       dataSource: node.properties.DataSource,
       dataField: node.properties.DataField,
+      listSource: node.properties.ListSource,
+      keyField: node.properties.KeyField,
+      listField: node.properties.ListField,
       label: node.properties.Caption ?? findNearbyLabel(node, parents.at(-1)),
       section: sectionPath.at(-1),
       sectionPath,
@@ -69,10 +76,7 @@ function findNearbyLabel(field: DelphiFormNode, parent?: DelphiFormNode): string
     .filter((entry) => entry.bounds.left !== undefined && entry.bounds.top !== undefined);
 
   const candidates = labels
-    .map((entry) => ({
-      caption: entry.label.properties.Caption,
-      score: scoreLabelCandidate(fieldBounds, entry.bounds)
-    }))
+    .map((entry) => ({ caption: entry.label.properties.Caption, score: scoreLabelCandidate(fieldBounds, entry.bounds) }))
     .filter((entry) => entry.score < Number.POSITIVE_INFINITY)
     .sort((a, b) => a.score - b.score);
 
@@ -81,14 +85,11 @@ function findNearbyLabel(field: DelphiFormNode, parent?: DelphiFormNode): string
 
 function scoreLabelCandidate(field: DelphiBounds, label: DelphiBounds): number {
   if (label.left === undefined || label.top === undefined || field.left === undefined || field.top === undefined) return Number.POSITIVE_INFINITY;
-
   const verticalDistance = Math.abs(field.top - label.top);
   const horizontalDistance = Math.abs(field.left - label.left);
   const isAbove = label.top <= field.top;
   const isLeftAligned = label.left <= field.left + 24;
-
   if (!isAbove || verticalDistance > 32 || !isLeftAligned) return Number.POSITIVE_INFINITY;
-
   return verticalDistance * 10 + horizontalDistance;
 }
 
