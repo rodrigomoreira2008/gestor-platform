@@ -48,6 +48,7 @@ function throwsWithMessage(values: string[], expectedMessage: string): boolean {
 
 const invalidRouteMessage = 'A opcao --route-path deve conter apenas um caminho de rota, sem espacos, query string ou fragmento.';
 const internalRouteMessage = 'A opcao --route-path deve ser um caminho interno iniciado por / e usar somente barras normais.';
+const repeatedSeparatorMessage = 'A opcao --route-path nao pode conter barras consecutivas.';
 const navigationSegmentMessage = 'A opcao --route-path nao pode conter os segmentos "." ou "..".';
 const invalidAliasMessage = 'A opcao --route-export-alias deve ser um identificador TypeScript valido.';
 const reservedAliasMessage = 'A opcao --route-export-alias nao pode ser uma palavra reservada do TypeScript.';
@@ -100,6 +101,8 @@ const checks = [
   throwsWithMessage(['--delphi-actions', '--route-path=cadastros/produtos'], internalRouteMessage),
   throwsWithMessage(['--delphi-actions', '--route-path=https://gestor.local/produtos'], internalRouteMessage),
   throwsWithMessage(['--delphi-actions', '--route-path=/cadastros\\produtos'], internalRouteMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=//cadastros/produtos'], repeatedSeparatorMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros//produtos'], repeatedSeparatorMessage),
   throwsWithMessage(['--delphi-actions', '--route-path=/cadastros/./produtos'], navigationSegmentMessage),
   throwsWithMessage(['--delphi-actions', '--route-path=/cadastros/../produtos'], navigationSegmentMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=produto-route'], invalidAliasMessage),
