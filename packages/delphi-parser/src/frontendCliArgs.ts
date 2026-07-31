@@ -163,7 +163,7 @@ function validateRoutePath(value: string): string {
 
   const segments = value.split('/');
   if (segments.some((segment) => segment === '.' || segment === '..')) {
-    throw new Error('A opcao --route-path nao pode conter segmentos . ou ...');
+    throw new Error('A opcao --route-path nao pode conter segmentos de navegacao . ou ...');
   }
 
   return value;
