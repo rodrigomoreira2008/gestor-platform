@@ -47,6 +47,8 @@ const TYPESCRIPT_RESERVED_WORDS = new Set([
   'yield'
 ]);
 
+const MAX_POSITIONAL_ARGUMENTS = 5;
+
 export interface ParsedFrontendCliArgs {
   positional: string[];
   withDelphiActions: boolean;
@@ -106,6 +108,10 @@ export function parseFrontendCliArgs(values: string[]): ParsedFrontendCliArgs {
     }
 
     positional.push(value);
+  }
+
+  if (!help && positional.length > MAX_POSITIONAL_ARGUMENTS) {
+    throw new Error(`Foram informados ${positional.length} argumentos posicionais; o maximo permitido e ${MAX_POSITIONAL_ARGUMENTS}.`);
   }
 
   if (!help && !withDelphiActions && (routePath !== undefined || routeExportAlias !== undefined)) {
