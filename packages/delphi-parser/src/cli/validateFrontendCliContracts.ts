@@ -11,7 +11,7 @@ const parsedInlineOptions = parseFrontendCliArgs([
   'PRODUTOS',
   'apps/frontend/src/modules/produtos',
   '--delphi-actions',
-  '--route-path=/cadastros/produtos',
+  '--route-path=/cadastros/produtos/',
   '--route-export-alias=produtoRoute'
 ]);
 
