@@ -1,3 +1,52 @@
+const TYPESCRIPT_RESERVED_WORDS = new Set([
+  'await',
+  'break',
+  'case',
+  'catch',
+  'class',
+  'const',
+  'continue',
+  'debugger',
+  'default',
+  'delete',
+  'do',
+  'else',
+  'enum',
+  'export',
+  'extends',
+  'false',
+  'finally',
+  'for',
+  'function',
+  'if',
+  'implements',
+  'import',
+  'in',
+  'instanceof',
+  'interface',
+  'let',
+  'new',
+  'null',
+  'package',
+  'private',
+  'protected',
+  'public',
+  'return',
+  'static',
+  'super',
+  'switch',
+  'this',
+  'throw',
+  'true',
+  'try',
+  'typeof',
+  'var',
+  'void',
+  'while',
+  'with',
+  'yield'
+]);
+
 export interface ParsedFrontendCliArgs {
   positional: string[];
   withDelphiActions: boolean;
@@ -106,8 +155,8 @@ function validateRoutePath(value: string): string {
 }
 
 function validateExportAlias(value: string): string {
-  if (!/^[$A-Z_a-z][$\w]*$/.test(value)) {
-    throw new Error('A opcao --route-export-alias deve ser um identificador TypeScript valido.');
+  if (!/^[$A-Z_a-z][$\w]*$/.test(value) || TYPESCRIPT_RESERVED_WORDS.has(value)) {
+    throw new Error('A opcao --route-export-alias deve ser um identificador TypeScript valido e nao reservado.');
   }
 
   return value;
