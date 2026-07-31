@@ -40,6 +40,7 @@ function throwsWithMessage(values: string[], expectedMessage: string): boolean {
 const reservedAliasMessage = 'A opcao --route-export-alias nao pode ser uma palavra reservada do TypeScript.';
 const excessPositionalsMessage = 'Foram informados 6 argumentos posicionais; o maximo permitido e 5.';
 const internalRouteMessage = 'A opcao --route-path deve ser um caminho interno iniciado por / e usar somente barras normais.';
+const repeatedSeparatorMessage = 'A opcao --route-path nao pode conter barras consecutivas.';
 const navigationSegmentMessage = 'A opcao --route-path nao pode conter os segmentos "." ou "..".';
 
 const checks = [
@@ -99,6 +100,8 @@ const checks = [
   throwsWithMessage(['--delphi-actions', '--route-path=cadastros/produtos'], internalRouteMessage),
   throwsWithMessage(['--delphi-actions', '--route-path=https://gestor.local/produtos'], internalRouteMessage),
   throwsWithMessage(['--delphi-actions', '--route-path=/cadastros\\produtos'], internalRouteMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=//cadastros/produtos'], repeatedSeparatorMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros//produtos'], repeatedSeparatorMessage),
   throwsWithMessage(['--delphi-actions', '--route-path=/cadastros/./produtos'], navigationSegmentMessage),
   throwsWithMessage(['--delphi-actions', '--route-path=/cadastros/../produtos'], navigationSegmentMessage),
   throwsWithMessage(
