@@ -175,6 +175,10 @@ function validateRoutePath(value: string): string {
     throw new Error('A opcao --route-path nao pode codificar segmentos de navegacao com ponto.');
   }
 
+  if (/%25(?:2f|5c|3f|23|20|09|0a|0d|2e)/i.test(value)) {
+    throw new Error('A opcao --route-path nao pode usar dupla codificacao percentual para ocultar caracteres estruturais.');
+  }
+
   if (value !== '/' && value.includes('//')) {
     throw new Error('A opcao --route-path nao pode conter barras consecutivas.');
   }
