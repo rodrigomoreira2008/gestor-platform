@@ -74,6 +74,26 @@ const checks = [
   throwsWithMessage(
     ['--route-export-alias=produtoRoute'],
     'As opcoes --route-path e --route-export-alias exigem --delphi-actions.'
+  ),
+  throwsWithMessage(
+    ['--delphi-actions', '--route-path=/cadastros/grupo produtos'],
+    'A opcao --route-path deve conter apenas um caminho de rota, sem espacos, query string ou fragmento.'
+  ),
+  throwsWithMessage(
+    ['--delphi-actions', '--route-path=/produtos?status=ativo'],
+    'A opcao --route-path deve conter apenas um caminho de rota, sem espacos, query string ou fragmento.'
+  ),
+  throwsWithMessage(
+    ['--delphi-actions', '--route-path=/produtos#lista'],
+    'A opcao --route-path deve conter apenas um caminho de rota, sem espacos, query string ou fragmento.'
+  ),
+  throwsWithMessage(
+    ['--delphi-actions', '--route-export-alias=produto-route'],
+    'A opcao --route-export-alias deve ser um identificador TypeScript valido.'
+  ),
+  throwsWithMessage(
+    ['--delphi-actions', '--route-export-alias=123ProdutoRoute'],
+    'A opcao --route-export-alias deve ser um identificador TypeScript valido.'
   )
 ];
 
