@@ -28,6 +28,7 @@ const parsedSeparatedOptions = parseFrontendCliArgs([
 
 const parsedRootRoute = parseFrontendCliArgs(['--delphi-actions', '--route-path=/']);
 const parsedEncodedUnicodeRoute = parseFrontendCliArgs(['--delphi-actions', '--route-path=/cadastros/ma%C3%A7as']);
+const parsedLiteralPercentRoute = parseFrontendCliArgs(['--delphi-actions', '--route-path=/descontos/100%25']);
 const helpLong = parseFrontendCliArgs(['--help']);
 const helpShort = parseFrontendCliArgs(['-h']);
 const helpWithRouteOption = parseFrontendCliArgs(['--help', '--route-path=/cadastros/produtos']);
@@ -54,7 +55,7 @@ const navigationSegmentMessage = 'A opcao --route-path nao pode conter os segmen
 const invalidEncodingMessage = 'A opcao --route-path contem uma codificacao percentual invalida.';
 const encodedStructureMessage = 'A opcao --route-path nao pode ocultar separadores, espacos, query string ou fragmento por codificacao percentual.';
 const encodedNavigationMessage = 'A opcao --route-path nao pode codificar segmentos de navegacao com ponto.';
-const doubleEncodingMessage = 'A opcao --route-path nao pode usar dupla codificacao percentual para ocultar caracteres estruturais.';
+const nestedEncodingMessage = 'A opcao --route-path nao pode usar codificacao percentual aninhada para ocultar caracteres estruturais.';
 const invalidAliasMessage = 'A opcao --route-export-alias deve ser um identificador TypeScript valido.';
 const reservedAliasMessage = 'A opcao --route-export-alias nao pode ser uma palavra reservada do TypeScript.';
 const excessPositionalsMessage = 'Foram informados 6 argumentos posicionais; o maximo permitido e 5.';
@@ -69,6 +70,7 @@ const checks = [
   parsedSeparatedOptions.routeExportAlias === 'produtoRoute',
   parsedRootRoute.routePath === '/',
   parsedEncodedUnicodeRoute.routePath === '/cadastros/ma%C3%A7as',
+  parsedLiteralPercentRoute.routePath === '/descontos/100%25',
   helpLong.help && helpLong.positional.length === 0,
   helpShort.help && helpShort.positional.length === 0,
   helpWithRouteOption.help && helpWithRouteOption.routePath === '/cadastros/produtos',
@@ -115,8 +117,9 @@ const checks = [
   throwsWithMessage(['--delphi-actions', '--route-path=/cadastros%2Fprodutos'], encodedStructureMessage),
   throwsWithMessage(['--delphi-actions', '--route-path=/produtos%3Fstatus=ativo'], encodedStructureMessage),
   throwsWithMessage(['--delphi-actions', '--route-path=/cadastros/%2E%2E/produtos'], encodedNavigationMessage),
-  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros%252Fprodutos'], doubleEncodingMessage),
-  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros/%252E%252E/produtos'], doubleEncodingMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros%252Fprodutos'], nestedEncodingMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros/%252E%252E/produtos'], nestedEncodingMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros%25252Fprodutos'], nestedEncodingMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=produto-route'], invalidAliasMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=123ProdutoRoute'], invalidAliasMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=default'], reservedAliasMessage),
