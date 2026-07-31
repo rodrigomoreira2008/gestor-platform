@@ -7,6 +7,7 @@ Este documento descreve os contratos que protegem a interface de linha de comand
 O fluxo cobre:
 
 - leitura dos argumentos posicionais;
+- limite maximo de cinco argumentos posicionais fora do modo de ajuda;
 - ativacao de `--delphi-actions`;
 - leitura de `--route-path` nas formas `--route-path=<valor>` e `--route-path <valor>`;
 - leitura de `--route-export-alias` nas formas inline e separada;
@@ -65,6 +66,8 @@ O validador agregado verifica:
 - rejeicao de caminhos com espacos, query string ou fragmento;
 - rejeicao de aliases com hifen ou iniciados por numero;
 - rejeicao de palavras reservadas do TypeScript, como `default`, `class` e `await`;
+- rejeicao de um sexto argumento posicional em execucao normal;
+- preservacao do modo de ajuda mesmo com argumentos posicionais excedentes;
 - a ajuda completa e a variante sem exemplo;
 - o consumo do renderer pelo gerador e pela ajuda geral;
 - ausencia da antiga validacao duplicada em `generateFrontend.ts`.
@@ -74,13 +77,13 @@ Os arquivos `generateFrontend.ts` e `showHelp.ts` sao localizados a partir de `i
 Saida esperada do contrato agregado:
 
 ```text
-FRONTEND_CLI_CONTRACTS_OK: checks=42: passed=42
+FRONTEND_CLI_CONTRACTS_OK: checks=44: passed=44
 ```
 
 Saida esperada do contrato especifico do parser:
 
 ```text
-FRONTEND_CLI_ARGS_OK: checks=32: passed=32
+FRONTEND_CLI_ARGS_OK: checks=34: passed=34
 ```
 
 ## Comando de geracao documentado
