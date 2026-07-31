@@ -25,6 +25,7 @@ const separated = parseFrontendCliArgs([
 const longHelp = parseFrontendCliArgs(['--help']);
 const shortHelp = parseFrontendCliArgs(['-h']);
 const helpWithRouteOption = parseFrontendCliArgs(['--help', '--route-path=/cadastros/produtos']);
+const helpWithExtraPositionals = parseFrontendCliArgs(['produto.dfm', 'produto.pas', 'Produto', 'TABELA', 'saida', 'extra', '--help']);
 
 function throwsWithMessage(values: string[], expectedMessage: string): boolean {
   try {
@@ -36,6 +37,7 @@ function throwsWithMessage(values: string[], expectedMessage: string): boolean {
 }
 
 const reservedAliasMessage = 'A opcao --route-export-alias nao pode ser uma palavra reservada do TypeScript.';
+const excessPositionalsMessage = 'Foram informados 6 argumentos posicionais; o maximo permitido e 5.';
 
 const checks = [
   inline.positional.length === 5,
@@ -52,6 +54,7 @@ const checks = [
   longHelp.help && longHelp.positional.length === 0,
   shortHelp.help && shortHelp.positional.length === 0,
   helpWithRouteOption.help && helpWithRouteOption.routePath === '/cadastros/produtos',
+  helpWithExtraPositionals.help && helpWithExtraPositionals.positional.length === 6,
   throwsWithMessage(['--route-path', '   '], 'A opcao --route-path exige um valor.'),
   throwsWithMessage(['--route-export-alias', '\t'], 'A opcao --route-export-alias exige um valor.'),
   throwsWithMessage(['--route-path', '-h'], 'A opcao --route-path exige um valor.'),
@@ -99,7 +102,8 @@ const checks = [
   ),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=default'], reservedAliasMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=class'], reservedAliasMessage),
-  throwsWithMessage(['--delphi-actions', '--route-export-alias=await'], reservedAliasMessage)
+  throwsWithMessage(['--delphi-actions', '--route-export-alias=await'], reservedAliasMessage),
+  throwsWithMessage(['produto.dfm', 'produto.pas', 'Produto', 'TABELA', 'saida', 'extra'], excessPositionalsMessage)
 ];
 
 const passed = checks.filter(Boolean).length;
