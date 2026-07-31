@@ -22,6 +22,10 @@ export function parseFrontendCliArgs(values: string[]): ParsedFrontendCliArgs {
     }
 
     if (value === '--delphi-actions') {
+      if (withDelphiActions) {
+        throw new Error('A opcao --delphi-actions foi informada mais de uma vez.');
+      }
+
       withDelphiActions = true;
       continue;
     }
