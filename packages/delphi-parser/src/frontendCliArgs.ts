@@ -28,6 +28,10 @@ export function parseFrontendCliArgs(values: string[]): ParsedFrontendCliArgs {
 
     const routePathResult = readNamedOption(values, index, '--route-path');
     if (routePathResult.matched) {
+      if (routePath !== undefined) {
+        throw new Error('A opcao --route-path foi informada mais de uma vez.');
+      }
+
       routePath = routePathResult.value;
       index += routePathResult.consumedNext ? 1 : 0;
       continue;
@@ -35,6 +39,10 @@ export function parseFrontendCliArgs(values: string[]): ParsedFrontendCliArgs {
 
     const aliasResult = readNamedOption(values, index, '--route-export-alias');
     if (aliasResult.matched) {
+      if (routeExportAlias !== undefined) {
+        throw new Error('A opcao --route-export-alias foi informada mais de uma vez.');
+      }
+
       routeExportAlias = aliasResult.value;
       index += aliasResult.consumedNext ? 1 : 0;
       continue;
