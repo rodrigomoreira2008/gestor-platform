@@ -54,6 +54,7 @@ const navigationSegmentMessage = 'A opcao --route-path nao pode conter os segmen
 const invalidEncodingMessage = 'A opcao --route-path contem uma codificacao percentual invalida.';
 const encodedStructureMessage = 'A opcao --route-path nao pode ocultar separadores, espacos, query string ou fragmento por codificacao percentual.';
 const encodedNavigationMessage = 'A opcao --route-path nao pode codificar segmentos de navegacao com ponto.';
+const doubleEncodingMessage = 'A opcao --route-path nao pode usar dupla codificacao percentual para ocultar caracteres estruturais.';
 const invalidAliasMessage = 'A opcao --route-export-alias deve ser um identificador TypeScript valido.';
 const reservedAliasMessage = 'A opcao --route-export-alias nao pode ser uma palavra reservada do TypeScript.';
 const excessPositionalsMessage = 'Foram informados 6 argumentos posicionais; o maximo permitido e 5.';
@@ -114,6 +115,8 @@ const checks = [
   throwsWithMessage(['--delphi-actions', '--route-path=/cadastros%2Fprodutos'], encodedStructureMessage),
   throwsWithMessage(['--delphi-actions', '--route-path=/produtos%3Fstatus=ativo'], encodedStructureMessage),
   throwsWithMessage(['--delphi-actions', '--route-path=/cadastros/%2E%2E/produtos'], encodedNavigationMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros%252Fprodutos'], doubleEncodingMessage),
+  throwsWithMessage(['--delphi-actions', '--route-path=/cadastros/%252E%252E/produtos'], doubleEncodingMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=produto-route'], invalidAliasMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=123ProdutoRoute'], invalidAliasMessage),
   throwsWithMessage(['--delphi-actions', '--route-export-alias=default'], reservedAliasMessage),
