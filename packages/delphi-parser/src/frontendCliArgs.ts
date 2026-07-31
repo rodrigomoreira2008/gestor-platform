@@ -170,7 +170,7 @@ function validateRoutePath(value: string): string {
     throw new Error('A opcao --route-path nao pode conter os segmentos "." ou "..".');
   }
 
-  return value;
+  return value === '/' ? value : value.replace(/\/+$/, '');
 }
 
 function validateExportAlias(value: string): string {
