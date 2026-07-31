@@ -155,8 +155,12 @@ function validateRoutePath(value: string): string {
 }
 
 function validateExportAlias(value: string): string {
-  if (!/^[$A-Z_a-z][$\w]*$/.test(value) || TYPESCRIPT_RESERVED_WORDS.has(value)) {
-    throw new Error('A opcao --route-export-alias deve ser um identificador TypeScript valido e nao reservado.');
+  if (!/^[$A-Z_a-z][$\w]*$/.test(value)) {
+    throw new Error('A opcao --route-export-alias deve ser um identificador TypeScript valido.');
+  }
+
+  if (TYPESCRIPT_RESERVED_WORDS.has(value)) {
+    throw new Error('A opcao --route-export-alias nao pode ser uma palavra reservada do TypeScript.');
   }
 
   return value;
